@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import { createStore } from 'redux'
 import { Provider, connect } from 'react-redux'
 import { View, Text, Button } from 'react-native-web'
 import { Svg, Ellipse, Rect } from 'react-native-svg'
 
-import logo from './logo.svg'
-import immutable, { Map } from 'immutable'
+import immutable, { List, Map } from 'immutable'
 import './App.css'
 
 console.log(new Map([[1, 2]]).toString())
@@ -20,7 +19,6 @@ const Spacer = ({}) => {
 }
 
 const ActionTypes = {
-  ADD_TODO: 'todos/ADD_TODO',
   SHAPE_ELLIPSE: '/shapes/SHAPE_ELLIPSE',
   SHAPE_RECTANGLE: '/shapes/SHAPE_RECTANGLE',
   MOVE_SHAPE: 'touch/MOVE_SHAPE',
@@ -28,28 +26,38 @@ const ActionTypes = {
 }
 
 const initialState = {
-  todos: [],
   shapes: [
-    {  }
+    { id: 0, type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100] },
+    { id: 1, type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100] },
   ],
-  position: [100, 100],
-  size: [50, 50],
 }
 
-const todoReducer = (state = initialState, action) => {
+const shapeReducer = (state = initialState, action) => {
   // console.log(action.type)
 
   switch (action.type) {
     case ActionTypes.MOVE_SHAPE: {
       return {
         ...state,
-        position: [state.position[0] + action.payload[0], state.position[1] + action.payload[1]]
+        shapes: state.shapes.map(shape => {
+          if (shape.id === action.payload.id) {
+            return { ...shape, position: [shape.position[0] + action.payload.delta[0], shape.position[1] + action.payload.delta[1]] }
+          }
+
+          return shape
+        }),
       }
     }
     case ActionTypes.SCALE_SHAPE: {
       return {
         ...state,
-        size: [state.size[0] + action.payload[0], state.size[1] + action.payload[1]]
+        shapes: state.shapes.map(shape => {
+          if (shape.id === action.payload.id) {
+            return { ...shape, size: [shape.size[0] + action.payload.delta[0], shape.size[1] + action.payload.delta[1]] }
+          }
+
+          return shape
+        }),
       }
     }
   }
@@ -57,100 +65,159 @@ const todoReducer = (state = initialState, action) => {
   return state
 }
 
-const addTodo = todo => ({ type: ActionTypes.ADD_TODO, payload: todo })
-const moveShape = position => ({ type: ActionTypes.MOVE_SHAPE, payload: position })
-const scaleShape = position => ({ type: ActionTypes.SCALE_SHAPE, payload: position })
-const transformShape = (actionType, delta) => ({ type: actionType, payload: delta })
+const transformShape = (id, actionType, delta) => ({
+  type: actionType,
+  payload: {
+    id,
+    delta
+  }
+})
 
 const mapStateToProps = state => {
   return {
-    position: state.position,
-    size: state.size,
-    todos: state.todos
+    shapes: state.shapes,
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    addTodo: todo => dispatch(addTodo(todo)),
-    moveShape: position => dispatch(moveShape(position)),
-    scaleShape: position => dispatch(scaleShape(position)),
-    transformShape: (actionType, delta) => dispatch(transformShape(actionType, delta)),
+    transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
   }
 }
 
-const store = createStore(todoReducer)
+const store = createStore(shapeReducer)
 
-const Shape = () => {
-  return (
-    'x'
-  )
+const shapeRegistration = {
+  'GridDraw.Ellipse': {
+    render: ({ position, size, ...props }) => {
+      return (
+        <Ellipse
+          cx={position[0] + size[0] / 2}
+          cy={position[1] + size[1] / 2}
+          rx={size[0] / 2}
+          ry={size[1] / 2}
+          {...props}
+        />
+      )
+    }
+  },
+  'GridDraw.Rectangle': {
+    render: ({ position, size, ...props }) => {
+      return (
+        <Rect
+          x={position[0]}
+          y={position[1]}
+          width={size[0]}
+          height={size[1]}
+          {...props}
+        />
+      )
+    }
+  }
 }
 
-const _Todos = ({ position, size, todos, moveShape, scaleShape, transformShape }) => {
-  const [touchStart, setTouchStart] = useState()
+class Shape extends React.PureComponent {
+  handleTouchStart = event => {
+    event.preventDefault()
+
+    this.touchStart = [event.nativeEvent.pageX, event.nativeEvent.pageY]
+  }
+
+  handleTouchMove = event => {
+    const { id, onDrag } = this.props
+
+    event.preventDefault()
+
+    onDrag(id, [event.nativeEvent.pageX - this.touchStart[0], event.nativeEvent.pageY - this.touchStart[1]])
+    this.touchStart = [event.nativeEvent.pageX, event.nativeEvent.pageY]
+  }
+
+  handleShouldSetResponder = event => true
+
+  render() {
+    const { id, type, position, size } = this.props
+  
+    return (
+      React.createElement(shapeRegistration[type].render, {
+        position,
+        size,
+        onStartShouldSetResponder: this.handleShouldSetResponder,
+        onStartShouldSetResponderCapture: this.handleShouldSetResponder,
+        onMoveShouldSetResponderCapture: this.handleShouldSetResponder,
+        onResponderGrant: this.handleTouchStart,
+        onResponderMove: this.handleTouchMove,
+      })
+    )
+  }
+}
+
+// const Shape = ({ id, type, position, size, onDrag }) => {
+//   console.log('Shape()')
+//   const touchStart = useRef()
+
+//   const handleTouchStart = useCallback(event => {
+//     console.log('Shape.handleTouchStart', event.nativeEvent.pageX)
+//     event.preventDefault()
+
+//     touchStart.current = ([event.nativeEvent.pageX, event.nativeEvent.pageY])
+//   }, [id])
+
+//   const handleTouchMove = useCallback(event => {
+//     event.preventDefault()
+// console.log('handleTouchMove', event.nativeEvent.pageX, touchStart.current[0])
+//     touchStart.current = ([event.nativeEvent.pageX, event.nativeEvent.pageY])
+//     onDrag(id, [event.nativeEvent.pageX - touchStart.current[0], event.nativeEvent.pageY - touchStart.current[1]])
+//   }, [id, touchStart])
+
+//   return (
+//     React.cloneElement(shapeRegistration[type].render(position, size), {
+//       onStartShouldSetResponder: event => true,
+//       onStartShouldSetResponderCapture: event => true,
+//       onMoveShouldSetResponderCapture: event => true,
+//       onResponderGrant: handleTouchStart,
+//       onResponderMove: handleTouchMove,
+//     })
+//   )
+// }
+
+const _Shapes = ({ position, size, shapes, moveShape, scaleShape, transformShape }) => {
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
 
-  const handleTouchStart = event => {
-    event.preventDefault()
-
-    setTouchStart([event.nativeEvent.pageX, event.nativeEvent.pageY])
-  }
-
-  const handleTouchMove = event => {
-    event.preventDefault()
-
-    setTouchStart([event.nativeEvent.pageX, event.nativeEvent.pageY])
-    // moveShape([event.nativeEvent.pageX - touchStart[0], event.nativeEvent.pageY - touchStart[1]])
-    transformShape(toolActionType, [event.nativeEvent.pageX - touchStart[0], event.nativeEvent.pageY - touchStart[1]])
+  const handleDrag = (id, delta) => {
+    transformShape(id, toolActionType, delta)
   }
 
   return (
     <View>
-      {todos.map((todo, index) => (
-        <View key={index}>
-          <Text>{todo}</Text>
-        </View>
-      ))}
-      <Svg
-        // onStartShouldSetResponder={event => true}
-        // onResponderGrant={event => console.log(event.nativeEvent.locationX)}
-        // onResponderMove={event => console.log(event.nativeEvent.locationX)}
-        style={{height: 200}}
-      >
-        <Ellipse
-          cx={position[0]}
-          cy={position[1]}
-          rx={size[0]}
-          ry={size[1]}
-          onStartShouldSetResponder={event => true}
-          onStartShouldSetResponderCapture={event => true}
-          onMoveShouldSetResponderCapture={event => true}
-          onResponderGrant={handleTouchStart}
-          onResponderMove={handleTouchMove}
-        />
-      </Svg>
+      <Spacer />
       <View style={{flexDirection: 'row'}}>
         <Spacer />
         <Button title="Move" onPress={() => setToolActionType(ActionTypes.MOVE_SHAPE)} />
         <Spacer />
         <Button title="Scale" onPress={() => setToolActionType(ActionTypes.SCALE_SHAPE)} />
       </View>
+      <Svg
+        // onStartShouldSetResponder={event => true}
+        // onResponderGrant={event => console.log(event.nativeEvent.locationX)}
+        // onResponderMove={event => console.log(event.nativeEvent.locationX)}
+        style={{height: 500}}
+      >
+        {shapes.map((shape, index) => (
+          <Shape key={index} id={shape.id} type={shape.type} position={shape.position} size={shape.size} onDrag={handleDrag} />
+        ))}
+      </Svg>
     </View>
   )
 }
 
-const Todos = connect(mapStateToProps, mapDispatchToProps)(_Todos)
+const Shapes = connect(mapStateToProps, mapDispatchToProps)(_Shapes)
 
 function App() {
   return (
     <Provider store={store}>
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-        </header>
-        <Todos />
-      </div>
+      <View>
+        <Shapes />
+      </View>
     </Provider>
   )
 }
