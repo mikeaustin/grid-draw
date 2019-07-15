@@ -1,11 +1,15 @@
 import React, { useState, useRef, useCallback } from 'react'
 import { createStore } from 'redux'
 import { Provider, connect } from 'react-redux'
-import { View, Text, Button } from 'react-native-web'
+import { View, Text, Button, TextInput } from 'react-native-web'
+// import { Slider } from 'react-native-elements'
 import { Svg, Ellipse, Rect } from 'react-native-svg'
 
-import immutable, { List, Map } from 'immutable'
+import immutable, { Record, List, Map } from 'immutable'
+import Immutable from 'seamless-immutable'
 import './App.css'
+
+const $ = Immutable
 
 console.log(new Map([[1, 2]]).toString())
 
@@ -19,6 +23,8 @@ const Spacer = ({}) => {
 }
 
 const ActionTypes = {
+  SELECT_SHAPE: '/tools/SELECT_SHAPE',
+  SET_OPACITY: 'shape/SET_OPACITY',
   SHAPE_ELLIPSE: '/shapes/SHAPE_ELLIPSE',
   SHAPE_RECTANGLE: '/shapes/SHAPE_RECTANGLE',
   MOVE_SHAPE: 'touch/MOVE_SHAPE',
@@ -26,26 +32,42 @@ const ActionTypes = {
 }
 
 const initialState = {
+  shapes2: $([
+    $({ id: 0, type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100] }),
+    $({ id: 1, type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100] }),
+  ]),
   shapes: [
-    { id: 0, type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100] },
-    { id: 1, type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100] },
+    { id: 0, type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100], opacity: 1.0 },
+    { id: 1, type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100], opacity: 0.75 },
   ],
+  selection: []
 }
 
 const shapeReducer = (state = initialState, action) => {
   // console.log(action.type)
 
   switch (action.type) {
+    case ActionTypes.SELECT_SHAPE: {
+      return {
+        ...state,
+        selection: [action.payload.id]
+      }
+    }
     case ActionTypes.MOVE_SHAPE: {
+      const shapeIndex = state.shapes2.findIndex(shape => shape.id === action.payload.id)
+      const payload = action.payload
+
       return {
         ...state,
         shapes: state.shapes.map(shape => {
-          if (shape.id === action.payload.id) {
-            return { ...shape, position: [shape.position[0] + action.payload.delta[0], shape.position[1] + action.payload.delta[1]] }
+          if (shape.id === payload.id) {
+            return { ...shape, position: [shape.position[0] + payload.delta[0], shape.position[1] + payload.delta[1]] }
           }
 
           return shape
         }),
+        shapes2: state.shapes2.update(shapeIndex, shape => shape.merge({ position: [shape.position[0] + payload.delta[0], shape.position[1] + payload.delta[1]] })),
+        // shapes2: state.shapes2.update(shapeIndex, shape => shape.merge({ position: [shape.position[0] + payload.delta[0], shape.position[1] + payload.delta[1]] })),
       }
     }
     case ActionTypes.SCALE_SHAPE: {
@@ -58,6 +80,18 @@ const shapeReducer = (state = initialState, action) => {
 
           return shape
         }),
+      }
+    }
+    case ActionTypes.SET_OPACITY: {
+      return {
+        ...state,
+        shapes: state.shapes.map(shape => {
+          if (shape.id === state.selection[0]) {
+            return { ...shape, opacity: action.payload.opacity }
+          }
+
+          return shape
+        }),      
       }
     }
   }
@@ -73,15 +107,32 @@ const transformShape = (id, actionType, delta) => ({
   }
 })
 
+const selectShape = id => ({
+  type: ActionTypes.SELECT_SHAPE,
+  payload: {
+    id
+  }
+})
+
+const setOpacity = (id, opacity) => ({
+  type: ActionTypes.SET_OPACITY,
+  payload: {
+    opacity
+  }
+})
+
 const mapStateToProps = state => {
   return {
     shapes: state.shapes,
+    selection: state.selection,
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
     transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
+    selectShape: id => dispatch(selectShape(id)),
+    setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity))
   }
 }
 
@@ -89,26 +140,32 @@ const store = createStore(shapeReducer)
 
 const shapeRegistration = {
   'GridDraw.Ellipse': {
-    render: ({ position, size, ...props }) => {
+    render: ({ selected, position, size, ...props }) => {
       return (
         <Ellipse
           cx={position[0] + size[0] / 2}
           cy={position[1] + size[1] / 2}
           rx={size[0] / 2}
           ry={size[1] / 2}
+          strokeWidth={3}
+          stroke={selected ? 'hsl(220, 50%, 50%)' : 'black'}
+          fill="#f0f0f0"
           {...props}
         />
       )
     }
   },
   'GridDraw.Rectangle': {
-    render: ({ position, size, ...props }) => {
+    render: ({ selected, position, size, ...props }) => {
       return (
         <Rect
           x={position[0]}
           y={position[1]}
           width={size[0]}
           height={size[1]}
+          strokeWidth={3}
+          stroke={selected ? 'hsl(220, 50%, 50%)' : 'black'}
+          fill="#f0f0f0"
           {...props}
         />
       )
@@ -118,8 +175,11 @@ const shapeRegistration = {
 
 class Shape extends React.PureComponent {
   handleTouchStart = event => {
+    const { id, onSelect } = this.props
+
     event.preventDefault()
 
+    onSelect(id)
     this.touchStart = [event.nativeEvent.pageX, event.nativeEvent.pageY]
   }
 
@@ -135,10 +195,12 @@ class Shape extends React.PureComponent {
   handleShouldSetResponder = event => true
 
   render() {
-    const { id, type, position, size } = this.props
-  
+    const { id, type, opacity, selected, position, size } = this.props
+
     return (
       React.createElement(shapeRegistration[type].render, {
+        opacity,
+        selected,
         position,
         size,
         onStartShouldSetResponder: this.handleShouldSetResponder,
@@ -180,11 +242,23 @@ class Shape extends React.PureComponent {
 //   )
 // }
 
-const _Shapes = ({ position, size, shapes, moveShape, scaleShape, transformShape }) => {
+const _Shapes = ({ selection, position, size, shapes, moveShape, scaleShape, selectShape, setOpacity, transformShape }) => {
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
+  const [opacityText, setOpacityText] = useState('1.0')
+
+  const handleSelect = id => {
+    selectShape(id)
+  }
 
   const handleDrag = (id, delta) => {
     transformShape(id, toolActionType, delta)
+  }
+
+  const handleOpacityKeyPress = event => {
+    if (event.nativeEvent.key === 'Enter') {
+      console.log('set opacity', opacityText)
+      setOpacity(selection[0], Number(opacityText))
+    }
   }
 
   return (
@@ -195,15 +269,31 @@ const _Shapes = ({ position, size, shapes, moveShape, scaleShape, transformShape
         <Button title="Move" onPress={() => setToolActionType(ActionTypes.MOVE_SHAPE)} />
         <Spacer />
         <Button title="Scale" onPress={() => setToolActionType(ActionTypes.SCALE_SHAPE)} />
+        {/* <Slider style={{width: 200, height: 40}} /> */}
+        <Text>Opacity:</Text>
+        <TextInput value={opacityText}
+          onChangeText={text => setOpacityText(text)}
+          onKeyPress={handleOpacityKeyPress}
+        />
       </View>
       <Svg
-        // onStartShouldSetResponder={event => true}
-        // onResponderGrant={event => console.log(event.nativeEvent.locationX)}
+        onStartShouldSetResponder={event => true}
+        onResponderGrant={event => selectShape()}
         // onResponderMove={event => console.log(event.nativeEvent.locationX)}
         style={{height: 500}}
       >
         {shapes.map((shape, index) => (
-          <Shape key={index} id={shape.id} type={shape.type} position={shape.position} size={shape.size} onDrag={handleDrag} />
+          <Shape
+            key={index}
+            id={shape.id}
+            type={shape.type}
+            opacity={shape.opacity}
+            selected={selection.includes(shape.id)}
+            position={shape.position}
+            size={shape.size}
+            onSelect={handleSelect}
+            onDrag={handleDrag}
+          />
         ))}
       </Svg>
     </View>
