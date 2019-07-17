@@ -7,7 +7,6 @@ import { View, Text, Button, TextInput } from 'react-native-web'
 import Slider from "react-native-slider"
 import { Svg, Ellipse, Rect } from 'react-native-svg'
 
-// import immutable, { Record, List, Map } from 'immutable'
 import Immutable from 'seamless-immutable'
 import './App.css'
 
@@ -32,20 +31,15 @@ const ActionTypes = {
 }
 
 const initialState = {
-  shapes2: $({
-    0: { type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100], opacity: 0.25 },
-    1: { type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100], opacity: 0.75 },
+  shapes: $({
+    0: { id: 0, type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100], opacity: 0.25 },
+    1: { id: 1, type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100], opacity: 0.75 },
   }),
-  shapes: [
-    { id: 0, type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100], opacity: 1.0 },
-    { id: 1, type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100], opacity: 0.75 },
-  ],
-  selection: []
+  selection: [],
 }
 
 const add = (a, b) => [a[0] + b[0], a[1] + b[1]]
 
-// const updateMerge = (object, key, updater) => $.update(object, key, value => value.merge(updater(value)))
 const merge = updater => value => value.merge(updater(value))
 
 console.log($({}))
@@ -57,7 +51,7 @@ const shapeReducer = (state = initialState, action) => {
     case ActionTypes.SELECT_SHAPE: {
       return {
         ...state,
-        selection: [action.payload.id]
+        selection: [action.payload.id],
       }
     }
     case ActionTypes.MOVE_SHAPE: {
@@ -66,26 +60,15 @@ const shapeReducer = (state = initialState, action) => {
 
       return {
         ...state,
-        shapes: state.shapes.map(shape => (
-          shape.id === payload.id
-            ? { ...shape, position: add(shape.position, delta) }
-            : shape
-        )),
-        // shapes2: shapes2.update(id, shape => shape.merge({ position: add(shape.position, payload.delta) })),
-        // shapes2: updateMerge(shapes2, id, ({ position }) => ({ position: add(position, delta) })),
-        shapes2: state.shapes2.update(id, merge(({ position }) => ({ position: add(position, delta) })))
+        shapes: state.shapes.update(id, merge(({ position }) => ({ position: add(position, delta) })))
       }
     }
     case ActionTypes.SCALE_SHAPE: {
+      const { id, delta } = action.payload
+
       return {
         ...state,
-        shapes: state.shapes.map(shape => {
-          if (shape.id === action.payload.id) {
-            return { ...shape, size: [shape.size[0] + action.payload.delta[0], shape.size[1] + action.payload.delta[1]] }
-          }
-
-          return shape
-        }),
+        shapes: state.shapes.update(id, merge(({ size }) => ({ size: add(size, delta) })))
       }
     }
     case ActionTypes.SET_OPACITY: {
@@ -93,14 +76,7 @@ const shapeReducer = (state = initialState, action) => {
 
       return {
         ...state,
-        shapes: state.shapes.map(shape => {
-          if (shape.id === state.selection[0]) {
-            return { ...shape, opacity: action.payload.opacity }
-          }
-
-          return shape
-        }),
-        shapes2: state.shapes2.update(id, merge(() => ({ opacity: opacity })))
+        shapes: state.shapes.update(id, merge(() => ({ opacity: opacity })))
       }
     }
   }
@@ -134,8 +110,7 @@ const setOpacity = (id, opacity) => ({
 const mapStateToProps = state => {
   return {
     shapes: state.shapes,
-    shapes2: state.shapes2,
-    selection: state.selection,
+    selection: state.selection.map(id => state.shapes[id]),
   }
 }
 
@@ -253,7 +228,7 @@ class Shape extends React.PureComponent {
 //   )
 // }
 
-const _Shapes = ({ selection, position, size, shapes, shapes2, moveShape, scaleShape, selectShape, setOpacity, transformShape }) => {
+const _Shapes = ({ selection, position, size, shapes, moveShape, scaleShape, selectShape, setOpacity, transformShape }) => {
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
   const [sliderOpacity, setSliderOpacity] = useState(1.0)
 
@@ -272,15 +247,9 @@ const _Shapes = ({ selection, position, size, shapes, shapes2, moveShape, scaleS
   //   }
   // }
 
-  // useEffect(() => {
-  //   if (shapes[selection[0]]) {
-  //     setSliderOpacity(shapes[selection[0]].opacity)
-  //   }
-  // }, [selection])
-
   const handleOpacityValueChange = opacity => {
     // setSliderOpacity(opacity)
-    setOpacity(selection[0], opacity)
+    setOpacity(selection[0].id, opacity)
   }
 
   return (
@@ -310,7 +279,7 @@ const _Shapes = ({ selection, position, size, shapes, shapes2, moveShape, scaleS
               '0 0 1px rgba(0, 0, 0, 0.3)',    // Sharp shadow
             ].join(', ')
           }}
-          value={selection[0] && shapes2[selection[0]].opacity}
+          value={selection[0] && selection[0].opacity}
           onValueChange={handleOpacityValueChange}
         />
         {/* <TextInput value={opacityText}
@@ -324,13 +293,13 @@ const _Shapes = ({ selection, position, size, shapes, shapes2, moveShape, scaleS
         // onResponderMove={event => console.log(event.nativeEvent.locationX)}
         style={{height: 500}}
       >
-        {Object.entries(shapes2).map(([id, shape]) => (
+        {Object.entries(shapes).map(([id, shape]) => (
           <Shape
             key={id}
             id={id}
             type={shape.type}
             opacity={shape.opacity}
-            selected={selection.includes(id)}
+            selected={selection.some(shape => shape.id === id)}
             position={shape.position}
             size={shape.size}
             onSelect={handleSelect}
