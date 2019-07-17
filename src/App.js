@@ -31,11 +31,11 @@ const ActionTypes = {
 }
 
 const initialState = {
-  shapes: $({
+  allShapes: $({
     0: { id: 0, type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100], opacity: 0.25 },
     1: { id: 1, type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100], opacity: 0.75 },
   }),
-  selection: [],
+  selectedShapeIds: [],
 }
 
 const add = (a, b) => [a[0] + b[0], a[1] + b[1]]
@@ -51,16 +51,15 @@ const shapeReducer = (state = initialState, action) => {
     case ActionTypes.SELECT_SHAPE: {
       return {
         ...state,
-        selection: [action.payload.id],
+        selectedShapeIds: [action.payload.id],
       }
     }
     case ActionTypes.MOVE_SHAPE: {
-      const payload = action.payload
       const { id, delta } = action.payload
 
       return {
         ...state,
-        shapes: state.shapes.update(id, merge(({ position }) => ({ position: add(position, delta) })))
+        allShapes: state.allShapes.update(id, merge(({ position }) => ({ position: add(position, delta) })))
       }
     }
     case ActionTypes.SCALE_SHAPE: {
@@ -68,7 +67,7 @@ const shapeReducer = (state = initialState, action) => {
 
       return {
         ...state,
-        shapes: state.shapes.update(id, merge(({ size }) => ({ size: add(size, delta) })))
+        allShapes: state.allShapes.update(id, merge(({ size }) => ({ size: add(size, delta) })))
       }
     }
     case ActionTypes.SET_OPACITY: {
@@ -76,7 +75,7 @@ const shapeReducer = (state = initialState, action) => {
 
       return {
         ...state,
-        shapes: state.shapes.update(id, merge(() => ({ opacity: opacity })))
+        allShapes: state.allShapes.update(id, merge(() => ({ opacity: opacity })))
       }
     }
   }
@@ -109,8 +108,8 @@ const setOpacity = (id, opacity) => ({
 
 const mapStateToProps = state => {
   return {
-    shapes: state.shapes,
-    selection: state.selection.map(id => state.shapes[id]),
+    allShapes: state.allShapes,
+    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
   }
 }
 
@@ -228,9 +227,8 @@ class Shape extends React.PureComponent {
 //   )
 // }
 
-const _Shapes = ({ selection, position, size, shapes, moveShape, scaleShape, selectShape, setOpacity, transformShape }) => {
+const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transformShape }) => {
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
-  const [sliderOpacity, setSliderOpacity] = useState(1.0)
 
   const handleSelect = id => {
     selectShape(id)
@@ -249,7 +247,7 @@ const _Shapes = ({ selection, position, size, shapes, moveShape, scaleShape, sel
 
   const handleOpacityValueChange = opacity => {
     // setSliderOpacity(opacity)
-    setOpacity(selection[0].id, opacity)
+    setOpacity(selectedShapes[0].id, opacity)
   }
 
   return (
@@ -279,7 +277,7 @@ const _Shapes = ({ selection, position, size, shapes, moveShape, scaleShape, sel
               '0 0 1px rgba(0, 0, 0, 0.3)',    // Sharp shadow
             ].join(', ')
           }}
-          value={selection[0] && selection[0].opacity}
+          value={selectedShapes[0] && selectedShapes[0].opacity}
           onValueChange={handleOpacityValueChange}
         />
         {/* <TextInput value={opacityText}
@@ -293,13 +291,13 @@ const _Shapes = ({ selection, position, size, shapes, moveShape, scaleShape, sel
         // onResponderMove={event => console.log(event.nativeEvent.locationX)}
         style={{height: 500}}
       >
-        {Object.entries(shapes).map(([id, shape]) => (
+        {Object.entries(allShapes).map(([id, shape]) => (
           <Shape
             key={id}
             id={id}
             type={shape.type}
             opacity={shape.opacity}
-            selected={selection.some(shape => shape.id === id)}
+            selected={selectedShapes.some(shape => shape.id === id)}
             position={shape.position}
             size={shape.size}
             onSelect={handleSelect}
