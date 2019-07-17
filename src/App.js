@@ -12,6 +12,8 @@ import './App.css'
 
 const $ = Immutable
 
+const highlightColor = 'rgb(33, 150, 243)'
+
 const Spacer = ({}) => {
   const style = {
     minWidth: 10,
@@ -51,7 +53,7 @@ const shapeReducer = (state = initialState, action) => {
     case ActionTypes.SELECT_SHAPE: {
       return {
         ...state,
-        selectedShapeIds: [action.payload.id],
+        selectedShapeIds: action.payload.id !== undefined ? [action.payload.id] : [],
       }
     }
     case ActionTypes.MOVE_SHAPE: {
@@ -109,7 +111,7 @@ const setOpacity = (id, opacity) => ({
 const mapStateToProps = state => {
   return {
     allShapes: state.allShapes,
-    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
+    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id].merge({selected: false})),
   }
 }
 
@@ -250,10 +252,22 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
     setOpacity(selectedShapes[0].id, opacity)
   }
 
+  const toolbarStyle = {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'hsl(0, 0%, 95%)',
+    paddingVertical: 5,
+    // borderBottomWidth: 1,
+    // borderBottomColor: 'hsl(0, 0%, 85%)',
+    boxShadow: [
+      '0 1px 0 hsla(0, 0%, 0%, 0.1)',
+      '0 0 10px hsla(0, 0%, 0%, 0.1)',
+    ].join(', '),
+  }
+
   return (
-    <View>
-      <Spacer />
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+    <View style={{flex: 1}}>
+      <View style={toolbarStyle}>
         <Spacer />
         <Button title="Move" onPress={() => setToolActionType(ActionTypes.MOVE_SHAPE)} />
         <Spacer />
@@ -275,7 +289,7 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
               // '0 0 3px rgba(0, 0, 0, 0.1)', // Soft shadow
               '0 2px 1px rgba(0, 0, 0, 0.1)',  // Drop shadow
               '0 0 1px rgba(0, 0, 0, 0.3)',    // Sharp shadow
-            ].join(', ')
+            ].join(', '),
           }}
           value={selectedShapes[0] && selectedShapes[0].opacity}
           onValueChange={handleOpacityValueChange}
@@ -285,26 +299,41 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
           onKeyPress={handleOpacityKeyPress}
         /> */}
       </View>
-      <Svg
-        onStartShouldSetResponder={event => true}
-        onResponderGrant={event => selectShape()}
-        // onResponderMove={event => console.log(event.nativeEvent.locationX)}
-        style={{height: 500}}
-      >
-        {Object.entries(allShapes).map(([id, shape]) => (
-          <Shape
-            key={id}
-            id={id}
-            type={shape.type}
-            opacity={shape.opacity}
-            selected={selectedShapes.some(shape => shape.id === id)}
-            position={shape.position}
-            size={shape.size}
-            onSelect={handleSelect}
-            onDrag={handleDrag}
-          />
-        ))}
-      </Svg>
+      <View style={{flexDirection: 'row', flex: 1}}>
+        <View style={{width: 200, backgroundColor: 'hsl(0, 0%, 95%)', boxShadow: [
+            '1px 1px 0 hsla(0, 0%, 0%, 0.1)',
+            '0 0 10px hsla(0, 0%, 0%, 0.1)',
+          ].join(', '),
+          marginTop: 1,
+          paddingVertical: 5,
+        }}>
+          {Object.entries(allShapes).map(([id, shape]) => (
+            <View key={id} style={[{paddingVertical: 5, paddingHorizontal: 10, marginRight: -1}, selectedShapes.some(shape => shape.id == id) && {backgroundColor: highlightColor}]}>
+              <Text style={[{fontWeight: '500', color: 'hsl(0, 0%, 25%)'}, selectedShapes.some(shape => shape.id == id) && {color: 'white'}]}>{shape.type}</Text>
+            </View>
+          ))}
+        </View>
+        <Svg
+          onStartShouldSetResponder={event => true}
+          onResponderGrant={event => selectShape()}
+          // onResponderMove={event => console.log(event.nativeEvent.locationX)}
+          style={{flex: 1}}
+        >
+          {Object.entries(allShapes).map(([id, shape]) => (
+            <Shape
+              key={id}
+              id={id}
+              type={shape.type}
+              opacity={shape.opacity}
+              selected={selectedShapes.some(shape => shape.id == id)}
+              position={shape.position}
+              size={shape.size}
+              onSelect={handleSelect}
+              onDrag={handleDrag}
+            />
+          ))}
+        </Svg>
+      </View>
     </View>
   )
 }
@@ -314,7 +343,7 @@ const Shapes = connect(mapStateToProps, mapDispatchToProps)(_Shapes)
 function App() {
   return (
     <Provider store={store}>
-      <View>
+      <View style={{flex: 1}}>
         <Shapes />
       </View>
     </Provider>
