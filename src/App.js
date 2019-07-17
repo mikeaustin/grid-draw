@@ -1,8 +1,10 @@
-import React, { useState, useRef, useCallback } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { createStore } from 'redux'
 import { Provider, connect } from 'react-redux'
 import { View, Text, Button, TextInput } from 'react-native-web'
 // import { Slider } from 'react-native-elements'
+// import * as Slider from '@react-native-community/slider'
+import Slider from "react-native-slider"
 import { Svg, Ellipse, Rect } from 'react-native-svg'
 
 import immutable, { Record, List, Map } from 'immutable'
@@ -23,25 +25,32 @@ const Spacer = ({}) => {
 }
 
 const ActionTypes = {
-  SELECT_SHAPE: '/tools/SELECT_SHAPE',
+  SELECT_SHAPE: 'tool/SELECT_SHAPE',
+  SHAPE_ELLIPSE: '/tool/SHAPE_ELLIPSE',
+  SHAPE_RECTANGLE: 'tool/SHAPE_RECTANGLE',
+  MOVE_SHAPE: 'shape/MOVE_SHAPE',
+  SCALE_SHAPE: 'shape/SCALE_SHAPE',
   SET_OPACITY: 'shape/SET_OPACITY',
-  SHAPE_ELLIPSE: '/shapes/SHAPE_ELLIPSE',
-  SHAPE_RECTANGLE: '/shapes/SHAPE_RECTANGLE',
-  MOVE_SHAPE: 'touch/MOVE_SHAPE',
-  SCALE_SHAPE: 'touch/SCALE_SHAPE',
 }
 
 const initialState = {
-  shapes2: $([
-    $({ id: 0, type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100] }),
-    $({ id: 1, type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100] }),
-  ]),
+  shapes2: $({
+    0: { type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100] },
+    1: { type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100] },
+  }),
   shapes: [
     { id: 0, type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100], opacity: 1.0 },
     { id: 1, type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100], opacity: 0.75 },
   ],
   selection: []
 }
+
+const add = (a, b) => [a[0] + b[0], a[1] + b[1]]
+
+// const updateMerge = (object, key, updater) => $.update(object, key, value => value.merge(updater(value)))
+const merge = updater => value => value.merge(updater(value))
+
+console.log($({}))
 
 const shapeReducer = (state = initialState, action) => {
   // console.log(action.type)
@@ -54,20 +63,19 @@ const shapeReducer = (state = initialState, action) => {
       }
     }
     case ActionTypes.MOVE_SHAPE: {
-      const shapeIndex = state.shapes2.findIndex(shape => shape.id === action.payload.id)
       const payload = action.payload
+      const { id, delta } = action.payload
 
       return {
         ...state,
-        shapes: state.shapes.map(shape => {
-          if (shape.id === payload.id) {
-            return { ...shape, position: [shape.position[0] + payload.delta[0], shape.position[1] + payload.delta[1]] }
-          }
-
-          return shape
-        }),
-        shapes2: state.shapes2.update(shapeIndex, shape => shape.merge({ position: [shape.position[0] + payload.delta[0], shape.position[1] + payload.delta[1]] })),
-        // shapes2: state.shapes2.update(shapeIndex, shape => shape.merge({ position: [shape.position[0] + payload.delta[0], shape.position[1] + payload.delta[1]] })),
+        shapes: state.shapes.map(shape => (
+          shape.id === payload.id
+            ? { ...shape, position: add(shape.position, delta) }
+            : shape
+        )),
+        // shapes2: shapes2.update(id, shape => shape.merge({ position: add(shape.position, payload.delta) })),
+        // shapes2: updateMerge(shapes2, id, ({ position }) => ({ position: add(position, delta) })),
+        shapes2: state.shapes2.update(id, merge(({ position }) => ({ position: add(position, delta) })))
       }
     }
     case ActionTypes.SCALE_SHAPE: {
@@ -148,7 +156,7 @@ const shapeRegistration = {
           rx={size[0] / 2}
           ry={size[1] / 2}
           strokeWidth={3}
-          stroke={selected ? 'hsl(220, 50%, 50%)' : 'black'}
+          stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
           fill="#f0f0f0"
           {...props}
         />
@@ -164,7 +172,7 @@ const shapeRegistration = {
           width={size[0]}
           height={size[1]}
           strokeWidth={3}
-          stroke={selected ? 'hsl(220, 50%, 50%)' : 'black'}
+          stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
           fill="#f0f0f0"
           {...props}
         />
@@ -244,7 +252,7 @@ class Shape extends React.PureComponent {
 
 const _Shapes = ({ selection, position, size, shapes, moveShape, scaleShape, selectShape, setOpacity, transformShape }) => {
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
-  const [opacityText, setOpacityText] = useState('1.0')
+  const [sliderOpacity, setSliderOpacity] = useState(1.0)
 
   const handleSelect = id => {
     selectShape(id)
@@ -254,27 +262,61 @@ const _Shapes = ({ selection, position, size, shapes, moveShape, scaleShape, sel
     transformShape(id, toolActionType, delta)
   }
 
-  const handleOpacityKeyPress = event => {
-    if (event.nativeEvent.key === 'Enter') {
-      console.log('set opacity', opacityText)
-      setOpacity(selection[0], Number(opacityText))
-    }
-  }
+  // const handleOpacityKeyPress = event => {
+  //   if (event.nativeEvent.key === 'Enter') {
+  //     console.log('set opacity', opacityText)
+  //     setOpacity(selection[0], Number(opacityText))
+  //   }
+  // }
 
+  console.log(shapes[selection[0]])
+
+  // useEffect(() => {
+  //   if (shapes[selection[0]]) {
+  //     setSliderOpacity(shapes[selection[0]].opacity)
+  //   }
+  // }, [selection])
+
+  const handleOpacityValueChange = opacity => {
+    // console.log()
+    // setSliderOpacity(opacity)
+    setOpacity(selection[0], opacity)
+  }
+console.log('>>>', selection[0])
   return (
     <View>
       <Spacer />
-      <View style={{flexDirection: 'row'}}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Spacer />
         <Button title="Move" onPress={() => setToolActionType(ActionTypes.MOVE_SHAPE)} />
         <Spacer />
         <Button title="Scale" onPress={() => setToolActionType(ActionTypes.SCALE_SHAPE)} />
-        {/* <Slider style={{width: 200, height: 40}} /> */}
-        <Text>Opacity:</Text>
-        <TextInput value={opacityText}
+        <Spacer />
+        <Slider
+          minimumTrackTintColor="rgb(33, 150, 243)"
+          thumbTintColor="white"
+          style={{width: 200}}
+          thumbStyle={{
+            // borderTopColor: 'rgb(236, 236, 236)',
+            // borderLeftColor: 'transparent',
+            // borderBottomColor: 'rgb(192, 192, 192)',
+            // borderWidth: 0.5,
+            width: 25,
+            height: 25,
+            borderRadius: 1000,
+            boxShadow: [
+              // '0 0 3px rgba(0, 0, 0, 0.1)', // Soft shadow
+              '0 2px 1px rgba(0, 0, 0, 0.1)',  // Drop shadow
+              '0 0 1px rgba(0, 0, 0, 0.3)',    // Sharp shadow
+            ].join(', ')
+          }}
+          value={selection[0] && shapes[selection[0]].opacity}
+          onValueChange={handleOpacityValueChange}
+        />
+        {/* <TextInput value={opacityText}
           onChangeText={text => setOpacityText(text)}
           onKeyPress={handleOpacityKeyPress}
-        />
+        /> */}
       </View>
       <Svg
         onStartShouldSetResponder={event => true}
