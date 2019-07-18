@@ -1,27 +1,51 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { createStore } from 'redux'
 import { Provider, connect } from 'react-redux'
-import { View, Text, Button, TextInput } from 'react-native-web'
+import { View as NativeView, Text, Button, TextInput } from 'react-native-web'
 // import { Slider } from 'react-native-elements'
 // import * as Slider from '@react-native-community/slider'
 import Slider from "react-native-slider"
 import { Svg, Ellipse, Rect } from 'react-native-svg'
+import JsxParser from 'react-jsx-parser'
 
 import Immutable from 'seamless-immutable'
 import './App.css'
 
 const $ = Immutable
 
+const withLayoutProps = Component => ({
+  horizontal, fill, justify, align, width, height, style, ...props
+}) => {
+  const rootStyles = [
+    horizontal && {flexDirection: 'row'},
+    fill && {flexGrow: typeof fill === 'boolean' ? 1 : fill},
+    justify && {justifyContent: justify},
+    align && {alignItems: align},
+    width && {width: width},
+    height && {height: height},
+  ]
+
+  return (
+    <Component style={[rootStyles, style]} {...props} />
+  )
+}
+
+const View = withLayoutProps(NativeView)
+
 const highlightColor = 'rgb(33, 150, 243)'
+const backgroundColor = 'hsl(0, 0%, 95%)'
 
 const Spacer = ({}) => {
   const style = {
     minWidth: 10,
     minHeight: 10,
+    alignSelf: 'stretch',
   }
 
   return <View style={style} />
 }
+
+const Point = (x, y) => $({ x, y })
 
 const ActionTypes = {
   SELECT_SHAPE: 'tool/SELECT_SHAPE',
@@ -34,17 +58,14 @@ const ActionTypes = {
 
 const initialState = {
   allShapes: $({
-    0: { id: 0, type: 'GridDraw.Ellipse', position: [100, 100], size: [100, 100], opacity: 0.25 },
-    1: { id: 1, type: 'GridDraw.Rectangle', position: [300, 100], size: [100, 100], opacity: 0.75 },
+    0: { id: 0, type: 'GridDraw.Ellipse', position: Point(100, 100), size: Point(100, 100), opacity: 0.25 },
+    1: { id: 1, type: 'GridDraw.Rectangle', position: Point(300, 100), size: Point(100, 100), opacity: 0.75 },
   }),
   selectedShapeIds: [],
 }
 
-const add = (a, b) => [a[0] + b[0], a[1] + b[1]]
-
+const add = (a, b) => Point(a.x + b.x, a.y + b.y)
 const merge = updater => value => value.merge(updater(value))
-
-console.log($({}))
 
 const shapeReducer = (state = initialState, action) => {
   // console.log(action.type)
@@ -57,19 +78,21 @@ const shapeReducer = (state = initialState, action) => {
       }
     }
     case ActionTypes.MOVE_SHAPE: {
+      const { allShapes } = state
       const { id, delta } = action.payload
 
       return {
         ...state,
-        allShapes: state.allShapes.update(id, merge(({ position }) => ({ position: add(position, delta) })))
+        allShapes: allShapes.update(id, merge(({ position }) => ({ position: add(position, delta) })))
       }
     }
     case ActionTypes.SCALE_SHAPE: {
+      const { allShapes } = state
       const { id, delta } = action.payload
 
       return {
         ...state,
-        allShapes: state.allShapes.update(id, merge(({ size }) => ({ size: add(size, delta) })))
+        allShapes: allShapes.update(id, merge(({ size }) => ({ size: add(size, delta) })))
       }
     }
     case ActionTypes.SET_OPACITY: {
@@ -130,10 +153,10 @@ const shapeRegistration = {
     render: ({ selected, position, size, ...props }) => {
       return (
         <Ellipse
-          cx={position[0] + size[0] / 2}
-          cy={position[1] + size[1] / 2}
-          rx={size[0] / 2}
-          ry={size[1] / 2}
+          cx={position.x + size.x / 2}
+          cy={position.y + size.y / 2}
+          rx={size.x / 2}
+          ry={size.y / 2}
           strokeWidth={3}
           stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
           fill="#f0f0f0"
@@ -146,10 +169,10 @@ const shapeRegistration = {
     render: ({ selected, position, size, ...props }) => {
       return (
         <Rect
-          x={position[0]}
-          y={position[1]}
-          width={size[0]}
-          height={size[1]}
+          x={position.x}
+          y={position.y}
+          width={size.x}
+          height={size.y}
           strokeWidth={3}
           stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
           fill="#f0f0f0"
@@ -175,7 +198,7 @@ class Shape extends React.PureComponent {
 
     event.preventDefault()
 
-    onDrag(id, [event.nativeEvent.pageX - this.touchStart[0], event.nativeEvent.pageY - this.touchStart[1]])
+    onDrag(id, Point(event.nativeEvent.pageX - this.touchStart[0], event.nativeEvent.pageY - this.touchStart[1]))
     this.touchStart = [event.nativeEvent.pageX, event.nativeEvent.pageY]
   }
 
@@ -253,9 +276,8 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
   }
 
   const toolbarStyle = {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'hsl(0, 0%, 95%)',
+    // alignItems: 'center',
+    backgroundColor: backgroundColor,
     paddingVertical: 5,
     // borderBottomWidth: 1,
     // borderBottomColor: 'hsl(0, 0%, 85%)',
@@ -266,8 +288,8 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
   }
 
   return (
-    <View style={{flex: 1}}>
-      <View style={toolbarStyle}>
+    <View fill>
+      <View horizontal align="center" style={toolbarStyle}>
         <Spacer />
         <Button title="Move" onPress={() => setToolActionType(ActionTypes.MOVE_SHAPE)} />
         <Spacer />
@@ -299,8 +321,8 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
           onKeyPress={handleOpacityKeyPress}
         /> */}
       </View>
-      <View style={{flexDirection: 'row', flex: 1}}>
-        <View style={{width: 200, backgroundColor: 'hsl(0, 0%, 95%)', boxShadow: [
+      <View horizontal fill>
+        <View width={200} style={{backgroundColor: backgroundColor, boxShadow: [
             '1px 1px 0 hsla(0, 0%, 0%, 0.1)',
             '0 0 10px hsla(0, 0%, 0%, 0.1)',
           ].join(', '),
@@ -343,7 +365,7 @@ const Shapes = connect(mapStateToProps, mapDispatchToProps)(_Shapes)
 function App() {
   return (
     <Provider store={store}>
-      <View style={{flex: 1}}>
+      <View fill>
         <Shapes />
       </View>
     </Provider>
