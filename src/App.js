@@ -7,43 +7,16 @@ import { View as NativeView, Text, Button, TextInput, TouchableOpacity, Touchabl
 import Slider from "react-native-slider"
 import { Svg, Ellipse, Rect } from 'react-native-svg'
 import JsxParser from 'react-jsx-parser'
+import * as $ from 'seamless-immutable'
 
-import Immutable from 'seamless-immutable'
 import './App.css'
-
-const $ = Immutable
-
-const withLayoutProps = Component => ({
-  horizontal, fill, justify, align, width, height, style, ...props
-}) => {
-  const rootStyles = [
-    horizontal && {flexDirection: 'row'},
-    fill && {flexGrow: typeof fill === 'boolean' ? 1 : fill},
-    justify && {justifyContent: justify},
-    align && {alignItems: align},
-    width && {width: width},
-    height && {height: height},
-  ]
-
-  return (
-    <Component style={[rootStyles, style]} {...props} />
-  )
-}
+import { withLayoutProps } from './core/utils/layout'
+import { Spacer } from './core/components'
 
 const View = withLayoutProps(NativeView)
 
 const highlightColor = 'rgb(33, 150, 243)'
 const backgroundColor = 'hsl(0, 0%, 97%)'
-
-const Spacer = ({}) => {
-  const style = {
-    minWidth: 10,
-    minHeight: 10,
-    alignSelf: 'stretch',
-  }
-
-  return <View style={style} />
-}
 
 const Point = (x, y) => $({ x, y })
 
@@ -66,6 +39,29 @@ const initialState = {
 
 const add = (a, b) => Point(a.x + b.x, a.y + b.y)
 const merge = updater => value => value.merge(updater(value))
+
+const transformShape = (id, actionType, delta) => ({
+  type: actionType,
+  payload: {
+    id,
+    delta
+  }
+})
+
+const selectShape = id => ({
+  type: ActionTypes.SELECT_SHAPE,
+  payload: {
+    id
+  }
+})
+
+const setOpacity = (id, opacity) => ({
+  type: ActionTypes.SET_OPACITY,
+  payload: {
+    id,
+    opacity
+  }
+})
 
 const shapeReducer = (state = initialState, action) => {
   // console.log(action.type)
@@ -107,29 +103,6 @@ const shapeReducer = (state = initialState, action) => {
 
   return state
 }
-
-const transformShape = (id, actionType, delta) => ({
-  type: actionType,
-  payload: {
-    id,
-    delta
-  }
-})
-
-const selectShape = id => ({
-  type: ActionTypes.SELECT_SHAPE,
-  payload: {
-    id
-  }
-})
-
-const setOpacity = (id, opacity) => ({
-  type: ActionTypes.SET_OPACITY,
-  payload: {
-    id,
-    opacity
-  }
-})
 
 const mapStateToProps = state => {
   return {
@@ -252,6 +225,14 @@ class Shape extends React.PureComponent {
 //   )
 // }
 
+const PanelHeader = ({ heading }) => {
+  return (
+  <View style={{paddingVertical: 5, paddingHorizontal: 10, backgroundColor: 'hsl(0, 0%, 85%)'}}>
+    <Text style={{fontWeight: 700, color: 'hsl(0, 0%, 25%)'}}>{heading}</Text>
+  </View>
+  )
+}
+
 const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transformShape }) => {
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
 
@@ -278,10 +259,10 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
   const toolbarStyle = {
     // alignItems: 'center',
     backgroundColor: backgroundColor,
-    // backgroundColor: 'hsl(0, 0%, 90%)',
+    // background: 'linear-gradient(hsl(0, 0%, 85%), hsl(0, 0%, 95%))',
     paddingVertical: 5,
     borderBottomWidth: 1,
-    borderBottomColor: 'hsla(0, 0%, 0%, 0.1)',
+    borderBottomColor: 'hsl(0, 0%, 85%)',
     boxShadow: [
       // '0 1px 0 hsla(0, 0%, 0%, 0.1)',
       // '0 0 10px hsla(0, 0%, 0%, 0.1)',
@@ -302,23 +283,29 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
         /> */}
       </View>
 
-      <View horizontal fill>
-        <View width={256} style={{backgroundColor: backgroundColor,
-          paddingVertical: 5,
+      <View horizontal fill style={{perspective: 10000}}>
+        <View width={256} style={{
+          backgroundColor: backgroundColor,
+          // background: 'linear-gradient(90deg, hsl(0, 0%, 85%), hsl(0, 0%, 95%))',
+          xpaddingVertical: 10,
           borderRightWidth: 1,
           borderRightColor: 'hsla(0, 0%, 0%, 0.1)',
+          xtransform: 'rotateY(10deg)',
         }}>
-          {Object.entries(allShapes).map(([id, shape]) => {
-            const selected = selectedShapes.some(shape => shape.id == id)
+          <PanelHeader heading="Objects" />
+          <View style={{paddingVertical: 5}}>
+            {Object.entries(allShapes).map(([id, shape]) => {
+              const selected = selectedShapes.some(shape => shape.id == id)
 
-            return (
-              <TouchableWithoutFeedback onPressIn={() => handleSelect(id)}>
-                <View key={id} style={[{paddingVertical: 5, paddingHorizontal: 10}, selected && {backgroundColor: highlightColor}]}>
-                  <Text style={[{fontWeight: '500', color: 'hsl(0, 0%, 25%)'}, selected && {color: 'white'}]}>{shape.type}</Text>
-                </View>
-              </TouchableWithoutFeedback>
-            )
-          })}
+              return (
+                <TouchableWithoutFeedback onPressIn={() => handleSelect(id)}>
+                  <View key={id} style={[{paddingVertical: 5, paddingHorizontal: 10}, selected && {backgroundColor: highlightColor}]}>
+                    <Text style={[{marginTop: -1, fontWeight: '500', color: 'hsl(0, 0%, 25%)'}, selected && {color: 'white'}]}>{shape.type}</Text>
+                  </View>
+                </TouchableWithoutFeedback>
+              )
+            })}
+          </View>
         </View>
 
         <Svg
@@ -343,11 +330,10 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
         </Svg>
 
         <View width={256} style={{backgroundColor: backgroundColor,
-          // paddingLeft: 10,
-          // paddingTop: 5,
           borderLeftWidth: 1,
           borderLeftColor: 'hsla(0, 0%, 0%, 0.1)',
         }}>
+          <PanelHeader heading="Properties" />
           <View horizontal style={{ paddingVertical: 5, paddingHorizontal: 10}}>
             <Slider
               minimumTrackTintColor="rgb(33, 150, 243)"
@@ -378,7 +364,7 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
           <SectionList
             renderSectionHeader={({section: {title}}) => (
               <View style={{paddingVertical: 5, paddingHorizontal: 10, marginTop: 10}}>
-                <Text style={{fontWeight: 'bold'}}>{title}</Text>
+                <Text style={{fontWeight: 700}}>{title}</Text>
               </View>
             )}
             renderItem={({item, index, section}) => (
