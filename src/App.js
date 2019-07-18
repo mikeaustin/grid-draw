@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { createStore } from 'redux'
 import { Provider, connect } from 'react-redux'
-import { View as NativeView, Text, Button, TextInput } from 'react-native-web'
+import { View as NativeView, Text, Button, TextInput, TouchableOpacity, TouchableWithoutFeedback, SectionList } from 'react-native'
 // import { Slider } from 'react-native-elements'
 // import * as Slider from '@react-native-community/slider'
 import Slider from "react-native-slider"
@@ -33,7 +33,7 @@ const withLayoutProps = Component => ({
 const View = withLayoutProps(NativeView)
 
 const highlightColor = 'rgb(33, 150, 243)'
-const backgroundColor = 'hsl(0, 0%, 95%)'
+const backgroundColor = 'hsl(0, 0%, 97%)'
 
 const Spacer = ({}) => {
   const style = {
@@ -278,12 +278,13 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
   const toolbarStyle = {
     // alignItems: 'center',
     backgroundColor: backgroundColor,
+    // backgroundColor: 'hsl(0, 0%, 90%)',
     paddingVertical: 5,
-    // borderBottomWidth: 1,
-    // borderBottomColor: 'hsl(0, 0%, 85%)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'hsla(0, 0%, 0%, 0.1)',
     boxShadow: [
-      '0 1px 0 hsla(0, 0%, 0%, 0.1)',
-      '0 0 10px hsla(0, 0%, 0%, 0.1)',
+      // '0 1px 0 hsla(0, 0%, 0%, 0.1)',
+      // '0 0 10px hsla(0, 0%, 0%, 0.1)',
     ].join(', '),
   }
 
@@ -295,51 +296,36 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
         <Spacer />
         <Button title="Scale" onPress={() => setToolActionType(ActionTypes.SCALE_SHAPE)} />
         <Spacer />
-        <Slider
-          minimumTrackTintColor="rgb(33, 150, 243)"
-          thumbTintColor="white"
-          style={{width: 200}}
-          thumbStyle={{
-            // borderTopColor: 'rgb(236, 236, 236)',
-            // borderLeftColor: 'transparent',
-            // borderBottomColor: 'rgb(192, 192, 192)',
-            // borderWidth: 0.5,
-            width: 25,
-            height: 25,
-            borderRadius: 1000,
-            boxShadow: [
-              // '0 0 3px rgba(0, 0, 0, 0.1)', // Soft shadow
-              '0 2px 1px rgba(0, 0, 0, 0.1)',  // Drop shadow
-              '0 0 1px rgba(0, 0, 0, 0.3)',    // Sharp shadow
-            ].join(', '),
-          }}
-          value={selectedShapes[0] && selectedShapes[0].opacity}
-          onValueChange={handleOpacityValueChange}
-        />
         {/* <TextInput value={opacityText}
           onChangeText={text => setOpacityText(text)}
           onKeyPress={handleOpacityKeyPress}
         /> */}
       </View>
+
       <View horizontal fill>
-        <View width={200} style={{backgroundColor: backgroundColor, boxShadow: [
-            '1px 1px 0 hsla(0, 0%, 0%, 0.1)',
-            '0 0 10px hsla(0, 0%, 0%, 0.1)',
-          ].join(', '),
-          marginTop: 1,
+        <View width={256} style={{backgroundColor: backgroundColor,
           paddingVertical: 5,
+          borderRightWidth: 1,
+          borderRightColor: 'hsla(0, 0%, 0%, 0.1)',
         }}>
-          {Object.entries(allShapes).map(([id, shape]) => (
-            <View key={id} style={[{paddingVertical: 5, paddingHorizontal: 10, marginRight: -1}, selectedShapes.some(shape => shape.id == id) && {backgroundColor: highlightColor}]}>
-              <Text style={[{fontWeight: '500', color: 'hsl(0, 0%, 25%)'}, selectedShapes.some(shape => shape.id == id) && {color: 'white'}]}>{shape.type}</Text>
-            </View>
-          ))}
+          {Object.entries(allShapes).map(([id, shape]) => {
+            const selected = selectedShapes.some(shape => shape.id == id)
+
+            return (
+              <TouchableWithoutFeedback onPressIn={() => handleSelect(id)}>
+                <View key={id} style={[{paddingVertical: 5, paddingHorizontal: 10}, selected && {backgroundColor: highlightColor}]}>
+                  <Text style={[{fontWeight: '500', color: 'hsl(0, 0%, 25%)'}, selected && {color: 'white'}]}>{shape.type}</Text>
+                </View>
+              </TouchableWithoutFeedback>
+            )
+          })}
         </View>
+
         <Svg
           onStartShouldSetResponder={event => true}
           onResponderGrant={event => selectShape()}
           // onResponderMove={event => console.log(event.nativeEvent.locationX)}
-          style={{flex: 1}}
+          style={{flex: 1, xboxShadow: 'inset 0 0 5px hsla(0, 0%, 0%, 0.5)'}}
         >
           {Object.entries(allShapes).map(([id, shape]) => (
             <Shape
@@ -355,6 +341,59 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
             />
           ))}
         </Svg>
+
+        <View width={256} style={{backgroundColor: backgroundColor,
+          // paddingLeft: 10,
+          // paddingTop: 5,
+          borderLeftWidth: 1,
+          borderLeftColor: 'hsla(0, 0%, 0%, 0.1)',
+        }}>
+          <View horizontal style={{ paddingVertical: 5, paddingHorizontal: 10}}>
+            <Slider
+              minimumTrackTintColor="rgb(33, 150, 243)"
+              thumbTintColor="white"
+              style={{flex: 1}}
+              disabled={!selectedShapes[0]}
+              thumbStyle={{
+                width: 25,
+                height: 25,
+                borderRadius: 1000,
+                boxShadow: [
+                  // '0 0 3px rgba(0, 0, 0, 0.1)', // Soft shadow
+                  // '0 2px 1px rgba(0, 0, 0, 0.1)',  // Drop shadow
+                  '0 0 1px rgba(0, 0, 0, 0.5)',    // Sharp shadow
+                ].join(', '),
+              }}
+              value={selectedShapes[0] && selectedShapes[0].opacity}
+              onValueChange={handleOpacityValueChange}
+            />
+            <Spacer />
+            <TextInput
+              value={selectedShapes[0] ? selectedShapes[0].opacity.toFixed(2) : '0.00'}
+              // onChangeText={text => setOpacity(text)}
+              // onKeyPress={handleOpacityKeyPress}
+              style={{width: 35}}
+            />
+          </View>
+          <SectionList
+            renderSectionHeader={({section: {title}}) => (
+              <View style={{paddingVertical: 5, paddingHorizontal: 10, marginTop: 10}}>
+                <Text style={{fontWeight: 'bold'}}>{title}</Text>
+              </View>
+            )}
+            renderItem={({item, index, section}) => (
+              <View style={{paddingVertical: 5, paddingHorizontal: 10, backgroundColor: 'white'}}>
+                <Text key={index}>{item}</Text>
+              </View>
+            )}
+            sections={[
+              {title: 'Title1', data: ['item1', 'item2']},
+              {title: 'Title2', data: ['item3', 'item4']},
+              {title: 'Title3', data: ['item5', 'item6']},
+            ]}
+          />
+        </View>
+
       </View>
     </View>
   )
