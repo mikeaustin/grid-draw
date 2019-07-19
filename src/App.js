@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { createStore } from 'redux'
 import { Provider, connect } from 'react-redux'
-import { View as NativeView, Text, Button, TextInput, TouchableOpacity, TouchableWithoutFeedback, SectionList } from 'react-native'
+import { View as NativeView, Text, Image, Button, TextInput, TouchableOpacity, TouchableWithoutFeedback, SectionList } from 'react-native'
 // import { Slider } from 'react-native-elements'
 // import * as Slider from '@react-native-community/slider'
 import Slider from "react-native-slider"
@@ -11,7 +11,7 @@ import * as $ from 'seamless-immutable'
 
 import './App.css'
 import { withLayoutProps } from './core/utils/layout'
-import { Spacer } from './core/components'
+import { Spacer, List, Toolbar } from './core/components'
 
 const View = withLayoutProps(NativeView)
 
@@ -21,6 +21,7 @@ const backgroundColor = 'hsl(0, 0%, 97%)'
 const Point = (x, y) => $({ x, y })
 
 const ActionTypes = {
+  SELECT_TOOL: 'tool/SELECT_TOOL',
   SELECT_SHAPE: 'tool/SELECT_SHAPE',
   SHAPE_ELLIPSE: '/tool/SHAPE_ELLIPSE',
   SHAPE_RECTANGLE: 'tool/SHAPE_RECTANGLE',
@@ -35,10 +36,18 @@ const initialState = {
     1: { id: 1, type: 'GridDraw.Rectangle', position: Point(300, 100), size: Point(100, 100), opacity: 0.75 },
   }),
   selectedShapeIds: [],
+  selectedTool: ActionTypes.MOVE_SHAPE,
 }
 
 const add = (a, b) => Point(a.x + b.x, a.y + b.y)
 const merge = updater => value => value.merge(updater(value))
+
+const selectTool = actionType => ({
+  type: ActionTypes.SELECT_TOOL,
+  payload: {
+    actionType
+  }
+})
 
 const transformShape = (id, actionType, delta) => ({
   type: actionType,
@@ -64,9 +73,10 @@ const setOpacity = (id, opacity) => ({
 })
 
 const shapeReducer = (state = initialState, action) => {
-  // console.log(action.type)
-
   switch (action.type) {
+    case ActionTypes.SELECT_TOOL: {
+      return state.merge({ selectedTool: action.payload.actionType })
+    }
     case ActionTypes.SELECT_SHAPE: {
       return {
         ...state,
@@ -113,6 +123,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
+    dispatch,
     transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
     selectShape: id => dispatch(selectShape(id)),
     setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity))
@@ -227,13 +238,13 @@ class Shape extends React.PureComponent {
 
 const PanelHeader = ({ heading }) => {
   return (
-  <View style={{paddingVertical: 5, paddingHorizontal: 10, backgroundColor: 'hsl(0, 0%, 85%)'}}>
-    <Text style={{fontWeight: 700, color: 'hsl(0, 0%, 25%)'}}>{heading}</Text>
+  <View style={{paddingVertical: 10, paddingHorizontal: 10, backgroundColor: 'hsl(0, 0%, 85%)'}}>
+    <Text style={{fontWeight: '700', color: 'hsl(0, 0%, 25%)'}}>{heading}</Text>
   </View>
   )
 }
 
-const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transformShape }) => {
+const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transformShape, ...props }) => {
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
 
   const handleSelect = id => {
@@ -281,16 +292,21 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
           onChangeText={text => setOpacityText(text)}
           onKeyPress={handleOpacityKeyPress}
         /> */}
+        <Toolbar horizontal actionType={toolActionType} setActionType={setToolActionType}>
+          <Toolbar.Button actionType={ActionTypes.MOVE_SHAPE} icon="037-cursor" />
+          <Toolbar.Button actionType={ActionTypes.SCALE_SHAPE} icon="008-resize" />
+          <Toolbar.Button actionType={ActionTypes.xMOVE_SHAPE} icon="037-cursor" />
+          <Toolbar.Button actionType={ActionTypes.xSCALE_SHAPE} icon="008-resize" />
+        </Toolbar>
       </View>
 
       <View horizontal fill style={{perspective: 10000}}>
         <View width={256} style={{
           backgroundColor: backgroundColor,
           // background: 'linear-gradient(90deg, hsl(0, 0%, 85%), hsl(0, 0%, 95%))',
-          xpaddingVertical: 10,
+          // paddingVertical: 10,
           borderRightWidth: 1,
           borderRightColor: 'hsla(0, 0%, 0%, 0.1)',
-          xtransform: 'rotateY(10deg)',
         }}>
           <PanelHeader heading="Objects" />
           <View style={{paddingVertical: 5}}>
@@ -298,9 +314,16 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
               const selected = selectedShapes.some(shape => shape.id == id)
 
               return (
-                <TouchableWithoutFeedback onPressIn={() => handleSelect(id)}>
-                  <View key={id} style={[{paddingVertical: 5, paddingHorizontal: 10}, selected && {backgroundColor: highlightColor}]}>
-                    <Text style={[{marginTop: -1, fontWeight: '500', color: 'hsl(0, 0%, 25%)'}, selected && {color: 'white'}]}>{shape.type}</Text>
+                <TouchableWithoutFeedback key={id} onPressIn={() => handleSelect(id)}>
+                  <View
+                    style={[
+                      {paddingVertical: 5, paddingHorizontal: 10},
+                      selected && {backgroundColor: highlightColor}
+                    ]}
+                  >
+                    <Text style={[{marginTop: -1, fontWeight: '500', color: 'hsl(0, 0%, 25%)'}, selected && {color: 'white'}]}>
+                      {shape.type}
+                    </Text>
                   </View>
                 </TouchableWithoutFeedback>
               )
@@ -341,11 +364,8 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
               style={{flex: 1}}
               disabled={!selectedShapes[0]}
               thumbStyle={{
-                width: 25,
-                height: 25,
-                borderRadius: 1000,
                 boxShadow: [
-                  // '0 0 3px rgba(0, 0, 0, 0.1)', // Soft shadow
+                  '0 0 3px rgba(0, 0, 0, 0.1)', // Soft shadow
                   // '0 2px 1px rgba(0, 0, 0, 0.1)',  // Drop shadow
                   '0 0 1px rgba(0, 0, 0, 0.5)',    // Sharp shadow
                 ].join(', '),
@@ -364,7 +384,7 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
           <SectionList
             renderSectionHeader={({section: {title}}) => (
               <View style={{paddingVertical: 5, paddingHorizontal: 10, marginTop: 10}}>
-                <Text style={{fontWeight: 700}}>{title}</Text>
+                <Text style={{fontWeight: '700'}}>{title}</Text>
               </View>
             )}
             renderItem={({item, index, section}) => (
