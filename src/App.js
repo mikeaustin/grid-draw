@@ -26,14 +26,14 @@ const backgroundColor = ''
 const borderColor = 'hsla(0, 0%, 0%, 0.29)'
 const titleColor = 'hsla(0, 0%, 0%, 0.11)'
 
-const initialState = {
-  allShapes: $({
+const initialState = $({
+  allShapes: {
     0: { id: 0, type: 'GridDraw.Ellipse', position: Point(100, 100), size: Point(100, 100), opacity: 0.25 },
     1: { id: 1, type: 'GridDraw.Rectangle', position: Point(300, 100), size: Point(100, 100), opacity: 0.75 },
-  }),
+  },
   selectedShapeIds: [],
   selectedTool: ActionTypes.MOVE_SHAPE,
-}
+})
 
 const add = (a, b) => Point(a.x + b.x, a.y + b.y)
 const merge = updater => value => value.merge(updater(value))
