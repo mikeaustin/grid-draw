@@ -14,6 +14,8 @@ import { Point } from './core/utils/geometry'
 import { withLayoutProps } from './core/utils/layout'
 import { Spacer, Divider, List, Toolbar } from './core/components'
 import Shape from './app/components/Shape'
+import AppToolbar from './app/components/AppToolbar'
+import { ActionTypes, selectTool, selectShape, transformShape, setOpacity } from './app/actions/common'
 
 const View = withLayoutProps(NativeView)
 
@@ -23,16 +25,6 @@ const highlightColor = 'rgb(33, 150, 243)'
 const backgroundColor = ''
 const borderColor = 'hsla(0, 0%, 0%, 0.29)'
 const titleColor = 'hsla(0, 0%, 0%, 0.11)'
-
-const ActionTypes = {
-  SELECT_TOOL: 'tool/SELECT_TOOL',
-  SELECT_SHAPE: 'tool/SELECT_SHAPE',
-  SHAPE_ELLIPSE: '/tool/SHAPE_ELLIPSE',
-  SHAPE_RECTANGLE: 'tool/SHAPE_RECTANGLE',
-  MOVE_SHAPE: 'shape/MOVE_SHAPE',
-  SCALE_SHAPE: 'shape/SCALE_SHAPE',
-  SET_OPACITY: 'shape/SET_OPACITY',
-}
 
 const initialState = {
   allShapes: $({
@@ -45,36 +37,6 @@ const initialState = {
 
 const add = (a, b) => Point(a.x + b.x, a.y + b.y)
 const merge = updater => value => value.merge(updater(value))
-
-const selectTool = actionType => ({
-  type: ActionTypes.SELECT_TOOL,
-  payload: {
-    actionType
-  }
-})
-
-const transformShape = (id, actionType, delta) => ({
-  type: actionType,
-  payload: {
-    id,
-    delta
-  }
-})
-
-const selectShape = id => ({
-  type: ActionTypes.SELECT_SHAPE,
-  payload: {
-    id
-  }
-})
-
-const setOpacity = (id, opacity) => ({
-  type: ActionTypes.SET_OPACITY,
-  payload: {
-    id,
-    opacity
-  }
-})
 
 const shapeReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -167,44 +129,9 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
     setOpacity(selectedShapes[0].id, opacity)
   }
 
-  const toolbarStyle = {
-    // alignItems: 'center',
-    backgroundColor: backgroundColor,
-    // background: 'linear-gradient(hsl(0, 0%, 85%), hsl(0, 0%, 95%))',
-    paddingVertical: 5,
-    borderBottomWidth: 0.5,
-    borderBottomColor: borderColor,
-    boxShadow: [
-      // '0 1px 0 hsla(0, 0%, 0%, 0.1)',
-      // '0 0 10px hsla(0, 0%, 0%, 0.1)',
-    ].join(', '),
-  }
-
   return (
     <View fill>
-      <View horizontal align="center" style={toolbarStyle}>
-        <Toolbar horizontal>
-          <Spacer />
-          <Toolbar.Group title="Tools" value={toolActionType} setValue={setToolActionType}>
-            <Toolbar.Button value={ActionTypes.MOVE_SHAPE} icon="037-cursor" />
-            <Toolbar.Button value={ActionTypes.SCALE_SHAPE} icon="008-resize" />
-          </Toolbar.Group>
-          <Divider xsize="xsmall" />
-          <Toolbar.Group title="Shapes" value={toolActionType} setValue={setToolActionType}>
-            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="009-rectangle" />
-            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="025-ellipse" />
-            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="001-star" />
-            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="007-pen-tool" />
-          </Toolbar.Group>
-          <Divider xsize="xsmall" />
-          <Toolbar.Group title="Combine" value={toolActionType} setValue={setToolActionType}>
-            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="030-unite" />
-            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="014-minus-front" />
-            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="022-intersection" />
-            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="038-exclude" />
-          </Toolbar.Group>
-        </Toolbar>
-      </View>
+      <AppToolbar toolActionType={toolActionType} setToolActionType={setToolActionType} />
 
       <View horizontal fill style={{perspective: 10000}}>
         <View width={256} style={{

@@ -3,9 +3,17 @@ import { View, Text, Image, TouchableWithoutFeedback } from 'react-native'
 
 import { Spacer, List } from '.'
 
-const Toolbar = ({ children, value, setValue, ...props }) => {
+const borderColor = 'hsla(0, 0%, 0%, 0.29)'
+
+const toolbarStyle = {
+  paddingVertical: 5,
+  borderBottomWidth: 0.5,
+  borderBottomColor: borderColor,
+}
+
+const Toolbar = ({ children, style, value, setValue, ...props }) => {
   return (
-    <List {...props}>
+    <List style={[toolbarStyle, style]} {...props}>
       {React.Children.map(children, (child, index) => (
         React.cloneElement(child, {
           ...props,
