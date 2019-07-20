@@ -29,7 +29,7 @@ const Group = ({ children, title, value, setValue, ...props }) => {
         ))}
       </List>
       <Spacer size="xsmall" />
-      <Text style={{ fontSize: 12, textAlign: 'center' }}>{title}</Text>
+      <Text style={{ fontSize: 12, color: 'hsl(0, 0%, 25%)', textAlign: 'center' }}>{title}</Text>
     </View>
   )
 }
