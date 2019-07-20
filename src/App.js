@@ -11,12 +11,16 @@ import * as $ from 'seamless-immutable'
 
 import './App.css'
 import { withLayoutProps } from './core/utils/layout'
-import { Spacer, List, Toolbar } from './core/components'
+import { Spacer, Divider, List, Toolbar } from './core/components'
 
 const View = withLayoutProps(NativeView)
 
 const highlightColor = 'rgb(33, 150, 243)'
-const backgroundColor = 'hsl(0, 0%, 97%)'
+// const backgroundColor = 'hsl(0, 0%, 97%)'
+// const backgroundColor = 'hsla(0, 0%, 0%, 0.01)'
+const backgroundColor = ''
+const borderColor = 'hsla(0, 0%, 0%, 0.29)'
+const titleColor = 'hsla(0, 0%, 0%, 0.11)'
 
 const Point = (x, y) => $({ x, y })
 
@@ -238,13 +242,13 @@ class Shape extends React.PureComponent {
 
 const PanelHeader = ({ heading }) => {
   return (
-  <View style={{paddingVertical: 10, paddingHorizontal: 10, backgroundColor: 'hsl(0, 0%, 85%)'}}>
+  <View style={{paddingVertical: 10, paddingHorizontal: 10, backgroundColor: 'hsla(0, 0%, 0%, 0.05)'}}>
     <Text style={{fontWeight: '700', color: 'hsl(0, 0%, 25%)'}}>{heading}</Text>
   </View>
   )
 }
 
-const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transformShape, ...props }) => {
+const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transformShape, dispatch, ...props }) => {
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
 
   const handleSelect = id => {
@@ -272,8 +276,8 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
     backgroundColor: backgroundColor,
     // background: 'linear-gradient(hsl(0, 0%, 85%), hsl(0, 0%, 95%))',
     paddingVertical: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: 'hsl(0, 0%, 85%)',
+    borderBottomWidth: 0.5,
+    borderBottomColor: borderColor,
     boxShadow: [
       // '0 1px 0 hsla(0, 0%, 0%, 0.1)',
       // '0 0 10px hsla(0, 0%, 0%, 0.1)',
@@ -283,20 +287,26 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
   return (
     <View fill>
       <View horizontal align="center" style={toolbarStyle}>
-        <Spacer />
-        <Button title="Move" onPress={() => setToolActionType(ActionTypes.MOVE_SHAPE)} />
-        <Spacer />
-        <Button title="Scale" onPress={() => setToolActionType(ActionTypes.SCALE_SHAPE)} />
-        <Spacer />
-        {/* <TextInput value={opacityText}
-          onChangeText={text => setOpacityText(text)}
-          onKeyPress={handleOpacityKeyPress}
-        /> */}
-        <Toolbar horizontal actionType={toolActionType} setActionType={setToolActionType}>
-          <Toolbar.Button actionType={ActionTypes.MOVE_SHAPE} icon="037-cursor" />
-          <Toolbar.Button actionType={ActionTypes.SCALE_SHAPE} icon="008-resize" />
-          <Toolbar.Button actionType={ActionTypes.xMOVE_SHAPE} icon="037-cursor" />
-          <Toolbar.Button actionType={ActionTypes.xSCALE_SHAPE} icon="008-resize" />
+        <Toolbar horizontal>
+          <Spacer />
+          <Toolbar.Group title="Tools" value={toolActionType} setValue={setToolActionType}>
+            <Toolbar.Button value={ActionTypes.MOVE_SHAPE} icon="037-cursor" />
+            <Toolbar.Button value={ActionTypes.SCALE_SHAPE} icon="008-resize" />
+          </Toolbar.Group>
+          <Divider xsize="xsmall" />
+          <Toolbar.Group title="Shapes" value={toolActionType} setValue={setToolActionType}>
+            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="009-rectangle" />
+            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="025-ellipse" />
+            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="001-star" />
+            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="007-pen-tool" />
+          </Toolbar.Group>
+          <Divider xsize="xsmall" />
+          <Toolbar.Group title="Combine" value={toolActionType} setValue={setToolActionType}>
+            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="030-unite" />
+            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="014-minus-front" />
+            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="022-intersection" />
+            <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="038-exclude" />
+          </Toolbar.Group>
         </Toolbar>
       </View>
 
@@ -305,8 +315,8 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
           backgroundColor: backgroundColor,
           // background: 'linear-gradient(90deg, hsl(0, 0%, 85%), hsl(0, 0%, 95%))',
           // paddingVertical: 10,
-          borderRightWidth: 1,
-          borderRightColor: 'hsla(0, 0%, 0%, 0.1)',
+          borderRightWidth: 0.5,
+          borderRightColor: 'hsla(0, 0%, 0%, 0.29)',
         }}>
           <PanelHeader heading="Objects" />
           <View style={{paddingVertical: 5}}>
@@ -353,8 +363,8 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
         </Svg>
 
         <View width={256} style={{backgroundColor: backgroundColor,
-          borderLeftWidth: 1,
-          borderLeftColor: 'hsla(0, 0%, 0%, 0.1)',
+          borderLeftWidth: 0.5,
+          borderLeftColor: borderColor,
         }}>
           <PanelHeader heading="Properties" />
           <View horizontal style={{ paddingVertical: 5, paddingHorizontal: 10}}>
