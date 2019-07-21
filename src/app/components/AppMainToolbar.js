@@ -2,7 +2,7 @@ import React from 'react';
 import { Spacer, Divider, Toolbar } from '../../core/components'
 import { ActionTypes } from '../actions/common'
 
-const AppToolbar = ({ toolActionType, setToolActionType }) => {
+const AppMainToolbar = ({ toolActionType, setToolActionType }) => {
   const borderColor = 'hsla(0, 0%, 0%, 0.29)'
 
   const toolbarStyle = {
@@ -38,4 +38,4 @@ const AppToolbar = ({ toolActionType, setToolActionType }) => {
   )
 }
 
-export default AppToolbar
+export default AppMainToolbar

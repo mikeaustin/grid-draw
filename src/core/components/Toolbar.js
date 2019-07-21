@@ -49,7 +49,7 @@ const Button = ({ value, title, icon, imageSource, selected, onPressIn }) => {
   ]
   
   const setNativeProps = ref => {
-    ref && ref.setNativeProps({ title: title })
+    ref && title && ref.setNativeProps({ title: title })
   }
 
   return (

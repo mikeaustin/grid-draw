@@ -14,25 +14,19 @@ import { Point } from './core/utils/geometry'
 import { withLayoutProps } from './core/utils/layout'
 import { Spacer, Divider, List, Toolbar } from './core/components'
 import Shape from './app/components/Shape'
-import AppToolbar from './app/components/AppToolbar'
+import AppMainToolbar from './app/components/AppMainToolbar'
 import AppObjectsPanel from './app/components/AppObjectsPanel'
+import AppPropertiesPanel from './app/components/AppPropertiesPanel'
 import { ActionTypes, selectTool, selectShape, transformShape, setOpacity } from './app/actions/common'
 
 const View = withLayoutProps(NativeView)
 
 const theme = {
-  backgroundColor: '',
+  backgroundColor: 'transparent',
   highlightColor: 'rgb(33, 150, 243)',
   borderColor: 'hsla(0, 0%, 0%, 0.29)',
   titleColor: 'hsla(0, 0%, 0%, 0.11)',
 }
-
-const highlightColor = 'rgb(33, 150, 243)'
-// const backgroundColor = 'hsl(0, 0%, 97%)'
-// const backgroundColor = 'hsla(0, 0%, 0%, 0.01)'
-// const backgroundColor = ''
-// const borderColor = 'hsla(0, 0%, 0%, 0.29)'
-// const titleColor = 'hsla(0, 0%, 0%, 0.11)'
 
 const initialState = $({
   allShapes: {
@@ -137,7 +131,7 @@ const _Shapes = ({ selectedShapes, allShapes, layerShapes, selectShape, setOpaci
 
   return (
     <View fill>
-      <AppToolbar toolActionType={toolActionType} setToolActionType={setToolActionType} />
+      <AppMainToolbar toolActionType={toolActionType} setToolActionType={setToolActionType} />
 
       <View horizontal fill>
         <AppObjectsPanel
@@ -168,54 +162,7 @@ const _Shapes = ({ selectedShapes, allShapes, layerShapes, selectShape, setOpaci
           ))}
         </Svg>
 
-        <View width={256} style={{backgroundColor: theme.backgroundColor,
-          borderLeftWidth: 0.5,
-          borderLeftColor: theme.borderColor,
-        }}>
-          <PanelHeader heading="Properties" />
-          <View horizontal style={{ paddingVertical: 5, paddingHorizontal: 10}}>
-            <Slider
-              minimumTrackTintColor="rgb(33, 150, 243)"
-              thumbTintColor="white"
-              style={{flex: 1}}
-              disabled={!selectedShapes[0]}
-              thumbStyle={{
-                boxShadow: [
-                  '0 0 3px rgba(0, 0, 0, 0.1)', // Soft shadow
-                  // '0 2px 1px rgba(0, 0, 0, 0.1)',  // Drop shadow
-                  '0 0 1px rgba(0, 0, 0, 0.5)',    // Sharp shadow
-                ].join(', '),
-              }}
-              value={selectedShapes[0] && selectedShapes[0].opacity}
-              onValueChange={handleOpacityValueChange}
-            />
-            <Spacer />
-            <TextInput
-              value={selectedShapes[0] ? selectedShapes[0].opacity.toFixed(2) : '0.00'}
-              // onChangeText={text => setOpacity(text)}
-              // onKeyPress={handleOpacityKeyPress}
-              style={{width: 35}}
-            />
-          </View>
-          
-          <SectionList
-            renderSectionHeader={({section: {title}}) => (
-              <View style={{paddingVertical: 5, paddingHorizontal: 10, marginTop: 10}}>
-                <Text style={{fontWeight: '700'}}>{title}</Text>
-              </View>
-            )}
-            renderItem={({item, index, section}) => (
-              <View style={{paddingVertical: 5, paddingHorizontal: 10, backgroundColor: 'white'}}>
-                <Text key={index}>{item}</Text>
-              </View>
-            )}
-            sections={[
-              {title: 'Title1', data: ['item1', 'item2']},
-              {title: 'Title2', data: ['item3', 'item4']},
-              {title: 'Title3', data: ['item5', 'item6']},
-            ]}
-          />
-        </View>
+        <AppPropertiesPanel theme={theme} selectedShapes={selectedShapes} setOpacity={setOpacity} />
 
       </View>
     </View>
