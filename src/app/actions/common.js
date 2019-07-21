@@ -6,12 +6,13 @@ const ActionTypes = {
   MOVE_SHAPE: 'shape/MOVE_SHAPE',
   SCALE_SHAPE: 'shape/SCALE_SHAPE',
   SET_OPACITY: 'shape/SET_OPACITY',
+  BRING_TO_FRONT: 'shape/BRING_TO_FRONT',
 }
 
 const selectTool = actionType => ({
   type: ActionTypes.SELECT_TOOL,
   payload: {
-    actionType
+    actionType,
   }
 })
 
@@ -19,14 +20,14 @@ const transformShape = (id, actionType, delta) => ({
   type: actionType,
   payload: {
     id,
-    delta
+    delta,
   }
 })
 
 const selectShape = id => ({
   type: ActionTypes.SELECT_SHAPE,
   payload: {
-    id
+    id,
   }
 })
 
@@ -34,7 +35,14 @@ const setOpacity = (id, opacity) => ({
   type: ActionTypes.SET_OPACITY,
   payload: {
     id,
-    opacity
+    opacity,
+  }
+})
+
+const bringToFont = id => ({
+  type: ActionTypes.BRING_TO_FRONT,
+  payload: {
+    id,
   }
 })
 

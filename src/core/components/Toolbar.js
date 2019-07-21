@@ -42,15 +42,19 @@ const Group = ({ children, title, value, setValue, ...props }) => {
   )
 }
 
-const Button = ({ value, icon, imageSource, selected, onPressIn }) => {
+const Button = ({ value, title, icon, imageSource, selected, onPressIn }) => {
   const buttonStyle = [
     { padding: 5, borderRadius: 2, borderWidth: 0.5, borderColor: 'transparent' },
     selected && {backgroundColor: 'hsla(0, 0%, 0%, 0.11)', borderColor: 'hsla(0, 0%, 0%, 0.05)' },
   ]
+  
+  const setNativeProps = ref => {
+    ref && ref.setNativeProps({ title: title })
+  }
 
   return (
     <TouchableWithoutFeedback onPressIn={onPressIn}>
-      <View style={buttonStyle}>
+      <View ref={setNativeProps} style={buttonStyle}>
         <Image
           source={imageSource || {uri: `/images/icons/${icon}.svg`}}
           style={{width: 25, height: 25, opacity: 0.65}}

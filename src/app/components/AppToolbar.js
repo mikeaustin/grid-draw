@@ -17,8 +17,8 @@ const AppToolbar = ({ toolActionType, setToolActionType }) => {
     <Toolbar horizontal>
       <Spacer />
       <Toolbar.Group title="Tools" value={toolActionType} setValue={setToolActionType}>
-        <Toolbar.Button value={ActionTypes.MOVE_SHAPE} icon="037-cursor" />
-        <Toolbar.Button value={ActionTypes.SCALE_SHAPE} icon="008-resize" />
+        <Toolbar.Button title="Move Shapes" value={ActionTypes.MOVE_SHAPE} icon="037-cursor" />
+        <Toolbar.Button title="Resize Shapes" value={ActionTypes.SCALE_SHAPE} icon="008-resize" />
       </Toolbar.Group>
       <Divider xsize="xsmall" />
       <Toolbar.Group title="Shapes" value={toolActionType} setValue={setToolActionType}>

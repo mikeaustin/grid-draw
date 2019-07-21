@@ -15,22 +15,31 @@ import { withLayoutProps } from './core/utils/layout'
 import { Spacer, Divider, List, Toolbar } from './core/components'
 import Shape from './app/components/Shape'
 import AppToolbar from './app/components/AppToolbar'
+import AppObjectsPanel from './app/components/AppObjectsPanel'
 import { ActionTypes, selectTool, selectShape, transformShape, setOpacity } from './app/actions/common'
 
 const View = withLayoutProps(NativeView)
 
+const theme = {
+  backgroundColor: '',
+  highlightColor: 'rgb(33, 150, 243)',
+  borderColor: 'hsla(0, 0%, 0%, 0.29)',
+  titleColor: 'hsla(0, 0%, 0%, 0.11)',
+}
+
 const highlightColor = 'rgb(33, 150, 243)'
 // const backgroundColor = 'hsl(0, 0%, 97%)'
 // const backgroundColor = 'hsla(0, 0%, 0%, 0.01)'
-const backgroundColor = ''
-const borderColor = 'hsla(0, 0%, 0%, 0.29)'
-const titleColor = 'hsla(0, 0%, 0%, 0.11)'
+// const backgroundColor = ''
+// const borderColor = 'hsla(0, 0%, 0%, 0.29)'
+// const titleColor = 'hsla(0, 0%, 0%, 0.11)'
 
 const initialState = $({
   allShapes: {
     0: { id: 0, type: 'GridDraw.Ellipse', position: Point(100, 100), size: Point(100, 100), opacity: 0.25 },
     1: { id: 1, type: 'GridDraw.Rectangle', position: Point(300, 100), size: Point(100, 100), opacity: 0.75 },
   },
+  layerShapeIds: [0, 1],
   selectedShapeIds: [],
   selectedTool: ActionTypes.MOVE_SHAPE,
 })
@@ -79,7 +88,8 @@ const shapeReducer = (state = initialState, action) => {
 const mapStateToProps = state => {
   return {
     allShapes: state.allShapes,
-    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id].merge({selected: false})),
+    layerShapes: state.layerShapeIds.map(id => state.allShapes[id]),
+    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
   }
 }
 
@@ -102,7 +112,7 @@ const PanelHeader = ({ heading }) => {
   )
 }
 
-const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transformShape, dispatch, ...props }) => {
+const _Shapes = ({ selectedShapes, allShapes, layerShapes, selectShape, setOpacity, transformShape, dispatch, ...props }) => {
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
 
   const handleSelect = id => {
@@ -129,36 +139,13 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
     <View fill>
       <AppToolbar toolActionType={toolActionType} setToolActionType={setToolActionType} />
 
-      <View horizontal fill style={{perspective: 10000}}>
-        <View width={256} style={{
-          backgroundColor: backgroundColor,
-          // background: 'linear-gradient(90deg, hsl(0, 0%, 85%), hsl(0, 0%, 95%))',
-          // paddingVertical: 10,
-          borderRightWidth: 0.5,
-          borderRightColor: 'hsla(0, 0%, 0%, 0.29)',
-        }}>
-          <PanelHeader heading="Objects" />
-          <View style={{paddingVertical: 5}}>
-            {Object.entries(allShapes).map(([id, shape]) => {
-              const selected = selectedShapes.some(shape => shape.id == id)
-
-              return (
-                <TouchableWithoutFeedback key={id} onPressIn={() => handleSelect(id)}>
-                  <View
-                    style={[
-                      {paddingVertical: 5, paddingHorizontal: 10},
-                      selected && {backgroundColor: highlightColor}
-                    ]}
-                  >
-                    <Text style={[{marginTop: -1, fontWeight: '500', color: 'hsl(0, 0%, 25%)'}, selected && {color: 'white'}]}>
-                      {shape.type}
-                    </Text>
-                  </View>
-                </TouchableWithoutFeedback>
-              )
-            })}
-          </View>
-        </View>
+      <View horizontal fill>
+        <AppObjectsPanel
+          theme={theme}
+          layerShapes={layerShapes}
+          selectedShapes={selectedShapes}
+          selectShape={selectShape}
+        />
 
         <Svg
           onStartShouldSetResponder={event => true}
@@ -181,9 +168,9 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
           ))}
         </Svg>
 
-        <View width={256} style={{backgroundColor: backgroundColor,
+        <View width={256} style={{backgroundColor: theme.backgroundColor,
           borderLeftWidth: 0.5,
-          borderLeftColor: borderColor,
+          borderLeftColor: theme.borderColor,
         }}>
           <PanelHeader heading="Properties" />
           <View horizontal style={{ paddingVertical: 5, paddingHorizontal: 10}}>
@@ -210,6 +197,7 @@ const _Shapes = ({ selectedShapes, allShapes, selectShape, setOpacity, transform
               style={{width: 35}}
             />
           </View>
+          
           <SectionList
             renderSectionHeader={({section: {title}}) => (
               <View style={{paddingVertical: 5, paddingHorizontal: 10, marginTop: 10}}>
