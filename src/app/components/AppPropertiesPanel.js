@@ -1,19 +1,9 @@
 import React from 'react'
-import { View as NativeView, Text, Image, Button, TextInput, TouchableOpacity, TouchableWithoutFeedback, SectionList } from 'react-native'
+import { Text, Image, Button, TextInput, SectionList } from 'react-native'
 import Slider from 'react-native-slider'
 
-import { withLayoutProps } from '../../core/utils/layout'
-import { Spacer, Divider, Toolbar } from '../../core/components'
-
-const View = withLayoutProps(NativeView)
-
-const PanelHeader = ({ heading }) => {
-  return (
-  <View style={{paddingVertical: 10, paddingHorizontal: 10, backgroundColor: 'hsla(0, 0%, 0%, 0.05)'}}>
-    <Text style={{fontWeight: '700', color: 'hsl(0, 0%, 25%)'}}>{heading}</Text>
-  </View>
-  )
-}
+import { View, Spacer, Divider, Toolbar } from 'core/components'
+import PanelHeader from './PanelHeader'
 
 const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity }) => {
   const handleOpacityValueChange = opacity => {

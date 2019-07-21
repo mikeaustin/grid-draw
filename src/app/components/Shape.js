@@ -1,7 +1,7 @@
 import React from 'react'
 import { Svg, Ellipse, Rect } from 'react-native-svg'
 
-import { Point } from '../../core/utils/geometry'
+import { Point } from 'core/utils/geometry'
 
 const shapeRegistration = {
   'GridDraw.Ellipse': {

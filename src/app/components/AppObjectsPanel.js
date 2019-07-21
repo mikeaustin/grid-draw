@@ -1,17 +1,8 @@
 import React from 'react'
 
-import { View as NativeView, Text, TouchableWithoutFeedback } from 'react-native'
-import { withLayoutProps } from '../../core/utils/layout'
-
-const View = withLayoutProps(NativeView)
-
-const PanelHeader = ({ heading }) => {
-  return (
-  <View style={{paddingVertical: 10, paddingHorizontal: 10, backgroundColor: 'hsla(0, 0%, 0%, 0.05)'}}>
-    <Text style={{fontWeight: '700', color: 'hsl(0, 0%, 25%)'}}>{heading}</Text>
-  </View>
-  )
-}
+import { Text, TouchableWithoutFeedback } from 'react-native'
+import { View } from 'core/components'
+import PanelHeader from './PanelHeader'
 
 const AppObjectsPanel = ({ theme, layerShapes, selectedShapes, selectShape }) => {
   const handleSelect = id => {

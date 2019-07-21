@@ -1,6 +1,6 @@
 import React from 'react';
-import { Spacer, Divider, Toolbar } from '../../core/components'
-import { ActionTypes } from '../actions/common'
+import { Spacer, Divider, Toolbar } from 'core/components'
+import { ActionTypes } from 'app/actions/common'
 
 const AppMainToolbar = ({ toolActionType, setToolActionType }) => {
   const borderColor = 'hsla(0, 0%, 0%, 0.29)'

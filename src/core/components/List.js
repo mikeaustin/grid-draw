@@ -1,8 +1,7 @@
 import React from 'react'
-import { View } from 'react-native'
 
-import { withLayoutProps } from '../utils/layout'
-import { Spacer } from '.'
+import { View, Spacer } from '.'
+import { withLayoutProps } from 'core/utils/layout'
 
 const List = ({ children, spacerSize = 'none', ...props }) => {
   return (
@@ -17,4 +16,4 @@ const List = ({ children, spacerSize = 'none', ...props }) => {
   )
 }
 
-export default withLayoutProps(List)
+export default List

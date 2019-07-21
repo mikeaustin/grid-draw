@@ -1,7 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { createStore } from 'redux'
 import { Provider, connect } from 'react-redux'
-import { View as NativeView, Text, Image, Button, TextInput, TouchableOpacity, TouchableWithoutFeedback, SectionList } from 'react-native'
 // import { Slider } from 'react-native-elements'
 // import * as Slider from '@react-native-community/slider'
 import Slider from "react-native-slider"
@@ -10,16 +9,13 @@ import JsxParser from 'react-jsx-parser'
 import * as $ from 'seamless-immutable'
 
 import './App.css'
-import { Point } from './core/utils/geometry'
-import { withLayoutProps } from './core/utils/layout'
-import { Spacer, Divider, List, Toolbar } from './core/components'
-import Shape from './app/components/Shape'
-import AppMainToolbar from './app/components/AppMainToolbar'
-import AppObjectsPanel from './app/components/AppObjectsPanel'
-import AppPropertiesPanel from './app/components/AppPropertiesPanel'
-import { ActionTypes, selectTool, selectShape, transformShape, setOpacity } from './app/actions/common'
-
-const View = withLayoutProps(NativeView)
+import { View } from 'core/components'
+import { Point } from 'core/utils/geometry'
+import Shape from 'app/components/Shape'
+import AppMainToolbar from 'app/components/AppMainToolbar'
+import AppObjectsPanel from 'app/components/AppObjectsPanel'
+import AppPropertiesPanel from 'app/components/AppPropertiesPanel'
+import { ActionTypes, selectTool, selectShape, transformShape, setOpacity } from 'app/actions/common'
 
 const theme = {
   backgroundColor: 'transparent',
@@ -98,14 +94,6 @@ const mapDispatchToProps = dispatch => {
 
 const store = createStore(shapeReducer)
 
-const PanelHeader = ({ heading }) => {
-  return (
-  <View style={{paddingVertical: 10, paddingHorizontal: 10, backgroundColor: 'hsla(0, 0%, 0%, 0.05)'}}>
-    <Text style={{fontWeight: '700', color: 'hsl(0, 0%, 25%)'}}>{heading}</Text>
-  </View>
-  )
-}
-
 const _Shapes = ({ selectedShapes, allShapes, layerShapes, selectShape, setOpacity, transformShape, dispatch, ...props }) => {
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
 
@@ -123,11 +111,6 @@ const _Shapes = ({ selectedShapes, allShapes, layerShapes, selectShape, setOpaci
   //     setOpacity(selection[0], Number(opacityText))
   //   }
   // }
-
-  const handleOpacityValueChange = opacity => {
-    // setSliderOpacity(opacity)
-    setOpacity(selectedShapes[0].id, opacity)
-  }
 
   return (
     <View fill>
