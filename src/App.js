@@ -44,36 +44,32 @@ const shapeReducer = (state = initialState, action) => {
       return state.merge({ selectedTool: action.payload.actionType })
     }
     case ActionTypes.SELECT_SHAPE: {
-      return {
-        ...state,
+      return state.merge({
         selectedShapeIds: action.payload.id !== undefined ? [action.payload.id] : [],
-      }
+      })
     }
     case ActionTypes.MOVE_SHAPE: {
       const { allShapes } = state
       const { id, delta } = action.payload
 
-      return {
-        ...state,
+      return state.merge({
         allShapes: allShapes.update(id, merge(({ position }) => ({ position: add(position, delta) })))
-      }
+      })
     }
     case ActionTypes.SCALE_SHAPE: {
       const { allShapes } = state
       const { id, delta } = action.payload
 
-      return {
-        ...state,
+      return state.merge({
         allShapes: allShapes.update(id, merge(({ size }) => ({ size: add(size, delta) })))
-      }
+      })
     }
     case ActionTypes.SET_OPACITY: {
       const { id, opacity } = action.payload
 
-      return {
-        ...state,
+      return state.merge({
         allShapes: state.allShapes.update(id, merge(() => ({ opacity: opacity })))
-      }
+      })
     }
   }
 
