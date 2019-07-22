@@ -1,5 +1,5 @@
 import React from 'react'
-import { Svg, Ellipse, Rect } from 'react-native-svg'
+import { Svg, G, Ellipse, Rect } from 'react-native-svg'
 
 import { Point } from 'core/utils/geometry'
 
@@ -35,7 +35,23 @@ const shapeRegistration = {
         />
       )
     }
-  }
+  },
+  'GridDraw.Group': {
+    render: ({ selected, position, size, ...props }) => {
+      return (
+        <G
+          x={position.x}
+          y={position.y}
+          width={size.x}
+          height={size.y}
+          strokeWidth={3}
+          stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
+          fill="#f0f0f0"
+          {...props}
+        />
+      )
+    }
+  },
 }
 
 class Shape extends React.PureComponent {
