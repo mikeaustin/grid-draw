@@ -1,16 +1,13 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
-import { createStore } from 'redux'
-import { Provider, connect } from 'react-redux'
+import { connect } from 'react-redux'
 // import { Slider } from 'react-native-elements'
 // import * as Slider from '@react-native-community/slider'
 import Slider from "react-native-slider"
 import { Svg, Ellipse, Rect } from 'react-native-svg'
 import JsxParser from 'react-jsx-parser'
-import * as $ from 'seamless-immutable'
 
 import './App.css'
 import { View } from 'core/components'
-import { Point } from 'core/utils/geometry'
 import Shape from 'app/components/Shape'
 import AppMainToolbar from 'app/components/AppMainToolbar'
 import AppObjectsPanel from 'app/components/AppObjectsPanel'
@@ -22,57 +19,6 @@ const theme = {
   highlightColor: 'rgb(33, 150, 243)',
   borderColor: 'hsla(0, 0%, 0%, 0.29)',
   titleColor: 'hsla(0, 0%, 0%, 0.11)',
-}
-
-const initialState = $({
-  allShapes: {
-    0: { id: 0, type: 'GridDraw.Ellipse', position: Point(100, 100), size: Point(100, 100), opacity: 0.25 },
-    1: { id: 1, type: 'GridDraw.Rectangle', position: Point(300, 100), size: Point(100, 100), opacity: 0.75 },
-  },
-  layerShapeIds: [0, 1],
-  selectedShapeIds: [],
-  selectedTool: ActionTypes.MOVE_SHAPE,
-})
-
-const add = (a, b) => Point(a.x + b.x, a.y + b.y)
-const merge = updater => value => value.merge(updater(value))
-
-const shapeReducer = (state = initialState, action) => {
-  switch (action.type) {
-    case ActionTypes.SELECT_TOOL: {
-      return state.merge({ selectedTool: action.payload.actionType })
-    }
-    case ActionTypes.SELECT_SHAPE: {
-      return state.merge({
-        selectedShapeIds: action.payload.id !== undefined ? [action.payload.id] : [],
-      })
-    }
-    case ActionTypes.MOVE_SHAPE: {
-      const { allShapes } = state
-      const { id, delta } = action.payload
-
-      return state.merge({
-        allShapes: allShapes.update(id, merge(({ position }) => ({ position: add(position, delta) })))
-      })
-    }
-    case ActionTypes.SCALE_SHAPE: {
-      const { allShapes } = state
-      const { id, delta } = action.payload
-
-      return state.merge({
-        allShapes: allShapes.update(id, merge(({ size }) => ({ size: add(size, delta) })))
-      })
-    }
-    case ActionTypes.SET_OPACITY: {
-      const { id, opacity } = action.payload
-
-      return state.merge({
-        allShapes: state.allShapes.update(id, merge(() => ({ opacity: opacity })))
-      })
-    }
-  }
-
-  return state
 }
 
 const mapStateToProps = state => {
@@ -92,9 +38,15 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-const store = createStore(shapeReducer)
-
-const _Shapes = ({ selectedShapes, allShapes, layerShapes, selectShape, setOpacity, transformShape, dispatch, ...props }) => {
+const App = ({
+  allShapes,
+  layerShapes,
+  selectedShapes,
+  selectShape,
+  transformShape,
+  setOpacity,
+  dispatch
+}) => {
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
 
   const handleSelect = id => {
@@ -105,17 +57,12 @@ const _Shapes = ({ selectedShapes, allShapes, layerShapes, selectShape, setOpaci
     transformShape(id, toolActionType, delta)
   }
 
-  // const handleOpacityKeyPress = event => {
-  //   if (event.nativeEvent.key === 'Enter') {
-  //     console.log('set opacity', opacityText)
-  //     setOpacity(selection[0], Number(opacityText))
-  //   }
-  // }
-
   return (
     <View fill>
-      <AppMainToolbar toolActionType={toolActionType} setToolActionType={setToolActionType} />
-
+      <AppMainToolbar
+        toolActionType={toolActionType}
+        setToolActionType={setToolActionType}
+      />
       <View horizontal fill>
         <AppObjectsPanel
           theme={theme}
@@ -123,7 +70,6 @@ const _Shapes = ({ selectedShapes, allShapes, layerShapes, selectShape, setOpaci
           selectedShapes={selectedShapes}
           selectShape={selectShape}
         />
-
         <Svg
           onStartShouldSetResponder={event => true}
           onResponderGrant={event => selectShape()}
@@ -144,24 +90,14 @@ const _Shapes = ({ selectedShapes, allShapes, layerShapes, selectShape, setOpaci
             />
           ))}
         </Svg>
-
-        <AppPropertiesPanel theme={theme} selectedShapes={selectedShapes} setOpacity={setOpacity} />
-
+        <AppPropertiesPanel
+          theme={theme}
+          selectedShapes={selectedShapes}
+          setOpacity={setOpacity}
+        />
       </View>
     </View>
   )
 }
 
-const Shapes = connect(mapStateToProps, mapDispatchToProps)(_Shapes)
-
-function App() {
-  return (
-    <Provider store={store}>
-      <View fill>
-        <Shapes />
-      </View>
-    </Provider>
-  )
-}
-
-export default App
+export default connect(mapStateToProps, mapDispatchToProps)(App)

@@ -10,6 +10,13 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity }) => {
     setOpacity(selectedShapes[0].id, opacity)
   }
 
+  // const handleOpacityKeyPress = event => {
+  //   if (event.nativeEvent.key === 'Enter') {
+  //     console.log('set opacity', opacityText)
+  //     setOpacity(selection[0], Number(opacityText))
+  //   }
+  // }
+
   return (
     <View width={256} style={{backgroundColor: theme.backgroundColor,
       borderLeftWidth: 0.5,
