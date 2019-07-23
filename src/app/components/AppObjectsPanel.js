@@ -4,7 +4,38 @@ import { Text, TouchableWithoutFeedback } from 'react-native'
 import { View } from 'core/components'
 import PanelHeader from './PanelHeader'
 
-const AppObjectsPanel = ({ theme, layerShapes, selectedShapes, selectShape }) => {
+const Shape = ({ depth = 0, theme, allShapes, selectedShapes, layerShape, selected, onSelect }) => {
+  return (
+    <View>
+      <TouchableWithoutFeedback key={layerShape.id} onPressIn={() => onSelect(layerShape.id)}>
+        <View
+          style={[
+            {paddingVertical: 5, paddingHorizontal: 10},
+            selected && {backgroundColor: theme.highlightColor}
+          ]}
+        >
+          <Text
+            style={[
+              {marginTop: -1, paddingLeft: depth * 15, fontWeight: '500', color: 'hsl(0, 0%, 25%)'},
+              selected && {color: 'white'}
+            ]}
+          >
+            {allShapes[layerShape.id].type}
+          </Text>
+        </View>
+      </TouchableWithoutFeedback>
+      {layerShape.childIds.map(layerShape => {
+          const selected = selectedShapes.some(selectedShape => selectedShape.id === layerShape.id)
+
+          return (
+          <Shape depth={depth + 1} key={layerShape.id} theme={theme} allShapes={allShapes} layerShape={layerShape} selected={selected} onSelect={onSelect} />
+        )
+      })}
+    </View>
+  )
+}
+
+const AppObjectsPanel = ({ theme, allShapes, layerShapeIds, selectedShapes, selectShape }) => {
   const handleSelect = id => {
     selectShape(id)
   }
@@ -17,23 +48,11 @@ const AppObjectsPanel = ({ theme, layerShapes, selectedShapes, selectShape }) =>
     }}>
       <PanelHeader heading="Objects" />
       <View style={{paddingVertical: 5}}>
-        {layerShapes.map(shape => {
+        {layerShapeIds.map(layerShape => {
+          const shape = allShapes[layerShape.id]
           const selected = selectedShapes.some(selectedShape => selectedShape.id === shape.id)
 
-          return (
-            <TouchableWithoutFeedback key={shape.id} onPressIn={() => handleSelect(shape.id)}>
-              <View
-                style={[
-                  {paddingVertical: 5, paddingHorizontal: 10},
-                  selected && {backgroundColor: theme.highlightColor}
-                ]}
-              >
-                <Text style={[{marginTop: -1, fontWeight: '500', color: 'hsl(0, 0%, 25%)'}, selected && {color: 'white'}]}>
-                  {shape.type}
-                </Text>
-              </View>
-            </TouchableWithoutFeedback>
-          )
+          return <Shape key={layerShape.id} theme={theme} allShapes={allShapes} selectedShapes={selectedShapes} layerShape={layerShape} selected={selected} onSelect={handleSelect} />
         })}
       </View>
     </View>

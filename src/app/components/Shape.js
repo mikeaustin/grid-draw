@@ -5,7 +5,7 @@ import { Point } from 'core/utils/geometry'
 
 const shapeRegistration = {
   'GridDraw.Ellipse': {
-    render: ({ selected, position, size, ...props }) => {
+    render: ({ allShapes, selectedShapes, selected, position, size, childIds, ...props }) => {
       return (
         <Ellipse
           cx={position.x + size.x / 2}
@@ -21,7 +21,7 @@ const shapeRegistration = {
     }
   },
   'GridDraw.Rectangle': {
-    render: ({ selected, position, size, ...props }) => {
+    render: ({ allShapes, selectedShapes, selected, position, size, childIds, ...props }) => {
       return (
         <Rect
           x={position.x}
@@ -37,7 +37,7 @@ const shapeRegistration = {
     }
   },
   'GridDraw.Group': {
-    render: ({ selected, position, size, ...props }) => {
+    render: ({ allShapes, selectedShapes, selected, position, size, childIds, ...props }) => {
       return (
         <G
           x={position.x}
@@ -48,7 +48,26 @@ const shapeRegistration = {
           stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
           fill="#f0f0f0"
           {...props}
-        />
+        >
+          {childIds.map(layerShape => {
+            const shape = allShapes[layerShape.id]
+            const selected = selectedShapes.some(selectedShape => selectedShape.id === layerShape.id)
+
+            return (
+              <Shape
+                allShapes={allShapes}
+                selected={selected}
+                key={shape.id}
+                id={shape.id}
+                type={shape.type}
+                opacity={shape.opacity}
+                position={shape.position}
+                size={shape.size}
+                childIds={layerShape.childIds}
+              />
+            )
+          })}
+        </G>
       )
     }
   },
@@ -76,14 +95,17 @@ class Shape extends React.PureComponent {
   handleShouldSetResponder = event => true
 
   render() {
-    const { id, type, opacity, selected, position, size } = this.props
+    const { allShapes, selectedShapes, type, opacity, selected, position, size, childIds } = this.props
 
     return (
       React.createElement(shapeRegistration[type].render, {
+        allShapes,
+        selectedShapes,
         opacity,
         selected,
         position,
         size,
+        childIds,
         onStartShouldSetResponder: this.handleShouldSetResponder,
         onStartShouldSetResponderCapture: this.handleShouldSetResponder,
         onMoveShouldSetResponderCapture: this.handleShouldSetResponder,

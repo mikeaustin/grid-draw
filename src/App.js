@@ -24,7 +24,8 @@ const theme = {
 const mapStateToProps = state => {
   return {
     allShapes: state.allShapes,
-    layerShapes: state.layerShapeIds.map(id => state.allShapes[id]),
+    layerShapeIds: state.layerShapeIds,
+    layerShapes: state.layerShapeIds.map(shape => state.allShapes[shape.id]),
     selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
   }
 }
@@ -40,6 +41,7 @@ const mapDispatchToProps = dispatch => {
 
 const App = ({
   allShapes,
+  layerShapeIds,
   layerShapes,
   selectedShapes,
   selectShape,
@@ -66,6 +68,8 @@ const App = ({
       <View horizontal fill>
         <AppObjectsPanel
           theme={theme}
+          allShapes={allShapes}
+          layerShapeIds={layerShapeIds}
           layerShapes={layerShapes}
           selectedShapes={selectedShapes}
           selectShape={selectShape}
@@ -76,19 +80,26 @@ const App = ({
           // onResponderMove={event => console.log(event.nativeEvent.locationX)}
           style={{flex: 1, xboxShadow: 'inset 0 0 5px hsla(0, 0%, 0%, 0.5)'}}
         >
-          {Object.entries(allShapes).map(([id, shape]) => (
-            <Shape
-              key={id}
-              id={id}
-              type={shape.type}
-              opacity={shape.opacity}
-              selected={selectedShapes.some(shape => shape.id == id)}
-              position={shape.position}
-              size={shape.size}
-              onSelect={handleSelect}
-              onDrag={handleDrag}
-            />
-          ))}
+          {layerShapeIds.map((shapeData) => {
+            const shape = allShapes[shapeData.id]
+
+            return (
+              <Shape
+                allShapes={allShapes}
+                selectedShapes={selectedShapes}
+                key={shape.id}
+                id={shape.id}
+                type={shape.type}
+                opacity={shape.opacity}
+                selected={selectedShapes.some(selectedShape => selectedShape.id === shape.id)}
+                position={shape.position}
+                size={shape.size}
+                childIds={shapeData.childIds}
+                onSelect={handleSelect}
+                onDrag={handleDrag}
+              />
+            )
+          })}
         </Svg>
         <AppPropertiesPanel
           theme={theme}
