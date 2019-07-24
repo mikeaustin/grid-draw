@@ -23,9 +23,7 @@ const theme = {
 
 const mapStateToProps = state => {
   return {
-    allShapes: state.allShapes,
-    layerShapeIds: state.layerShapeIds,
-    layerShapes: state.layerShapeIds.map(shape => state.allShapes[shape.id]),
+    allShapes2: state.allShapes2,
     selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
   }
 }
@@ -40,9 +38,7 @@ const mapDispatchToProps = dispatch => {
 }
 
 const App = ({
-  allShapes,
-  layerShapeIds,
-  layerShapes,
+  allShapes2,
   selectedShapes,
   selectShape,
   transformShape,
@@ -70,11 +66,6 @@ const App = ({
       <View horizontal fill>
         <AppObjectsPanel
           theme={theme}
-          // allShapes={allShapes}
-          // layerShapeIds={layerShapeIds}
-          // layerShapes={layerShapes}
-          // selectedShapes={selectedShapes}
-          // selectShape={selectShape}
         />
         <Svg
           onStartShouldSetResponder={event => true}
@@ -82,12 +73,12 @@ const App = ({
           // onResponderMove={event => console.log(event.nativeEvent.locationX)}
           style={{flex: 1, xboxShadow: 'inset 0 0 5px hsla(0, 0%, 0%, 0.5)'}}
         >
-          {layerShapeIds.map((shapeData) => {
-            const shape = allShapes[shapeData.id]
+          {allShapes2[0].childIds.map((childId) => {
+            const shape = allShapes2[childId]
 
             return (
               <Shape
-                allShapes={allShapes}
+                allShapes2={allShapes2}
                 selectedShapes={selectedShapes}
                 key={shape.id}
                 id={shape.id}
@@ -96,7 +87,7 @@ const App = ({
                 selected={selectedShapes.some(selectedShape => selectedShape.id === shape.id)}
                 position={shape.position}
                 size={shape.size}
-                childIds={shapeData.childIds}
+                childIds={allShapes2[childId].childIds}
                 onSelect={handleSelect}
                 onDrag={handleDrag}
               />

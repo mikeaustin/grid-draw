@@ -18,14 +18,14 @@ const initialState = Immutable({
     3: { id: 3, type: 'GridDraw.Ellipse', position: Point(100, 100), size: Point(100, 100), opacity: 1.0 },
     4: { id: 4, type: 'GridDraw.Rectangle', position: Point(300, 100), size: Point(100, 100), opacity: 1.0 },
   },
-  layerShapeIds: [
-    { id: 0, childIds: [] },
-    { id: 1, childIds: [] },
-    { id: 2, childIds: [
-      { id: 3, childIds: [] },
-      { id: 4, childIds: [] },
-    ] },
-  ],
+  allShapes2: {
+    0: { id: 0, type: 'GridDraw.Group', position: Point(0, 0), size: Point(0, 0), opacity: 1.0, childIds: [1, 2, 3] },
+      1: { id: 1, type: 'GridDraw.Ellipse', position: Point(100, 100), size: Point(100, 100), opacity: 1.0, childIds: [], parentId: 0 },
+      2: { id: 2, type: 'GridDraw.Rectangle', position: Point(300, 100), size: Point(100, 100), opacity: 1.0, childIds: [], parentId: 0 },
+      3: { id: 3, type: 'GridDraw.Group', position: Point(200, 200), size: Point(100, 100), opacity: 1.0, childIds: [4, 5], parentId: 0 },
+        4: { id: 4, type: 'GridDraw.Ellipse', position: Point(100, 100), size: Point(100, 100), opacity: 1.0, childIds: [], parentId: 3 },
+        5: { id: 5, type: 'GridDraw.Rectangle', position: Point(300, 100), size: Point(100, 100), opacity: 1.0, childIds: [], parentId: 3 },
+  },
   selectedShapeIds: [],
   selectedTool: ActionTypes.MOVE_SHAPE,
 })
@@ -44,11 +44,12 @@ const shapeReducer = (state = initialState, action) => {
       })
     }
     case ActionTypes.MOVE_SHAPE: {
-      const { allShapes } = state
+      const { allShapes, allShapes2 } = state
       const { id, delta } = action.payload
 
       return state.merge({
-        allShapes: allShapes.update(id, merge(({ position }) => ({ position: add(position, delta) })))
+        allShapes: allShapes.update(id, merge(({ position }) => ({ position: add(position, delta) }))),
+        allShapes2: allShapes2.update(id, merge(({ position }) => ({ position: add(position, delta) }))),
       })
     }
     case ActionTypes.SCALE_SHAPE: {
