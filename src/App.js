@@ -49,6 +49,8 @@ const App = ({
   setOpacity,
   dispatch
 }) => {
+  console.log('App.render()')
+
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
 
   const handleSelect = id => {
@@ -68,11 +70,11 @@ const App = ({
       <View horizontal fill>
         <AppObjectsPanel
           theme={theme}
-          allShapes={allShapes}
-          layerShapeIds={layerShapeIds}
-          layerShapes={layerShapes}
-          selectedShapes={selectedShapes}
-          selectShape={selectShape}
+          // allShapes={allShapes}
+          // layerShapeIds={layerShapeIds}
+          // layerShapes={layerShapes}
+          // selectedShapes={selectedShapes}
+          // selectShape={selectShape}
         />
         <Svg
           onStartShouldSetResponder={event => true}

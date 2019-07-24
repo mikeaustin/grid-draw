@@ -1,10 +1,12 @@
 import React from 'react'
-
 import { Text, TouchableWithoutFeedback } from 'react-native'
+
 import { View } from 'core/components'
 import PanelHeader from './PanelHeader'
+import { connect } from 'react-redux'
+import { ActionTypes, selectTool, selectShape, transformShape, setOpacity } from 'app/actions/common'
 
-const Shape = ({ depth = 0, theme, allShapes, selectedShapes, layerShape, selected, onSelect }) => {
+const Shape = ({ depth = 0, theme, allShapes, selectedShapeIds, layerShape, selected, onSelect }) => {
   return (
     <View>
       <TouchableWithoutFeedback key={layerShape.id} onPressIn={() => onSelect(layerShape.id)}>
@@ -20,22 +22,31 @@ const Shape = ({ depth = 0, theme, allShapes, selectedShapes, layerShape, select
               selected && {color: 'white'}
             ]}
           >
-            {allShapes[layerShape.id].type}
+            {allShapes.value[layerShape.id].type}
           </Text>
         </View>
       </TouchableWithoutFeedback>
       {layerShape.childIds.map(layerShape => {
-          const selected = selectedShapes.some(selectedShape => selectedShape.id === layerShape.id)
+          const selected = selectedShapeIds.some(selectedShapeId => selectedShapeId === layerShape.id)
 
           return (
-          <Shape depth={depth + 1} key={layerShape.id} theme={theme} allShapes={allShapes} layerShape={layerShape} selected={selected} onSelect={onSelect} />
+          <Shape
+            depth={depth + 1}
+            key={layerShape.id}
+            theme={theme}
+            allShapes={allShapes}
+            layerShape={layerShape}
+            selected={selected}
+            onSelect={onSelect}
+          />
         )
       })}
     </View>
   )
 }
 
-const AppObjectsPanel = ({ theme, allShapes, layerShapeIds, selectedShapes, selectShape }) => {
+const AppObjectsPanel = ({ theme, allShapes, layerShapeIds, selectedShapeIds, selectShape }) => {
+  console.log('AppObjectsPanel.render()')
   const handleSelect = id => {
     selectShape(id)
   }
@@ -49,14 +60,42 @@ const AppObjectsPanel = ({ theme, allShapes, layerShapeIds, selectedShapes, sele
       <PanelHeader heading="Objects" />
       <View style={{paddingVertical: 5}}>
         {layerShapeIds.map(layerShape => {
-          const shape = allShapes[layerShape.id]
-          const selected = selectedShapes.some(selectedShape => selectedShape.id === shape.id)
+          const shape = allShapes.value[layerShape.id]
+          const selected = selectedShapeIds.some(selectedShapeId => selectedShapeId === shape.id)
 
-          return <Shape key={layerShape.id} theme={theme} allShapes={allShapes} selectedShapes={selectedShapes} layerShape={layerShape} selected={selected} onSelect={handleSelect} />
+          return <Shape
+            key={layerShape.id}
+            theme={theme}
+            allShapes={allShapes}
+            selectedShapeIds={selectedShapeIds}
+            layerShape={layerShape}
+            selected={selected}
+            onSelect={handleSelect}
+          />
         })}
       </View>
     </View>
   )
 }
 
-export default AppObjectsPanel
+let allShapes = {}
+
+const mapStateToProps = state => {
+  console.log('AppObjectsPanel.mapStateToProps()')
+  allShapes.value = state.allShapes
+  return {
+    allShapes: allShapes,
+    layerShapeIds: state.layerShapeIds,
+    selectedShapeIds: state.selectedShapeIds,
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  console.log('AppObjectsPanel.mapDispatchToProps()')
+  return {
+    dispatch,
+    selectShape: id => dispatch(selectShape(id)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AppObjectsPanel)
