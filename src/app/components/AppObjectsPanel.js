@@ -10,7 +10,7 @@ const ShapeItemList = ({
   depth, theme, allShapes, childIds, selectedShapeIds, onSelect
 }) => {
   return (
-    childIds.map(childId => {
+    childIds.asMutable().reverse().map(childId => {
       const selected = selectedShapeIds.some(shapeId => shapeId === childId)
 
       return (
