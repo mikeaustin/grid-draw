@@ -2,7 +2,7 @@ import React from 'react';
 import { Spacer, Divider, Toolbar } from 'core/components'
 import { ActionTypes } from 'app/actions/common'
 
-const AppMainToolbar = ({ toolActionType, setToolActionType }) => {
+const AppMainToolbar = ({ toolActionType, setToolActionType, arrangeShape }) => {
   const borderColor = 'hsla(0, 0%, 0%, 0.29)'
 
   const toolbarStyle = {
@@ -26,6 +26,11 @@ const AppMainToolbar = ({ toolActionType, setToolActionType }) => {
         <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="025-ellipse" />
         <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="001-star" />
         <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="007-pen-tool" />
+      </Toolbar.Group>
+      <Divider xsize="xsmall" />
+      <Toolbar.Group title="Shapes" value={toolActionType} setValue={arrangeShape}>
+        <Toolbar.Button value={ActionTypes.BRING_TO_FRONT} icon="018-alignment-1" />
+        <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="002-object-alignment" />
       </Toolbar.Group>
       <Divider xsize="xsmall" />
       <Toolbar.Group title="Combine" value={toolActionType} setValue={setToolActionType}>

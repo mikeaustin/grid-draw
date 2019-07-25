@@ -39,11 +39,9 @@ const setOpacity = (id, opacity) => ({
   }
 })
 
-const bringToFont = id => ({
+const arrangeShape = id => ({
   type: ActionTypes.BRING_TO_FRONT,
-  payload: {
-    id,
-  }
+  payload: {}
 })
 
 export {
@@ -52,4 +50,5 @@ export {
   selectShape,
   transformShape,
   setOpacity,
+  arrangeShape,
 }

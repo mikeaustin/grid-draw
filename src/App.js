@@ -9,7 +9,7 @@ import JsxParser from 'react-jsx-parser'
 import { View } from 'core/components'
 import Shape from 'app/components/Shape'
 import { AppMainToolbar, AppObjectsPanel, AppPropertiesPanel, AppCanvasShape } from 'app/components'
-import { ActionTypes, selectTool, selectShape, transformShape, setOpacity } from 'app/actions/common'
+import { ActionTypes, selectTool, selectShape, transformShape, setOpacity, arrangeShape } from 'app/actions/common'
 import './App.css'
 
 const theme = {
@@ -31,7 +31,8 @@ const mapDispatchToProps = dispatch => {
     dispatch,
     transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
     selectShape: id => dispatch(selectShape(id)),
-    setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity))
+    setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
+    arrangeShape: () => dispatch(arrangeShape()),
   }
 }
 
@@ -41,6 +42,7 @@ const App = ({
   selectShape,
   transformShape,
   setOpacity,
+  arrangeShape,
   dispatch
 }) => {
   console.log('App.render()')
@@ -61,6 +63,7 @@ const App = ({
       <AppMainToolbar
         toolActionType={toolActionType}
         setToolActionType={setToolActionType}
+        arrangeShape={arrangeShape}
       />
       <View horizontal fill>
         <AppObjectsPanel
