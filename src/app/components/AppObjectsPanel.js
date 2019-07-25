@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import { selectShape } from 'app/actions/common'
 
 const ShapeList = ({
-  depth = 0, theme, allShapes2, childIds, selectedShapeIds, onSelect
+  depth, theme, allShapes, childIds, selectedShapeIds, onSelect
 }) => {
   return (
     childIds.map(childId => {
@@ -17,14 +17,16 @@ const ShapeList = ({
         <ShapeItem
           key={childId}
           id={childId}
-          type={allShapes2[childId].type}
+          type={allShapes[childId].type}
           depth={depth}
           theme={theme}
-          allShapes2={allShapes2}
-          childIds={allShapes2[childId].childIds}
-          selectedShapeIds={selectedShapeIds}
           selected={selected}
           onSelect={onSelect}
+          shapeListProps={{
+            allShapes,
+            selectedShapeIds,
+            childIds: allShapes[childId].childIds
+          }}
         />
       )
     })
@@ -32,8 +34,7 @@ const ShapeList = ({
 }
 
 const ShapeItem = ({
-  allShapes2, childIds, selectedShapeIds,
-  depth, theme, id, type, selected, onSelect
+  depth, theme, id, type, selected, onSelect, shapeListProps
 }) => {
   return (
     <View>
@@ -57,16 +58,14 @@ const ShapeItem = ({
       <ShapeList
         depth={depth + 1}
         theme={theme}
-        allShapes2={allShapes2}
-        selectedShapeIds={selectedShapeIds}
-        childIds={childIds}
         onSelect={onSelect}
+        {...shapeListProps}
       />
     </View>
   )
 }
 
-const AppObjectsPanel = ({ theme, allShapes2, rootChildIds, selectedShapeIds, selectShape }) => {
+const AppObjectsPanel = ({ theme, allShapes, rootChildIds, selectedShapeIds, selectShape }) => {
   console.log('AppObjectsPanel.render()')
 
   const handleSelect = id => {
@@ -84,27 +83,11 @@ const AppObjectsPanel = ({ theme, allShapes2, rootChildIds, selectedShapeIds, se
         <ShapeList
           depth={0}
           theme={theme}
-          allShapes2={allShapes2}
+          allShapes={allShapes}
           selectedShapeIds={selectedShapeIds}
           childIds={rootChildIds}
           onSelect={handleSelect}
         />
-        {/* {rootChildIds.map(childId => {
-          const selected = selectedShapeIds.some(shapeId => shapeId === childId)
-
-          return (
-            <ShapeItem
-              key={childId}
-              theme={theme}
-              allShapes2={allShapes2}
-              childIds={allShapes2[childId].childIds}
-              selectedShapeIds={selectedShapeIds}
-              id={childId}
-              selected={selected}
-              onSelect={handleSelect}
-            />
-          )
-        })} */}
       </View>
     </View>
   )
@@ -113,7 +96,7 @@ const AppObjectsPanel = ({ theme, allShapes2, rootChildIds, selectedShapeIds, se
 const mapStateToProps = state => {
   console.log('AppObjectsPanel.mapStateToProps()')
   return {
-    allShapes2: state.allShapes2,
+    allShapes: state.allShapes2,
     rootChildIds: state.allShapes2[0].childIds,
     selectedShapeIds: state.selectedShapeIds,
   }

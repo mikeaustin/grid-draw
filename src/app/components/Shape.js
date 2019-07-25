@@ -50,21 +50,21 @@ const shapeRegistration = {
           {...props}
         >
           {childIds.map(childId => {
-            const shape = allShapes2[childId]
-            const selected = selectedShapes.some(selectedShape => selectedShape.id === childId)
+            const { type, opacity, position, size } = allShapes2[childId]
+            const selected = selectedShapes.some(shape => shape.id === childId)
 
             return (
               <Shape
                 allShapes2={allShapes2}
                 selectedShapes={selectedShapes}
                 selected={selected}
-                key={shape.id}
-                id={shape.id}
-                type={shape.type}
-                opacity={shape.opacity}
-                position={shape.position}
-                size={shape.size}
-                childIds={allShapes2[childId].childIds}
+                key={childId}
+                id={childId}
+                type={type}
+                opacity={opacity}
+                position={position}
+                size={size}
+                childIds={childIds}
               />
             )
           })}
@@ -118,32 +118,3 @@ class Shape extends React.PureComponent {
 }
 
 export default Shape
-
-// const Shape = ({ id, type, position, size, onDrag }) => {
-//   console.log('Shape()')
-//   const touchStart = useRef()
-
-//   const handleTouchStart = useCallback(event => {
-//     console.log('Shape.handleTouchStart', event.nativeEvent.pageX)
-//     event.preventDefault()
-
-//     touchStart.current = ([event.nativeEvent.pageX, event.nativeEvent.pageY])
-//   }, [id])
-
-//   const handleTouchMove = useCallback(event => {
-//     event.preventDefault()
-// console.log('handleTouchMove', event.nativeEvent.pageX, touchStart.current[0])
-//     touchStart.current = ([event.nativeEvent.pageX, event.nativeEvent.pageY])
-//     onDrag(id, [event.nativeEvent.pageX - touchStart.current[0], event.nativeEvent.pageY - touchStart.current[1]])
-//   }, [id, touchStart])
-
-//   return (
-//     React.cloneElement(shapeRegistration[type].render(position, size), {
-//       onStartShouldSetResponder: event => true,
-//       onStartShouldSetResponderCapture: event => true,
-//       onMoveShouldSetResponderCapture: event => true,
-//       onResponderGrant: handleTouchStart,
-//       onResponderMove: handleTouchMove,
-//     })
-//   )
-// }

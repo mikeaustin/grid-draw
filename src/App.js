@@ -2,17 +2,15 @@ import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { connect } from 'react-redux'
 // import { Slider } from 'react-native-elements'
 // import * as Slider from '@react-native-community/slider'
-import Slider from "react-native-slider"
+// import Slider from "react-native-slider"
 import { Svg, Ellipse, Rect } from 'react-native-svg'
 import JsxParser from 'react-jsx-parser'
 
-import './App.css'
 import { View } from 'core/components'
 import Shape from 'app/components/Shape'
-import AppMainToolbar from 'app/components/AppMainToolbar'
-import AppObjectsPanel from 'app/components/AppObjectsPanel'
-import AppPropertiesPanel from 'app/components/AppPropertiesPanel'
+import { AppMainToolbar, AppObjectsPanel, AppPropertiesPanel, AppCanvasShape } from 'app/components'
 import { ActionTypes, selectTool, selectShape, transformShape, setOpacity } from 'app/actions/common'
+import './App.css'
 
 const theme = {
   backgroundColor: 'transparent',
@@ -74,19 +72,19 @@ const App = ({
           style={{flex: 1, xboxShadow: 'inset 0 0 5px hsla(0, 0%, 0%, 0.5)'}}
         >
           {allShapes2[0].childIds.map((childId) => {
-            const shape = allShapes2[childId]
+            const { type, opacity, position, size } = allShapes2[childId]
 
             return (
-              <Shape
+              <AppCanvasShape
                 allShapes2={allShapes2}
                 selectedShapes={selectedShapes}
-                key={shape.id}
-                id={shape.id}
-                type={shape.type}
-                opacity={shape.opacity}
-                selected={selectedShapes.some(selectedShape => selectedShape.id === shape.id)}
-                position={shape.position}
-                size={shape.size}
+                key={childId}
+                id={childId}
+                type={type}
+                opacity={opacity}
+                selected={selectedShapes.some(shape => shape.id === childId)}
+                position={position}
+                size={size}
                 childIds={allShapes2[childId].childIds}
                 onSelect={handleSelect}
                 onDrag={handleDrag}
