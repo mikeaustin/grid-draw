@@ -6,7 +6,7 @@ import PanelHeader from './PanelHeader'
 import { connect } from 'react-redux'
 import { selectShape } from 'app/actions/common'
 
-const ShapeList = ({
+const ShapeItemList = ({
   depth, theme, allShapes, childIds, selectedShapeIds, onSelect
 }) => {
   return (
@@ -55,7 +55,7 @@ const ShapeItem = ({
           </Text>
         </View>
       </TouchableWithoutFeedback>
-      <ShapeList
+      <ShapeItemList
         depth={depth + 1}
         theme={theme}
         onSelect={onSelect}
@@ -80,7 +80,7 @@ const AppObjectsPanel = ({ theme, allShapes, rootChildIds, selectedShapeIds, sel
     }}>
       <PanelHeader heading="Objects" />
       <View style={{paddingVertical: 5}}>
-        <ShapeList
+        <ShapeItemList
           depth={0}
           theme={theme}
           allShapes={allShapes}

@@ -21,8 +21,8 @@ const theme = {
 
 const mapStateToProps = state => {
   return {
-    allShapes2: state.allShapes2,
-    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
+    allShapes: state.allShapes2,
+    selectedShapes: state.selectedShapeIds.map(id => state.allShapes2[id]),
   }
 }
 
@@ -36,7 +36,7 @@ const mapDispatchToProps = dispatch => {
 }
 
 const App = ({
-  allShapes2,
+  allShapes,
   selectedShapes,
   selectShape,
   transformShape,
@@ -71,12 +71,12 @@ const App = ({
           // onResponderMove={event => console.log(event.nativeEvent.locationX)}
           style={{flex: 1, xboxShadow: 'inset 0 0 5px hsla(0, 0%, 0%, 0.5)'}}
         >
-          {allShapes2[0].childIds.map((childId) => {
-            const { type, opacity, position, size } = allShapes2[childId]
+          {allShapes[0].childIds.map((childId) => {
+            const { type, opacity, position, size } = allShapes[childId]
 
             return (
               <AppCanvasShape
-                allShapes2={allShapes2}
+                allShapes={allShapes}
                 selectedShapes={selectedShapes}
                 key={childId}
                 id={childId}
@@ -85,7 +85,8 @@ const App = ({
                 selected={selectedShapes.some(shape => shape.id === childId)}
                 position={position}
                 size={size}
-                childIds={allShapes2[childId].childIds}
+                childIds={allShapes[childId].childIds}
+                groupProps={{ allShapes, selectedShapes }}
                 onSelect={handleSelect}
                 onDrag={handleDrag}
               />

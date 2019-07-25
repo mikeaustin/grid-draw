@@ -1,11 +1,11 @@
 import React from 'react'
-import { Svg, G, Ellipse, Rect } from 'react-native-svg'
+import { G, Ellipse, Rect } from 'react-native-svg'
 
 import { Point } from 'core/utils/geometry'
 
 const shapeRegistration = {
   'GridDraw.Ellipse': {
-    render: ({ allShapes2, selectedShapes, selected, position, size, childIds, ...props }) => {
+    render: ({ selected, position, size, ...props }) => {
       return (
         <Ellipse
           cx={position.x + size.x / 2}
@@ -21,7 +21,7 @@ const shapeRegistration = {
     }
   },
   'GridDraw.Rectangle': {
-    render: ({ allShapes2, selectedShapes, selected, position, size, childIds, ...props }) => {
+    render: ({ selected, position, size, ...props }) => {
       return (
         <Rect
           x={position.x}
@@ -37,7 +37,7 @@ const shapeRegistration = {
     }
   },
   'GridDraw.Group': {
-    render: ({ allShapes2, selectedShapes, selected, position, size, childIds, ...props }) => {
+    render: ({ selected, position, size, ...props }) => {
       return (
         <G
           x={position.x}
@@ -48,30 +48,34 @@ const shapeRegistration = {
           stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
           fill="#f0f0f0"
           {...props}
-        >
-          {childIds.map(childId => {
-            const { type, opacity, position, size } = allShapes2[childId]
-            const selected = selectedShapes.some(shape => shape.id === childId)
-
-            return (
-              <Shape
-                allShapes2={allShapes2}
-                selectedShapes={selectedShapes}
-                selected={selected}
-                key={childId}
-                id={childId}
-                type={type}
-                opacity={opacity}
-                position={position}
-                size={size}
-                childIds={childIds}
-              />
-            )
-          })}
-        </G>
+        />
       )
     }
   },
+}
+
+const ShapeList = ({ childIds, groupProps, onSelect, onDrag }) => {
+  return (
+    childIds.map(childId => {
+      const { type, opacity, position, size } = groupProps.allShapes[childId]
+      const selected = groupProps.selectedShapes.some(shape => shape.id === childId)
+
+      return (
+        <Shape
+          key={childId}
+          type={type}
+          opacity={opacity}
+          position={position}
+          size={size}
+          selected={selected}
+          childIds={groupProps.allShapes[childId].childIds}
+          groupProps={groupProps}
+          onSelect={onSelect}
+          onDrag={onDrag}
+        />
+      )
+    })
+  )
 }
 
 class Shape extends React.PureComponent {
@@ -89,30 +93,31 @@ class Shape extends React.PureComponent {
 
     event.preventDefault()
 
-    onDrag(id, Point(event.nativeEvent.pageX - this.touchStart[0], event.nativeEvent.pageY - this.touchStart[1]))
+    onDrag(id, Point(
+      event.nativeEvent.pageX - this.touchStart[0],
+      event.nativeEvent.pageY - this.touchStart[1])
+    )
     this.touchStart = [event.nativeEvent.pageX, event.nativeEvent.pageY]
   }
 
   handleShouldSetResponder = event => true
 
   render() {
-    const { allShapes2, selectedShapes, type, opacity, selected, position, size, childIds } = this.props
+    const {
+      type, opacity, selected, position, size, childIds, groupProps, onSelect, onDrag
+    } = this.props
 
     return (
       React.createElement(shapeRegistration[type].render, {
-        allShapes2,
-        selectedShapes,
-        opacity,
-        selected,
-        position,
-        size,
-        childIds,
+        opacity, selected, position, size,
         onStartShouldSetResponder: this.handleShouldSetResponder,
         onStartShouldSetResponderCapture: this.handleShouldSetResponder,
         onMoveShouldSetResponderCapture: this.handleShouldSetResponder,
         onResponderGrant: this.handleTouchStart,
         onResponderMove: this.handleTouchMove,
-      })
+      }, (
+        <ShapeList childIds={childIds} groupProps={groupProps} onSelect={onSelect} onDrag={onDrag} />
+      ))
     )
   }
 }
