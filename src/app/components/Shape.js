@@ -55,12 +55,12 @@ const shapeRegistration = {
 }
 
 const ShapeList = ({ 
-  childIds, groupProps, onSelect, onDrag
+  childIds, shapeListProps, onSelect, onDrag
 }) => {
   return (
     childIds.map(childId => {
-      const { type, opacity, position, size } = groupProps.allShapes[childId]
-      const selected = groupProps.selectedShapes.some(shape => shape.id === childId)
+      const { type, opacity, position, size } = shapeListProps.allShapes[childId]
+      const selected = shapeListProps.selectedShapes.some(shape => shape.id === childId)
 
       return (
         <Shape
@@ -70,8 +70,8 @@ const ShapeList = ({
           position={position}
           size={size}
           selected={selected}
-          childIds={groupProps.allShapes[childId].childIds}
-          groupProps={groupProps}
+          childIds={shapeListProps.allShapes[childId].childIds}
+          shapeListProps={shapeListProps}
           onSelect={onSelect}
           onDrag={onDrag}
         />
@@ -106,7 +106,7 @@ class Shape extends React.PureComponent {
 
   render() {
     const {
-      type, opacity, selected, position, size, childIds, groupProps, onSelect, onDrag
+      type, opacity, selected, position, size, childIds, shapeListProps, onSelect, onDrag
     } = this.props
 
     return (
@@ -120,7 +120,7 @@ class Shape extends React.PureComponent {
       }, (
         <ShapeList 
           childIds={childIds}
-          groupProps={groupProps}
+          shapeListProps={shapeListProps}
           onSelect={onSelect}
           onDrag={onDrag}
         />

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import { connect } from 'react-redux'
 // import { Slider } from 'react-native-elements'
 // import * as Slider from '@react-native-community/slider'
@@ -46,6 +46,7 @@ const App = ({
   console.log('App.render()')
 
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
+  const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [allShapes, selectedShapes])
 
   const handleSelect = id => {
     selectShape(id)
@@ -76,8 +77,6 @@ const App = ({
 
             return (
               <AppCanvasShape
-                allShapes={allShapes}
-                selectedShapes={selectedShapes}
                 key={childId}
                 id={childId}
                 type={type}
@@ -86,7 +85,7 @@ const App = ({
                 position={position}
                 size={size}
                 childIds={allShapes[childId].childIds}
-                groupProps={{ allShapes, selectedShapes }}
+                shapeListProps={shapeListProps}
                 onSelect={handleSelect}
                 onDrag={handleDrag}
               />

@@ -65,7 +65,9 @@ const ShapeItem = ({
   )
 }
 
-const AppObjectsPanel = ({ theme, allShapes, rootChildIds, selectedShapeIds, selectShape }) => {
+const AppObjectsPanel = ({
+  theme, allShapes, rootChildIds, selectedShapeIds, selectShape
+}) => {
   console.log('AppObjectsPanel.render()')
 
   const handleSelect = id => {

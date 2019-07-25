@@ -44,27 +44,26 @@ const shapeReducer = (state = initialState, action) => {
       })
     }
     case ActionTypes.MOVE_SHAPE: {
-      const { allShapes, allShapes2 } = state
+      const { allShapes2 } = state
       const { id, delta } = action.payload
 
       return state.merge({
-        allShapes: allShapes.update(id, merge(({ position }) => ({ position: add(position, delta) }))),
         allShapes2: allShapes2.update(id, merge(({ position }) => ({ position: add(position, delta) }))),
       })
     }
     case ActionTypes.SCALE_SHAPE: {
-      const { allShapes } = state
+      const { allShapes2 } = state
       const { id, delta } = action.payload
 
       return state.merge({
-        allShapes: allShapes.update(id, merge(({ size }) => ({ size: add(size, delta) })))
+        allShapes2: allShapes2.update(id, merge(({ size }) => ({ size: add(size, delta) })))
       })
     }
     case ActionTypes.SET_OPACITY: {
       const { id, opacity } = action.payload
 
       return state.merge({
-        allShapes: state.allShapes.update(id, merge(() => ({ opacity: opacity })))
+        allShapes2: state.allShapes2.update(id, merge(() => ({ opacity: opacity })))
       })
     }
   }
