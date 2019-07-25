@@ -6,7 +6,35 @@ import PanelHeader from './PanelHeader'
 import { connect } from 'react-redux'
 import { selectShape } from 'app/actions/common'
 
-const Shape = ({ depth = 0, id, theme, allShapes2, childIds, selectedShapeIds, layerShape, selected, onSelect }) => {
+const ShapeList = ({
+  depth = 0, theme, allShapes2, childIds, selectedShapeIds, onSelect
+}) => {
+  return (
+    childIds.map(childId => {
+      const selected = selectedShapeIds.some(shapeId => shapeId === childId)
+
+      return (
+        <ShapeItem
+          key={childId}
+          id={childId}
+          type={allShapes2[childId].type}
+          depth={depth}
+          theme={theme}
+          allShapes2={allShapes2}
+          childIds={allShapes2[childId].childIds}
+          selectedShapeIds={selectedShapeIds}
+          selected={selected}
+          onSelect={onSelect}
+        />
+      )
+    })
+  )
+}
+
+const ShapeItem = ({
+  allShapes2, childIds, selectedShapeIds,
+  depth, theme, id, type, selected, onSelect
+}) => {
   return (
     <View>
       <TouchableWithoutFeedback key={id} onPressIn={() => onSelect(id)}>
@@ -22,26 +50,18 @@ const Shape = ({ depth = 0, id, theme, allShapes2, childIds, selectedShapeIds, l
               selected && {color: 'white'}
             ]}
           >
-            {allShapes2[id].type}
+            {type}
           </Text>
         </View>
       </TouchableWithoutFeedback>
-      {childIds.map(childId => {
-        const selected = selectedShapeIds.some(shapeId => shapeId === childId)
-
-        return (
-          <Shape
-            key={childId}
-            id={childId}
-            depth={depth + 1}
-            theme={theme}
-            allShapes2={allShapes2}
-            childIds={allShapes2[childId].childIds}
-            selected={selected}
-            onSelect={onSelect}
-          />
-        )
-      })}
+      <ShapeList
+        depth={depth + 1}
+        theme={theme}
+        allShapes2={allShapes2}
+        selectedShapeIds={selectedShapeIds}
+        childIds={childIds}
+        onSelect={onSelect}
+      />
     </View>
   )
 }
@@ -61,20 +81,30 @@ const AppObjectsPanel = ({ theme, allShapes2, rootChildIds, selectedShapeIds, se
     }}>
       <PanelHeader heading="Objects" />
       <View style={{paddingVertical: 5}}>
-        {rootChildIds.map(childId => {
+        <ShapeList
+          depth={0}
+          theme={theme}
+          allShapes2={allShapes2}
+          selectedShapeIds={selectedShapeIds}
+          childIds={rootChildIds}
+          onSelect={handleSelect}
+        />
+        {/* {rootChildIds.map(childId => {
           const selected = selectedShapeIds.some(shapeId => shapeId === childId)
 
-          return <Shape
-            key={childId}
-            theme={theme}
-            allShapes2={allShapes2}
-            childIds={allShapes2[childId].childIds}
-            selectedShapeIds={selectedShapeIds}
-            id={childId}
-            selected={selected}
-            onSelect={handleSelect}
-          />
-        })}
+          return (
+            <ShapeItem
+              key={childId}
+              theme={theme}
+              allShapes2={allShapes2}
+              childIds={allShapes2[childId].childIds}
+              selectedShapeIds={selectedShapeIds}
+              id={childId}
+              selected={selected}
+              onSelect={handleSelect}
+            />
+          )
+        })} */}
       </View>
     </View>
   )
