@@ -39,17 +39,20 @@ const refocus = textInput => {
  * NumericInput
  * @param {} param0 
  */
-const NumericInput = ({ value, disabled, onSubmit }) => {
+const NumericInput = ({ value, maxLength, width, units, disabled, onSubmit }) => {
   const [text, setText] = useState('––')
   const textInput = useRef()
+  const [unitsWidth, setUnitsWidth] = useState(0)
 
   useEffect(() => {
+    console.log('useEffect')
     setText(valueOrBlank(value, () => value.toFixed(0)))
   }, [value])
 
   const handleSubmit = useCallback(value => {
     const clippedValue = Math.max(0, Math.min(100, value))
 
+    console.log('handleSubmit')
     onSubmit(clippedValue)
   })
 
@@ -73,20 +76,24 @@ const NumericInput = ({ value, disabled, onSubmit }) => {
     handleSubmit(Number(text))
   })
 
+  const handleLayout = useCallback(event => {
+    setUnitsWidth(event.nativeEvent.layout.width)
+  })
+
   return (
     <View horizontal align="center" style={styles.numericInput}>
       <TextInput
         ref={textInput}
         value={text}
-        maxLength={3}
+        maxLength={maxLength}
         disabled={disabled}
         selectTextOnFocus
-        style={styles.textInput}
+        style={[styles.textInput, {width, paddingRight: unitsWidth + 7}]}
         onChangeText={handleChangeText}
         onKeyPress={handleKeyPress}
         onBlur={handleBlur}
       />
-      <Text style={styles.unitText}>%</Text>
+      <Text style={styles.unitText} onLayout={handleLayout}>{units}</Text>
     </View>
   )
 }
@@ -124,12 +131,33 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity }) => {
         />
         <Spacer />
         <NumericInput
+          width={50}
+          maxLength={3}
+          units="%"
           value={selectedShapes[0] && selectedShapes[0].opacity * 100}
           disabled={!selectedShapes[0]}
           onSubmit={handleOpacityInputSubmit}
         />
       </View>
-      
+      <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
+        <NumericInput
+          width={65}
+          maxLength={4}
+          units="px"
+          value={selectedShapes[0] && selectedShapes[0].position.x}
+          disabled={!selectedShapes[0]}
+          onSubmit={handleOpacityInputSubmit}
+        />
+        <Spacer />
+        <NumericInput
+          width={65}
+          maxLength={4}
+          units="px"
+          value={selectedShapes[0] && selectedShapes[0].position.y}
+          disabled={!selectedShapes[0]}
+          onSubmit={handleOpacityInputSubmit}
+        />
+      </View>
       <SectionList
         renderSectionHeader={({section: {title}}) => (
           <View style={{paddingVertical: 5, paddingHorizontal: 10, marginTop: 10}}>
