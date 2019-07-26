@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { StyleSheet, Text, Image, Button, TextInput, SectionList } from 'react-native'
 import Slider from 'react-native-slider'
 
@@ -30,30 +30,60 @@ const valueOrBlank = (value, callback) => (
     : '––'
 )
 
+const refocus = textInput => {
+  textInput.current.blur()
+  setTimeout(() => textInput.current.focus(), 0)
+}
+
+/**
+ * NumericInput
+ * @param {} param0 
+ */
 const NumericInput = ({ value, disabled, onSubmit }) => {
   const [text, setText] = useState('––')
+  const textInput = useRef()
 
   useEffect(() => {
     setText(valueOrBlank(value, () => value.toFixed(0)))
   }, [value])
 
+  const handleSubmit = useCallback(value => {
+    const clippedValue = Math.max(0, Math.min(100, value))
+
+    onSubmit(clippedValue)
+  })
+
   const handleChangeText = useCallback(text => {
     setText(valueOrBlank(text))
   })
 
+  const handleKeyPress = event => {
+    const increment = event.nativeEvent.shiftKey ? 10 : 1
+
+    if (event.nativeEvent.key === 'ArrowUp') {
+      refocus(textInput)  
+      handleSubmit(Number(text) + increment)
+    } else if (event.nativeEvent.key === 'ArrowDown') {
+      refocus(textInput)
+      handleSubmit(Number(text) - increment)
+    }
+  }
+
   const handleBlur = useCallback(event => {
-    onSubmit(Math.max(0, Math.min(100, Number(text))))
+    handleSubmit(Number(text))
   })
 
   return (
     <View horizontal align="center" style={styles.numericInput}>
       <TextInput
+        ref={textInput}
         value={text}
         maxLength={3}
         disabled={disabled}
         selectTextOnFocus
         style={styles.textInput}
         onChangeText={handleChangeText}
+        onKeyPress={handleKeyPress}
         onBlur={handleBlur}
       />
       <Text style={styles.unitText}>%</Text>
