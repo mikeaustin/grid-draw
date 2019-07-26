@@ -1,21 +1,74 @@
-import React from 'react'
-import { Text, Image, Button, TextInput, SectionList } from 'react-native'
+import React, { useState, useCallback, useEffect } from 'react'
+import { StyleSheet, Text, Image, Button, TextInput, SectionList } from 'react-native'
 import Slider from 'react-native-slider'
 
 import { View, Spacer, Divider, Toolbar } from 'core/components'
 import PanelHeader from './PanelHeader'
+
+const styles = StyleSheet.create({
+  numericInput: {
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderRadius: 2,
+    borderColor: 'hsla(0, 0%, 0%, 0.1)',
+  },
+  textInput: {
+    width: 50,
+    padding: 5,
+    paddingRight: 20,
+    textAlign: 'right',
+  },
+  unitText: {
+    position: 'absolute',
+    right: 5,
+  }
+})
+
+const valueOrBlank = (value, callback) => (
+  value !== undefined
+    ? (callback ? callback() : value)
+    : '––'
+)
+
+const NumericInput = ({ value, disabled, onSubmit }) => {
+  const [text, setText] = useState('––')
+
+  useEffect(() => {
+    setText(valueOrBlank(value, () => value.toFixed(0)))
+  }, [value])
+
+  const handleChangeText = useCallback(text => {
+    setText(valueOrBlank(text))
+  })
+
+  const handleBlur = useCallback(event => {
+    onSubmit(Math.max(0, Math.min(100, Number(text))))
+  })
+
+  return (
+    <View horizontal align="center" style={styles.numericInput}>
+      <TextInput
+        value={text}
+        maxLength={3}
+        disabled={disabled}
+        selectTextOnFocus
+        style={styles.textInput}
+        onChangeText={handleChangeText}
+        onBlur={handleBlur}
+      />
+      <Text style={styles.unitText}>%</Text>
+    </View>
+  )
+}
 
 const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity }) => {
   const handleOpacityValueChange = opacity => {
     setOpacity(selectedShapes[0].id, opacity)
   }
 
-  // const handleOpacityKeyPress = event => {
-  //   if (event.nativeEvent.key === 'Enter') {
-  //     console.log('set opacity', opacityText)
-  //     setOpacity(selection[0], Number(opacityText))
-  //   }
-  // }
+  const handleOpacityInputSubmit = opacity => {
+    setOpacity(selectedShapes[0].id, opacity / 100)
+  }
 
   return (
     <View width={256} style={{backgroundColor: theme.backgroundColor,
@@ -23,7 +76,7 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity }) => {
       borderLeftColor: theme.borderColor,
     }}>
       <PanelHeader heading="Properties" />
-      <View horizontal style={{ paddingVertical: 5, paddingHorizontal: 10}}>
+      <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
         <Slider
           minimumTrackTintColor="rgb(33, 150, 243)"
           thumbTintColor="white"
@@ -40,11 +93,10 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity }) => {
           onValueChange={handleOpacityValueChange}
         />
         <Spacer />
-        <TextInput
-          value={selectedShapes[0] ? selectedShapes[0].opacity.toFixed(2) : '0.00'}
-          // onChangeText={text => setOpacity(text)}
-          // onKeyPress={handleOpacityKeyPress}
-          style={{width: 35}}
+        <NumericInput
+          value={selectedShapes[0] && selectedShapes[0].opacity * 100}
+          disabled={!selectedShapes[0]}
+          onSubmit={handleOpacityInputSubmit}
         />
       </View>
       

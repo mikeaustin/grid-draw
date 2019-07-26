@@ -56,7 +56,7 @@ const shapeReducer = (state = initialState, action) => {
       const { id, opacity } = action.payload
 
       return state.merge({
-        allShapes2: state.allShapes2.update(id, merge(() => ({ opacity: opacity })))
+        allShapes2: state.allShapes2.update(id, merge(() => ({ opacity: Math.round(opacity * 100) / 100 })))
       })
     }
     case ActionTypes.BRING_TO_FRONT: {

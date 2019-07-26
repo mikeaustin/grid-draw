@@ -68,7 +68,7 @@ const ShapeItem = ({
 const AppObjectsPanel = ({
   theme, allShapes, rootChildIds, selectedShapeIds, selectShape
 }) => {
-  console.log('AppObjectsPanel.render()')
+  // console.log('AppObjectsPanel.render()')
 
   const handleSelect = id => {
     selectShape(id)
@@ -96,7 +96,8 @@ const AppObjectsPanel = ({
 }
 
 const mapStateToProps = state => {
-  console.log('AppObjectsPanel.mapStateToProps()')
+  // console.log('AppObjectsPanel.mapStateToProps()')
+
   return {
     allShapes: state.allShapes2,
     rootChildIds: state.allShapes2[0].childIds,

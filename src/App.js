@@ -45,7 +45,7 @@ const App = ({
   arrangeShape,
   dispatch
 }) => {
-  console.log('App.render()')
+  // console.log('App.render()')
 
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
   const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [allShapes, selectedShapes])
