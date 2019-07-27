@@ -3,12 +3,13 @@ import { connect } from 'react-redux'
 // import { Slider } from 'react-native-elements'
 // import * as Slider from '@react-native-community/slider'
 // import Slider from "react-native-slider"
-import { Svg, Line, Ellipse, Rect } from 'react-native-svg'
+import { Svg, Line, Text, Ellipse, Rect } from 'react-native-svg'
 import JsxParser from 'react-jsx-parser'
 
 import { View } from 'core/components'
 import Shape from 'app/components/Shape'
 import { AppMainToolbar, AppObjectsPanel, AppPropertiesPanel, AppCanvasShape } from 'app/components'
+import Ruler from 'core/components/Ruler'
 import { ActionTypes, selectTool, selectShape, transformShape, setOpacity, arrangeShape } from 'app/actions/common'
 import './App.css'
 
@@ -81,10 +82,11 @@ const App = ({
               y1={index * 10 + 10.5}
               x2={'100%'}
               y2={index * 10 + 10.5}
-              stroke="hsla(0, 0%, 25%, 0.2)"
+              stroke="hsla(0, 0%, 0%, 0.2)"
               strokeDasharray="1 9"
             />
           ))}
+          <Ruler />
           {allShapes[0].childIds.map((childId) => {
             const { type, opacity, position, size } = allShapes[childId]
 
