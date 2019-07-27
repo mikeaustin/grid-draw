@@ -108,10 +108,11 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity }) => {
   }
 
   return (
-    <View width={256} style={{backgroundColor: theme.backgroundColor,
-      borderLeftWidth: 0.5,
-      borderLeftColor: theme.borderColor,
-    }}>
+    <View
+      width={256}
+      style={{marginTop: 1, backgroundColor: theme.backgroundColor}}
+      borderStyle={{borderLeftWidth: 1, left: -1, borderColor: 'hsla(0, 0%, 0%, 0.1)'}}
+    >
       <PanelHeader heading="Properties" />
       <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
         <Slider

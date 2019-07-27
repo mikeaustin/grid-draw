@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, TouchableWithoutFeedback } from 'react-native'
+import { StyleSheet, Text, TouchableWithoutFeedback } from 'react-native'
 
 import { View } from 'core/components'
 import PanelHeader from './PanelHeader'
@@ -65,6 +65,18 @@ const ShapeItem = ({
   )
 }
 
+const styles = StyleSheet.create({
+  objectsPanel: {
+    // backgroundColor: theme.backgroundColor,
+    marginTop: 1,
+  },
+  border: {
+    borderRightWidth: 1,
+    right: -1,
+    borderColor: 'hsla(0, 0%, 0%, 0.1)',
+  },
+})
+
 const AppObjectsPanel = ({
   theme, allShapes, rootChildIds, selectedShapeIds, selectShape
 }) => {
@@ -75,11 +87,7 @@ const AppObjectsPanel = ({
   }
   
   return (
-    <View width={256} style={{
-      backgroundColor: theme.backgroundColor,
-      borderRightWidth: 0.5,
-      borderRightColor: 'hsla(0, 0%, 0%, 0.29)',
-    }}>
+    <View width={256} style={styles.objectsPanel} borderStyle={styles.border}>
       <PanelHeader heading="Objects" />
       <View style={{paddingVertical: 5}}>
         <ShapeItemList
