@@ -10,6 +10,7 @@ import { View } from 'core/components'
 import Shape from 'app/components/Shape'
 import { AppMainToolbar, AppObjectsPanel, AppPropertiesPanel, AppCanvasShape } from 'app/components'
 import Ruler from 'core/components/Ruler'
+import Grid from 'core/components/Grid'
 import { ActionTypes, selectTool, selectShape, transformShape, setOpacity, arrangeShape } from 'app/actions/common'
 import './App.css'
 
@@ -71,21 +72,12 @@ const App = ({
           theme={theme}
         />
         <Svg
-          // onStartShouldSetResponder={event => true}
-          // onResponderGrant={event => selectShape()}
+          onStartShouldSetResponder={event => true}
+          onResponderGrant={event => selectShape()}
           // onResponderMove={event => console.log(event.nativeEvent.locationX)}
           style={{flex: 1, xboxShadow: 'inset 0 0 5px hsla(0, 0%, 0%, 0.5)'}}
         >
-          {Array.from({length: 100}, (_, index) => (
-            <Line
-              x1={10}
-              y1={index * 10 + 10.5}
-              x2={'100%'}
-              y2={index * 10 + 10.5}
-              stroke="hsla(0, 0%, 0%, 0.2)"
-              strokeDasharray="1 9"
-            />
-          ))}
+          <Grid />
           <Ruler />
           {allShapes[0].childIds.map((childId) => {
             const { type, opacity, position, size } = allShapes[childId]
@@ -111,6 +103,7 @@ const App = ({
           theme={theme}
           selectedShapes={selectedShapes}
           setOpacity={setOpacity}
+          transformShape={transformShape}
         />
       </View>
     </View>
