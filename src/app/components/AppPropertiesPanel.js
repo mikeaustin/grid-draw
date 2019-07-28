@@ -121,6 +121,9 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape 
   }
 
   const selectedShape = selectedShapes[0] || { position: {}, opacity: null }
+  const opacityProps = { width: 50, maxLength: 3, units: '%', disabled: !selectedShapes[0] }
+  const positionProps = { width: 65, maxLength: 4, units: 'px', disabled: !selectedShapes[0] }
+  const { position, opacity } = selectedShape
 
   return (
     <View
@@ -146,18 +149,16 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape 
           onValueChange={handleOpacityValueChange}
         />
         <Spacer />
-        <NumericInput
-          width={50} maxLength={3} units="%" value={selectedShape.opacity * 100} disabled={!selectedShapes[0]} onSubmit={handleOpacitySubmit}
-        />
+        <NumericInput {...opacityProps} value={opacity * 100} onSubmit={handleOpacitySubmit} />
       </View>
       <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
         <Text>X</Text>
         <Spacer size="xsmall" />
-        <NumericInput width={65} maxLength={4} units="px" value={selectedShape.position.x} disabled={!selectedShapes[0]} onSubmit={handlePositionXSubmit} />
+        <NumericInput {...positionProps} value={position.x} onSubmit={handlePositionXSubmit} />
         <Spacer />
         <Text>Y</Text>
         <Spacer size="xsmall" />
-        <NumericInput width={65} maxLength={4} units="px" value={selectedShape.position.y} disabled={!selectedShapes[0]} onSubmit={handlePositionYSubmit}
+        <NumericInput {...positionProps} value={position.y} onSubmit={handlePositionYSubmit}
         />
       </View>
       <SectionList
