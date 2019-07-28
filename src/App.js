@@ -34,7 +34,7 @@ const mapDispatchToProps = dispatch => {
     transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
     selectShape: id => dispatch(selectShape(id)),
     setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
-    arrangeShape: () => dispatch(arrangeShape()),
+    arrangeShape: (actionType) => dispatch(arrangeShape(actionType)),
   }
 }
 

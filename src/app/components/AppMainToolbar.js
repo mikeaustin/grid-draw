@@ -38,7 +38,7 @@ const AppMainToolbar = ({ toolActionType, setToolActionType, arrangeShape, dispa
       <Divider xsize="xsmall" />
       <Toolbar.Group title="Arrange" value={toolActionType} setValue={arrangeShape}>
         <Toolbar.Button title="Bring to Front" value={ActionTypes.BRING_TO_FRONT} icon="018-alignment-1" />
-        <Toolbar.Button title="Send to Back" value={ActionTypes.SET_OPACITY} icon="002-object-alignment" />
+        <Toolbar.Button title="Send to Back" value={ActionTypes.SEND_TO_BACK} icon="002-object-alignment" />
       </Toolbar.Group>
       <Divider xsize="xsmall" />
       <Toolbar.Group title="Combine" value={toolActionType} setValue={setToolActionType}>

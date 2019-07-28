@@ -7,6 +7,7 @@ const ActionTypes = {
   SCALE_SHAPE: 'shape/SCALE_SHAPE',
   SET_OPACITY: 'shape/SET_OPACITY',
   BRING_TO_FRONT: 'shape/BRING_TO_FRONT',
+  SEND_TO_BACK: 'shape/SEND_TO_BACK',
 }
 
 const selectTool = actionType => ({
@@ -39,8 +40,8 @@ const setOpacity = (id, opacity) => ({
   }
 })
 
-const arrangeShape = id => ({
-  type: ActionTypes.BRING_TO_FRONT,
+const arrangeShape = (actionType) => ({
+  type: actionType,
   payload: {}
 })
 

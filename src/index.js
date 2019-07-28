@@ -61,12 +61,21 @@ const shapeReducer = (state = initialState, action) => {
     }
     case ActionTypes.BRING_TO_FRONT: {
       const { allShapes2, selectedShapeIds } = state
-      const { id } = action.payload
       const shape = allShapes2[selectedShapeIds[0]]
 
       return state.merge({
         allShapes2: allShapes2.update(shape.parentId, merge(({ childIds }) => ({
           childIds: childIds.filter(id => id !== shape.id).concat(shape.id)
+        })))
+      })
+    }
+    case ActionTypes.SEND_TO_BACK: {
+      const { allShapes2, selectedShapeIds } = state
+      const shape = allShapes2[selectedShapeIds[0]]
+
+      return state.merge({
+        allShapes2: allShapes2.update(shape.parentId, merge(({ childIds }) => ({
+          childIds: [shape.id].concat(childIds.filter(id => id !== shape.id))
         })))
       })
     }

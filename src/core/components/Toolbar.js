@@ -56,7 +56,7 @@ const Button = ({ value, title, icon, imageSource, selected, onPressIn }) => {
     <TouchableWithoutFeedback onPressIn={onPressIn}>
       <View ref={setNativeProps} style={buttonStyle}>
         <Image
-          source={imageSource || {uri: `/images/icons/${icon}.svg`}}
+          source={imageSource || {uri: `images/icons/${icon}.svg`}}
           style={{width: 25, height: 25, opacity: 0.65}}
         />
       </View>
