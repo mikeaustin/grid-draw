@@ -2,6 +2,7 @@ import React from 'react'
 import { G, Ellipse, Rect, Path } from 'react-native-svg'
 
 import { Point } from 'core/utils/geometry'
+import { View, Spacer, Slider, NumericInput } from 'core/components'
 
 const shapeRegistration = {
   'GridDraw.Ellipse': {
@@ -37,6 +38,15 @@ const shapeRegistration = {
     }
   },
   'GridDraw.RoundRect': {
+    design: ({ id, opacity, setOpacity }) => {
+      return (
+        <View horizontal align="center">
+          <Slider value={opacity} onValueChange={newOpacity => setOpacity(id, newOpacity)} />
+          <Spacer />
+          <NumericInput width={50} value={opacity * 100} units="%" />
+        </View>
+      )
+    },
     render: ({ selected, position, size, radius = 10, ...props }) => {
       return (
         <Path d={`
@@ -153,3 +163,6 @@ class Shape extends React.PureComponent {
 }
 
 export default Shape
+export {
+  shapeRegistration
+}

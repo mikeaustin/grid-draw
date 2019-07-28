@@ -1,11 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { StyleSheet, SectionList } from 'react-native'
-import Slider from 'react-native-slider'
 
-import { View, Spacer, Text, Divider } from 'core/components'
+import { View, Spacer, Text, Slider } from 'core/components'
 import { NumericInput, NumericField } from 'core/components/NumericInput'
 import PanelHeader from './PanelHeader'
 import { ActionTypes } from 'app/actions/common'
+import { shapeRegistration } from 'app/components/Shape'
 
 const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape }) => {
   const handleOpacityValueChange = opacity => {
@@ -29,9 +29,17 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape 
   }
 
   const selectedShape = selectedShapes[0] || { position: {}, opacity: null }
+  const disabled = !selectedShapes[0]
   const opacityProps = { width: 50, maxLength: 3, units: '%', disabled: !selectedShapes[0] }
   const positionProps = { width: 65, maxLength: 4, units: 'px', disabled: !selectedShapes[0] }
   const { position, opacity } = selectedShape
+
+  const shape = shapeRegistration[selectedShape.type] && shapeRegistration[selectedShape.type].design
+  const design = shape && React.createElement(shape, {
+    id: selectedShape.id,
+    opacity: selectedShape.opacity,
+    setOpacity
+  })
 
   return (
     <View
@@ -40,22 +48,15 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape 
       borderStyle={{borderLeftWidth: 1, left: -1, borderColor: 'hsla(0, 0%, 0%, 0.1)'}}
     >
       <PanelHeader heading="Properties" />
+
+      {design && (
+        <View style={{ paddingVertical: 5, paddingHorizontal: 10 }}>
+          {design}
+        </View>
+      )}
+
       <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
-        <Slider
-          minimumTrackTintColor="rgb(33, 150, 243)"
-          thumbTintColor="white"
-          style={{flex: 1}}
-          disabled={!selectedShapes[0]}
-          thumbStyle={{
-            boxShadow: [
-              '0 0 3px rgba(0, 0, 0, 0.1)', // Soft shadow
-              // '0 2px 1px rgba(0, 0, 0, 0.1)',  // Drop shadow
-              '0 0 1px rgba(0, 0, 0, 0.5)',    // Sharp shadow
-            ].join(', '),
-          }}
-          value={selectedShapes[0] && selectedShapes[0].opacity}
-          onValueChange={handleOpacityValueChange}
-        />
+        <Slider value={opacity} disabled={disabled} onValueChange={handleOpacityValueChange} />
         <Spacer />
         <NumericInput {...opacityProps} value={opacity * 100} onSubmit={handleOpacitySubmit} />
       </View>
