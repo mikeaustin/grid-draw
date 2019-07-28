@@ -1,10 +1,10 @@
 import React from 'react'
-import { Text, G, Line } from 'react-native-svg'
+import { Line } from 'react-native-svg'
 
-const Grid = ({ }) => {
+const Grid = () => {
   return (
-    // Crosshairs
     <React.Fragment>
+      {/* Crosshairs */}
       {Array.from({length: 10}, (_, index) => (
         <Line
           key={index}
@@ -29,7 +29,7 @@ const Grid = ({ }) => {
           strokeDashoffset="1"
         />
       ))}
-      // Dot-Matrix
+      {/* Dot-Matrix */}
       {Array.from({length: 100}, (_, index) => (
         <Line
           key={index}

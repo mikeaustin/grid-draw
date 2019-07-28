@@ -1,13 +1,12 @@
-import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import { connect } from 'react-redux'
 // import { Slider } from 'react-native-elements'
 // import * as Slider from '@react-native-community/slider'
 // import Slider from "react-native-slider"
-import { Svg, Line, Text, Ellipse, Rect } from 'react-native-svg'
+import { Svg } from 'react-native-svg'
 import JsxParser from 'react-jsx-parser'
 
 import { View } from 'core/components'
-import Shape from 'app/components/Shape'
 import { AppMainToolbar, AppObjectsPanel, AppPropertiesPanel, AppCanvasShape } from 'app/components'
 import Ruler from 'core/components/Ruler'
 import Grid from 'core/components/Grid'

@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text as NativeText } from 'react-native'
+import { Text as NativeText } from 'react-native'
 
 import { withLayoutProps } from 'core/utils/layout';
 

@@ -79,9 +79,8 @@ const shapeReducer = (state = initialState, action) => {
         })))
       })
     }
+    default: return state
   }
-
-  return state
 }
 
 const store = createStore(shapeReducer)

@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { StyleSheet, Text, Image, Button, TextInput, SectionList } from 'react-native'
 import Slider from 'react-native-slider'
 
-import { View, Spacer, Divider, Toolbar } from 'core/components'
+import { View, Spacer, Divider } from 'core/components'
 import PanelHeader from './PanelHeader'
 import { ActionTypes } from 'app/actions/common'
 
@@ -48,20 +48,20 @@ const NumericInput = ({ value, maxLength, width, units, disabled, onSubmit }) =>
 
   useEffect(() => {
     setText(valueOrBlank(value, () => value.toFixed(0)))
-  }, [value])
+  }, [setText, value])
 
   const handleSubmit = useCallback(value => {
     // const clippedValue = Math.max(0, Math.min(100, value))
     const clippedValue = value
 
     onSubmit(clippedValue)
-  })
+  }, [onSubmit])
 
   const handleChangeText = useCallback(text => {
     setText(valueOrBlank(text))
-  })
+  }, [setText])
 
-  const handleKeyPress = event => {
+  const handleKeyPress = useCallback(event => {
     const increment = event.nativeEvent.shiftKey ? 10 : 1
 
     if (event.nativeEvent.key === 'ArrowUp') {
@@ -71,15 +71,15 @@ const NumericInput = ({ value, maxLength, width, units, disabled, onSubmit }) =>
       refocus(textInput)
       handleSubmit(Number(text) - increment)
     }
-  }
+  }, [handleSubmit, text])
 
   const handleBlur = useCallback(event => {
     handleSubmit(Number(text))
-  })
+  }, [handleSubmit, text])
 
   const handleLayout = useCallback(event => {
     setUnitsWidth(event.nativeEvent.layout.width)
-  })
+  }, [setUnitsWidth])
 
   return (
     <View horizontal align="center" style={styles.numericInput}>

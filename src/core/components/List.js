@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { View, Spacer } from '.'
-import { withLayoutProps } from 'core/utils/layout'
 
 const List = ({ children, spacerSize = 'none', ...props }) => {
   return (
