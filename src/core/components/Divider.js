@@ -9,7 +9,7 @@ const Divider = ({ size }) => {
   
   const style = {
     minWidth: 1,
-    backgroundColor: 'hsla(0, 0%, 0%, 0.05)',
+    backgroundColor: 'hsla(0, 0%, 0%, 0.1)',
     alignSelf: 'stretch',
   }
 

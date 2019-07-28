@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
 const View = ({ children, borderStyle, ...props }) => {
   return (
     <NativeView {...props}>
-      <NativeView style={[styles.border, borderStyle]} />
+      {borderStyle && <NativeView style={[styles.border, borderStyle]} />}
       {children}
     </NativeView>
   )
