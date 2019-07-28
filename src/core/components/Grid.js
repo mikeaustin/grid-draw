@@ -7,6 +7,7 @@ const Grid = ({ }) => {
     <React.Fragment>
       {Array.from({length: 10}, (_, index) => (
         <Line
+          key={index}
           x1={0}
           y1={index * 100 + 100.5}
           x2={'100%'}
@@ -18,6 +19,7 @@ const Grid = ({ }) => {
       ))}
       {Array.from({length: 10}, (_, index) => (
         <Line
+          key={index}
           x1={index * 100 + 100.5}
           y1={0}
           x2={index * 100 + 100.5}
@@ -30,6 +32,7 @@ const Grid = ({ }) => {
       // Dot-Matrix
       {Array.from({length: 100}, (_, index) => (
         <Line
+          key={index}
           x1={0}
           y1={index * 10 + 0.5}
           x2={'100%'}

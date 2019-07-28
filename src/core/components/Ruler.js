@@ -5,7 +5,7 @@ const Ruler = ({ vertical }) => {
   return (
     <G>
       {Array.from({length: 100}, (_, index) => (
-        <React.Fragment>
+        <React.Fragment key={index}>
           <Line
             x1={index * 10 + 30.5}
             y1={index % 5 === 0 ? (index % 10 === 0 ? 0 : 10) : 20}

@@ -41,7 +41,7 @@ const ShapeItem = ({
       <TouchableWithoutFeedback key={id} onPressIn={() => onSelect(id)}>
         <View
           style={[
-            {paddingVertical: 5, paddingHorizontal: 10},
+            {paddingVertical: 5, paddingHorizontal: 10, outlineWidth: 1},
             selected && {backgroundColor: theme.highlightColor}
           ]}
         >
@@ -114,7 +114,8 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => {
-  console.log('AppObjectsPanel.mapDispatchToProps()')
+  // console.log('AppObjectsPanel.mapDispatchToProps()')
+
   return {
     dispatch,
     selectShape: id => dispatch(selectShape(id)),

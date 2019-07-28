@@ -44,8 +44,8 @@ const Group = ({ children, title, value, setValue, ...props }) => {
 
 const Button = ({ value, title, icon, imageSource, selected, onPressIn }) => {
   const buttonStyle = [
-    { padding: 5, borderRadius: 2, borderWidth: 0.5, borderColor: 'transparent' },
-    selected && {backgroundColor: 'hsla(0, 0%, 0%, 0.11)', xborderColor: 'hsla(0, 0%, 0%, 0.05)' },
+    { padding: 5, borderRadius: 2, outlineWidth: 1 },
+    selected && {backgroundColor: 'hsla(0, 0%, 0%, 0.11)' },
   ]
   
   const setNativeProps = ref => {

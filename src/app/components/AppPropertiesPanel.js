@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     padding: 5,
     paddingRight: 20,
     textAlign: 'right',
+    outlineWidth: 1,
   },
   unitText: {
     position: 'absolute',
@@ -46,7 +47,6 @@ const NumericInput = ({ value, maxLength, width, units, disabled, onSubmit }) =>
   const [unitsWidth, setUnitsWidth] = useState(0)
 
   useEffect(() => {
-    console.log('useEffect')
     setText(valueOrBlank(value, () => value.toFixed(0)))
   }, [value])
 
@@ -54,7 +54,6 @@ const NumericInput = ({ value, maxLength, width, units, disabled, onSubmit }) =>
     // const clippedValue = Math.max(0, Math.min(100, value))
     const clippedValue = value
 
-    console.log('handleSubmit')
     onSubmit(clippedValue)
   })
 
