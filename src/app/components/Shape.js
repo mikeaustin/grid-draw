@@ -1,5 +1,5 @@
 import React from 'react'
-import { G, Ellipse, Rect } from 'react-native-svg'
+import { G, Ellipse, Rect, Path } from 'react-native-svg'
 
 import { Point } from 'core/utils/geometry'
 
@@ -28,6 +28,29 @@ const shapeRegistration = {
           y={position.y}
           width={size.x}
           height={size.y}
+          strokeWidth={3}
+          stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
+          fill="#f0f0f0"
+          {...props}
+        />
+      )
+    }
+  },
+  'GridDraw.RoundRect': {
+    render: ({ selected, position, size, radius = 10, ...props }) => {
+      return (
+        <Path d={`
+            M ${position.x + radius}, ${position.y}
+            l ${size.x - radius * 2}, 0
+            a ${radius}, ${radius} 0 0 1 ${radius}, ${radius}
+            l 0, ${100 - radius * 2}
+            a ${radius}, ${radius} 0 0 1 ${-radius}, ${radius}
+            l ${-100 + radius * 2}, 0
+            a ${radius}, ${radius} 0 0 1 ${-radius}, ${-radius}
+            l 0, ${-100 + radius * 2}
+            a ${radius}, ${radius} 0 0 1 ${radius}, ${-radius}
+            z
+          `}
           strokeWidth={3}
           stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
           fill="#f0f0f0"

@@ -1,9 +1,9 @@
 import React from 'react'
-import { Line } from 'react-native-svg'
+import { G, Line } from 'react-native-svg'
 
 const Grid = () => {
   return (
-    <React.Fragment>
+    <G>
       {/* Crosshairs */}
       {Array.from({length: 10}, (_, index) => (
         <Line
@@ -41,7 +41,7 @@ const Grid = () => {
           strokeDasharray={'1 9'}
         />
       ))}
-    </React.Fragment>
+    </G>
   )
 }
 

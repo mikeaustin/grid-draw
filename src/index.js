@@ -12,13 +12,14 @@ import { ActionTypes } from 'app/actions/common'
 
 const initialState = Immutable({
   allShapes2: {
-    0: { id: 0, type: 'GridDraw.Group', position: Point(0, 0), size: Point(0, 0), opacity: 1.0, parent: 0, childIds: [1, 2, 3] },
+    0: { id: 0, type: 'GridDraw.Group', position: Point(0, 0), size: Point(0, 0), opacity: 1.0, parent: 0, childIds: [1, 2, 3, 6] },
       1: { id: 1, type: 'GridDraw.Ellipse', position: Point(100, 100), size: Point(100, 100), opacity: 1.0, childIds: [], parentId: 0 },
       2: { id: 2, type: 'GridDraw.Rectangle', position: Point(300, 100), size: Point(100, 100), opacity: 1.0, childIds: [], parentId: 0 },
       3: { id: 3, type: 'GridDraw.Group', position: Point(200, 200), size: Point(100, 100), opacity: 1.0, childIds: [4, 5], parentId: 0 },
         4: { id: 4, type: 'GridDraw.Ellipse', position: Point(100, 100), size: Point(100, 100), opacity: 1.0, childIds: [], parentId: 3 },
         5: { id: 5, type: 'GridDraw.Rectangle', position: Point(300, 100), size: Point(100, 100), opacity: 1.0, childIds: [], parentId: 3 },
-  },
+      6: { id: 6, type: 'GridDraw.RoundRect', position: Point(100, 300), size: Point(100, 100), opacity: 1.0, childIds: [], parentId: 0 },
+    },
   selectedShapeIds: [],
   selectedTool: ActionTypes.MOVE_SHAPE,
 })
