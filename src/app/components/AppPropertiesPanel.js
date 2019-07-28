@@ -94,7 +94,17 @@ const NumericInput = ({ value, maxLength, width, units, disabled, onSubmit }) =>
         onKeyPress={handleKeyPress}
         onBlur={handleBlur}
       />
-      <Text style={styles.unitText} onLayout={handleLayout}>{units}</Text>
+      <Text pointerEvents="none" style={styles.unitText} onLayout={handleLayout}>{units}</Text>
+    </View>
+  )
+}
+
+const NumericField = ({ label, ...props }) => {
+  return (
+    <View horizontal align="center">
+      <Text>{label}</Text>
+      <Spacer size="xsmall" />
+      <NumericInput {...props} />
     </View>
   )
 }
@@ -152,13 +162,9 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape 
         <NumericInput {...opacityProps} value={opacity * 100} onSubmit={handleOpacitySubmit} />
       </View>
       <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
-        <Text>X</Text>
-        <Spacer size="xsmall" />
-        <NumericInput {...positionProps} value={position.x} onSubmit={handlePositionXSubmit} />
+        <NumericField {...positionProps} label="X" value={position.x} onSubmit={handlePositionXSubmit} />
         <Spacer />
-        <Text>Y</Text>
-        <Spacer size="xsmall" />
-        <NumericInput {...positionProps} value={position.y} onSubmit={handlePositionYSubmit}
+        <NumericField {...positionProps} label="Y" value={position.y} onSubmit={handlePositionYSubmit}
         />
       </View>
       <SectionList
@@ -172,6 +178,7 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape 
             <Text key={index}>{item}</Text>
           </View>
         )}
+        keyExtractor={(item, index) => item}
         sections={[
           {title: 'Title1', data: ['item1', 'item2']},
           {title: 'Title2', data: ['item3', 'item4']},
