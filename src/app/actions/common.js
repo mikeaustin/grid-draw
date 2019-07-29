@@ -1,4 +1,5 @@
 const ActionTypes = {
+  ADD_ACTION: 'app/ADD_ACTION',
   SELECT_TOOL: 'tool/SELECT_TOOL',
   SELECT_SHAPE: 'tool/SELECT_SHAPE',
   SHAPE_ELLIPSE: '/tool/SHAPE_ELLIPSE',

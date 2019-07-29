@@ -37,6 +37,7 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape 
   const shape = shapeRegistration[selectedShape.type] && shapeRegistration[selectedShape.type].design
   const design = shape && React.createElement(shape, {
     id: selectedShape.id,
+    shape: selectedShape,
     opacity: selectedShape.opacity,
     setOpacity
   })

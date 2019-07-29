@@ -10,7 +10,7 @@ const ShapeItemList = ({
   depth, theme, allShapes, childIds, selectedShapeIds, onSelect
 }) => {
   return (
-    childIds.asMutable().reverse().map(childId => {
+    childIds.asMutable().map(childId => {
       const selected = selectedShapeIds.some(shapeId => shapeId === childId)
 
       return (
@@ -107,8 +107,8 @@ const mapStateToProps = state => {
   // console.log('AppObjectsPanel.mapStateToProps()')
 
   return {
-    allShapes: state.allShapes2,
-    rootChildIds: state.allShapes2[0].childIds,
+    allShapes: state.allShapes,
+    rootChildIds: state.allShapes[0].childIds,
     selectedShapeIds: state.selectedShapeIds,
   }
 }

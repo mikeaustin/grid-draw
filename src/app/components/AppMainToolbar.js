@@ -5,8 +5,8 @@ import { ActionTypes } from 'app/actions/common'
 
 const mapStateToProps = state => {
   return {
-    allShapes: state.allShapes2,
-    selectedShapes: state.selectedShapeIds.map(id => state.allShapes2[id]),
+    allShapes: state.allShapes,
+    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
   }
 }
 

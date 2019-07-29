@@ -38,16 +38,17 @@ const shapeRegistration = {
     }
   },
   'GridDraw.RoundRect': {
-    design: ({ id, opacity, setOpacity }) => {
+    design: ({ shape: { id, cornerRadius, opacity }, setOpacity }) => {
       return (
         <View horizontal align="center">
           <Slider value={opacity} onValueChange={newOpacity => setOpacity(id, newOpacity)} />
           <Spacer />
-          <NumericInput width={50} value={opacity * 100} units="%" />
+          <NumericInput width={50} value={cornerRadius} units="px" />
         </View>
       )
     },
     render: ({ selected, position, size, radius = 10, ...props }) => {
+      console.log(props)
       return (
         <Path d={`
             M ${position.x + radius}, ${position.y}
@@ -91,7 +92,7 @@ const ShapeList = ({
   childIds, shapeListProps, onSelect, onDrag
 }) => {
   return (
-    childIds.map(childId => {
+    childIds.asMutable().reverse().map(childId => {
       const { type, opacity, position, size } = shapeListProps.allShapes[childId]
       const selected = shapeListProps.selectedShapes.some(shape => shape.id === childId)
 

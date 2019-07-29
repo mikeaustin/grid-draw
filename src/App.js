@@ -22,8 +22,8 @@ const theme = {
 
 const mapStateToProps = state => {
   return {
-    allShapes: state.allShapes2,
-    selectedShapes: state.selectedShapeIds.map(id => state.allShapes2[id]),
+    allShapes: state.allShapes,
+    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
   }
 }
 
@@ -78,7 +78,7 @@ const App = ({
         >
           <Grid />
           <Ruler />
-          {allShapes[0].childIds.map((childId) => {
+          {allShapes[0].childIds.asMutable().reverse().map((childId) => {
             const { type, opacity, position, size } = allShapes[childId]
 
             return (
