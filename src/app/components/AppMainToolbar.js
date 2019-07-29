@@ -20,7 +20,7 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-const AppMainToolbar = ({ toolActionType, setToolActionType, arrangeShape, dispatch }) => {
+const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, arrangeShape, dispatch }) => {
   return (
     <Toolbar horizontal>
       <Spacer />
@@ -36,7 +36,7 @@ const AppMainToolbar = ({ toolActionType, setToolActionType, arrangeShape, dispa
         <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="007-pen-tool" />
       </Toolbar.Group>
       <Divider xsize="xsmall" />
-      <Toolbar.Group title="Arrange" value={toolActionType} setValue={arrangeShape}>
+      <Toolbar.Group title="Arrange" value={toolActionType} setValue={actionType => arrangeShape(selectedShapes[0].id, actionType)}>
         <Toolbar.Button title="Bring to Front" value={ActionTypes.BRING_TO_FRONT} icon="018-alignment-1" />
         <Toolbar.Button title="Send to Back" value={ActionTypes.SEND_TO_BACK} icon="002-object-alignment" />
       </Toolbar.Group>

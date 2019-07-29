@@ -48,7 +48,6 @@ const shapeRegistration = {
       )
     },
     render: ({ selected, position, size, radius = 10, ...props }) => {
-      console.log(props)
       return (
         <Path d={`
             M ${position.x + radius}, ${position.y}

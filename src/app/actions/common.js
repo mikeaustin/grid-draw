@@ -41,9 +41,11 @@ const setOpacity = (id, opacity) => ({
   }
 })
 
-const arrangeShape = (actionType) => ({
+const arrangeShape = (id, actionType) => ({
   type: actionType,
-  payload: {}
+  payload: {
+    id
+  }
 })
 
 export {
