@@ -4,9 +4,18 @@ import { G, Ellipse, Rect, Path } from 'react-native-svg'
 import { Point } from 'core/utils/geometry'
 import { View, Spacer, Slider, NumericInput } from 'core/components'
 
+const setCornerRadius = (id, cornerRadius) => {
+  return {
+    type: 'shape/SET_CORNER_RADIUS',
+    payload: {
+      id, cornerRadius
+    }
+  }
+}
+
 const shapeRegistration = {
   'GridDraw.Ellipse': {
-    render: ({ selected, position, size, ...props }) => {
+    render: ({ shape: { position, size }, selected, ...props }) => {
       return (
         <Ellipse
           cx={position.x + size.x / 2}
@@ -22,7 +31,7 @@ const shapeRegistration = {
     }
   },
   'GridDraw.Rectangle': {
-    render: ({ selected, position, size, ...props }) => {
+    render: ({ shape: { position, size }, selected, ...props }) => {
       return (
         <Rect
           x={position.x}
@@ -38,27 +47,30 @@ const shapeRegistration = {
     }
   },
   'GridDraw.RoundRect': {
-    design: ({ shape: { id, cornerRadius, opacity }, setOpacity }) => {
+    design: ({ shape: { id, cornerRadius }, dispatch }) => {
+      const handleValueChange = newCornerRadius => dispatch(setCornerRadius(id, newCornerRadius * 50))
+      const handleSubmit = newCornerRadius => dispatch(setCornerRadius(id, newCornerRadius))
+
       return (
         <View horizontal align="center">
-          <Slider value={opacity} onValueChange={newOpacity => setOpacity(id, newOpacity)} />
+          <Slider value={cornerRadius / 50} onValueChange={handleValueChange} />
           <Spacer />
-          <NumericInput width={50} value={cornerRadius} units="px" />
+          <NumericInput width={50} value={cornerRadius} units="px" onSubmit={handleSubmit} />
         </View>
       )
     },
-    render: ({ selected, position, size, radius = 10, ...props }) => {
+    render: ({ shape: { position, size, cornerRadius }, selected, ...props }) => {
       return (
         <Path d={`
-            M ${position.x + radius}, ${position.y}
-            l ${size.x - radius * 2}, 0
-            a ${radius}, ${radius} 0 0 1 ${radius}, ${radius}
-            l 0, ${100 - radius * 2}
-            a ${radius}, ${radius} 0 0 1 ${-radius}, ${radius}
-            l ${-100 + radius * 2}, 0
-            a ${radius}, ${radius} 0 0 1 ${-radius}, ${-radius}
-            l 0, ${-100 + radius * 2}
-            a ${radius}, ${radius} 0 0 1 ${radius}, ${-radius}
+            M ${position.x + cornerRadius}, ${position.y}
+            l ${size.x - cornerRadius * 2}, 0
+            a ${cornerRadius}, ${cornerRadius} 0 0 1 ${cornerRadius}, ${cornerRadius}
+            l 0, ${100 - cornerRadius * 2}
+            a ${cornerRadius}, ${cornerRadius} 0 0 1 ${-cornerRadius}, ${cornerRadius}
+            l ${-100 + cornerRadius * 2}, 0
+            a ${cornerRadius}, ${cornerRadius} 0 0 1 ${-cornerRadius}, ${-cornerRadius}
+            l 0, ${-100 + cornerRadius * 2}
+            a ${cornerRadius}, ${cornerRadius} 0 0 1 ${cornerRadius}, ${-cornerRadius}
             z
           `}
           strokeWidth={3}
@@ -70,13 +82,11 @@ const shapeRegistration = {
     }
   },
   'GridDraw.Group': {
-    render: ({ selected, position, size, ...props }) => {
+    render: ({ shape: { position }, selected, ...props }) => {
       return (
         <G
           x={position.x}
           y={position.y}
-          width={size.x}
-          height={size.y}
           strokeWidth={3}
           stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
           fill="#f0f0f0"
@@ -98,10 +108,11 @@ const ShapeList = ({
       return (
         <Shape
           key={childId}
-          type={type}
+          // type={type}
+          shape={shapeListProps.allShapes[childId]}
           opacity={opacity}
-          position={position}
-          size={size}
+          // position={position}
+          // size={size}
           selected={selected}
           childIds={shapeListProps.allShapes[childId].childIds}
           shapeListProps={shapeListProps}
@@ -139,12 +150,16 @@ class Shape extends React.PureComponent {
 
   render() {
     const {
-      type, opacity, selected, position, size, childIds, shapeListProps, onSelect, onDrag
+      shape, opacity, selected, childIds, shapeListProps, onSelect, onDrag
     } = this.props
 
     return (
-      React.createElement(shapeRegistration[type].render, {
-        opacity, selected, position, size,
+      React.createElement(shapeRegistration[shape.type].render, {
+        shape,
+        opacity,
+        selected,
+        // position,
+        // size,
         onStartShouldSetResponder: this.handleShouldSetResponder,
         onStartShouldSetResponderCapture: this.handleShouldSetResponder,
         onMoveShouldSetResponderCapture: this.handleShouldSetResponder,

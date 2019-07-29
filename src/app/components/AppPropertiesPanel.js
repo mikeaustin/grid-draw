@@ -7,7 +7,7 @@ import PanelHeader from './PanelHeader'
 import { ActionTypes } from 'app/actions/common'
 import { shapeRegistration } from 'app/components/Shape'
 
-const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape }) => {
+const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape, dispatch }) => {
   const handleOpacityValueChange = opacity => {
     setOpacity(selectedShapes[0].id, opacity)
   }
@@ -39,7 +39,8 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape 
     id: selectedShape.id,
     shape: selectedShape,
     opacity: selectedShape.opacity,
-    setOpacity
+    setOpacity,
+    dispatch,
   })
 
   return (

@@ -1,10 +1,11 @@
 import React from 'react'
-import { Text, G, Line } from 'react-native-svg'
+import { Text, G, Line, Rect } from 'react-native-svg'
 
 const Ruler = ({ vertical }) => {
   return (
     <G>
-      {Array.from({length: 100}, (_, index) => (
+      <Rect x={30} y={0} width={1000} height={30} fill="white" />
+      {Array.from({length: 101}, (_, index) => (
         <React.Fragment key={index}>
           <Line
             x1={index * 10 + 30.5}
@@ -21,7 +22,7 @@ const Ruler = ({ vertical }) => {
       <Line
         x1={30}
         y1={30.5}
-        x2={1000}
+        x2={1030}
         y2={30.5}
         stroke="hsla(0, 0%, 0%, 0.2)"
       />

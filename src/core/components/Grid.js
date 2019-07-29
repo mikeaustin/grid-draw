@@ -4,7 +4,38 @@ import { G, Line } from 'react-native-svg'
 const Grid = () => {
   return (
     <G>
-      {/* Crosshairs */}
+      {Array.from({length: 50}, (_, index) => (
+        <React.Fragment key={index}>
+          <Line
+            x1={0}
+            y1={index * 50 + 0.5}
+            x2={'100%'}
+            y2={index * 50 + 0.5}
+            stroke="hsl(0, 0%, 50%)"
+            strokeDasharray={'1 9'}
+          />
+          <Line
+            x1={index * 50 + 0.5}
+            y1={0}
+            x2={index * 50 + 0.5}
+            y2={'100%'}
+            stroke="hsl(0, 0%, 50%)"
+            strokeDasharray={'1 9'}
+          />
+        </React.Fragment>
+      ))}
+    </G>
+  )
+}
+
+export default Grid
+
+/*
+
+const Grid = () => {
+  return (
+    <G>
+      {/ * Crosshairs * /}
       {Array.from({length: 10}, (_, index) => (
         <Line
           key={index}
@@ -29,7 +60,7 @@ const Grid = () => {
           strokeDashoffset="1"
         />
       ))}
-      {/* Dot-Matrix */}
+      {/ * Dot-Matrix * /}
       {Array.from({length: 100}, (_, index) => (
         <Line
           key={index}
@@ -45,4 +76,4 @@ const Grid = () => {
   )
 }
 
-export default Grid
+*/

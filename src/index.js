@@ -75,6 +75,11 @@ const shapeReducer = (allShapes, action) => {
 
       return allShapes.update(id, merge(() => ({ opacity: Math.round(opacity * 100) / 100 })))
     }
+    case 'shape/SET_CORNER_RADIUS': {
+      const { id, cornerRadius } = action.payload
+
+      return allShapes.update(id, merge(() => ({ cornerRadius: cornerRadius })))
+    }
     case ActionTypes.BRING_TO_FRONT: {
       const shape = allShapes[action.payload.id]
 
