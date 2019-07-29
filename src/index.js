@@ -115,7 +115,11 @@ const shapeReducer = (state = initialState, action) => {
   }
 }
 
-const store = createStore(shapeReducer)
+const appReducer = (state = initialState, action) => {
+  state = shapeReducer(state, action)
+}
+
+  const store = createStore(shapeReducer)
 
 AppRegistry.registerComponent('App', () => props => (
   <Provider store={store}>
