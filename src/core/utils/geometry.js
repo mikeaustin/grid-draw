@@ -1,5 +1,8 @@
 const Point = (x, y) => ({ x, y })
 
+const add = (a, b) => Point(a.x + b.x, a.y + b.y)
+
 export {
-  Point
+  Point,
+  add,
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { connect } from 'react-redux'
 import { Spacer, Divider, Toolbar } from 'core/components'
 import { ActionTypes, arrangeShape } from 'app/actions/common'
@@ -16,11 +16,15 @@ const mapDispatchToProps = dispatch => {
     // transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
     // selectShape: id => dispatch(selectShape(id)),
     // setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
-    arrangeShape: (id, actionType) => dispatch(arrangeShape(id, actionType)),
+    onArrangeShape: (id, actionType) => dispatch(arrangeShape(id, actionType)),
   }
 }
 
-const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, arrangeShape, dispatch }) => {
+const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, onArrangeShape, dispatch }) => {
+  const handleArrangeShape = useCallback(actionType => {
+    onArrangeShape(selectedShapes[0].id, actionType)
+  }, [onArrangeShape, selectedShapes])
+
   return (
     <Toolbar horizontal>
       <Spacer />
@@ -36,7 +40,7 @@ const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, arr
         <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="007-pen-tool" />
       </Toolbar.Group>
       <Divider xsize="xsmall" />
-      <Toolbar.Group title="Arrange" value={toolActionType} setValue={actionType => arrangeShape(selectedShapes[0].id, actionType)}>
+      <Toolbar.Group title="Arrange" value={toolActionType} setValue={handleArrangeShape}>
         <Toolbar.Button title="Bring to Front" value={ActionTypes.BRING_TO_FRONT} icon="018-alignment-1" />
         <Toolbar.Button title="Send to Back" value={ActionTypes.SEND_TO_BACK} icon="002-object-alignment" />
       </Toolbar.Group>

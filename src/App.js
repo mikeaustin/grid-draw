@@ -5,10 +5,8 @@ import React, { useState } from 'react'
 import JsxParser from 'react-jsx-parser'
 
 import { View } from 'core/components'
-import { AppMainToolbar, AppObjectsPanel, AppPropertiesPanel } from 'app/components'
+import { AppMainToolbar, AppCanvas, AppObjectsPanel, AppPropertiesPanel } from 'app/components'
 import { ActionTypes } from 'app/actions/common'
-import { AppCanvas } from 'app/components'
-import './App.css'
 
 const theme = {
   backgroundColor: 'transparent',

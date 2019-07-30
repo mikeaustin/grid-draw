@@ -7,7 +7,7 @@ import { connect } from 'react-redux'
 import { selectShape } from 'app/actions/common'
 
 const ShapeItemList = ({
-  depth, theme, allShapes, childIds, selectedShapeIds, onSelect
+  depth, theme, allShapes, childIds, selectedShapeIds, onSelectShape
 }) => {
   return (
     childIds.asMutable().reverse().map(childId => {
@@ -21,7 +21,7 @@ const ShapeItemList = ({
           depth={depth}
           theme={theme}
           selected={selected}
-          onSelect={onSelect}
+          onSelectShape={onSelectShape}
           shapeListProps={{
             allShapes,
             selectedShapeIds,
@@ -34,11 +34,11 @@ const ShapeItemList = ({
 }
 
 const ShapeItem = ({
-  depth, theme, id, type, selected, onSelect, shapeListProps
+  depth, theme, id, type, selected, onSelectShape, shapeListProps
 }) => {
   return (
     <View>
-      <TouchableWithoutFeedback key={id} onPressIn={() => onSelect(id)}>
+      <TouchableWithoutFeedback key={id} onPressIn={() => onSelectShape(id)}>
         <View
           style={[
             {paddingVertical: 5, paddingHorizontal: 10, outlineWidth: 1},
@@ -58,7 +58,7 @@ const ShapeItem = ({
       <ShapeItemList
         depth={depth + 1}
         theme={theme}
-        onSelect={onSelect}
+        onSelectShape={onSelectShape}
         {...shapeListProps}
       />
     </View>
@@ -78,12 +78,12 @@ const styles = StyleSheet.create({
 })
 
 const AppObjectsPanel = ({
-  theme, allShapes, rootChildIds, selectedShapeIds, selectShape
+  theme, allShapes, rootChildIds, selectedShapeIds, onSelectShape
 }) => {
   // console.log('AppObjectsPanel.render()')
 
-  const handleSelect = id => {
-    selectShape(id)
+  const handleSelectShape = id => {
+    onSelectShape(id)
   }
   
   return (
@@ -96,7 +96,7 @@ const AppObjectsPanel = ({
           allShapes={allShapes}
           selectedShapeIds={selectedShapeIds}
           childIds={rootChildIds}
-          onSelect={handleSelect}
+          onSelectShape={handleSelectShape}
         />
       </View>
     </View>
@@ -118,7 +118,7 @@ const mapDispatchToProps = dispatch => {
 
   return {
     dispatch,
-    selectShape: id => dispatch(selectShape(id)),
+    onSelectShape: id => dispatch(selectShape(id)),
   }
 }
 

@@ -5,8 +5,8 @@ import { connect } from 'react-redux'
 import { View, Spacer, Text, Slider } from 'core/components'
 import { NumericInput, NumericField } from 'core/components/NumericInput'
 import PanelHeader from './PanelHeader'
-import { ActionTypes, selectTool, selectShape, transformShape, setOpacity, arrangeShape } from 'app/actions/common'
-import { shapeRegistration } from 'app/components/Shape'
+import { ActionTypes, transformShape, setOpacity } from 'app/actions/common'
+import { shapeRegistration } from 'app/components/CanvasShape'
 
 const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape, dispatch }) => {
   const handleOpacityValueChange = useCallback(opacity => {
@@ -19,13 +19,15 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape,
 
   const handlePositionXSubmit = useCallback(positionX => {
     transformShape(selectedShapes[0].id, ActionTypes.MOVE_SHAPE, {
-      x: positionX - selectedShapes[0].position.x, y: 0
+      x: positionX - selectedShapes[0].position.x,
+      y: 0
     })
   }, [transformShape, selectedShapes])
 
   const handlePositionYSubmit = useCallback(positionY => {
     transformShape(selectedShapes[0].id, ActionTypes.MOVE_SHAPE, {
-      x: 0, y: positionY - selectedShapes[0].position.y
+      x: 0,
+      y: positionY - selectedShapes[0].position.y
     })
   }, [transformShape, selectedShapes])
 
@@ -102,9 +104,7 @@ const mapDispatchToProps = dispatch => {
   return {
     dispatch,
     transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
-    selectShape: id => dispatch(selectShape(id)),
     setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
-    arrangeShape: (id, actionType) => dispatch(arrangeShape(id, actionType)),
   }
 }
 

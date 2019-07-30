@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { connect } from 'react-redux'
 
 import { StyleSheet } from 'react-native'
@@ -8,7 +8,7 @@ import { View } from 'core/components'
 import Ruler from 'core/components/Ruler'
 import Grid from 'core/components/Grid'
 
-import { AppCanvasShape } from 'app/components'
+import { CanvasShape } from 'app/components'
 import { selectShape, transformShape } from 'app/actions/common'
 
 const styles = StyleSheet.create({
@@ -22,21 +22,25 @@ const styles = StyleSheet.create({
   }
 })
 
-const AppCanvas = ({ toolActionType, allShapes, selectedShapes, onSelectShape, onTransformShape, onDragShape }) => {
+const AppCanvas = ({ toolActionType, allShapes, selectedShapes, onSelectShape, onTransformShape }) => {
   const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [allShapes, selectedShapes])
 
-  const handleDragShape = (id, delta) => {
+  const handleResponderGrant = useCallback(event => {
+    onSelectShape()
+  }, [onSelectShape])
+  
+  const handleDragShape = useCallback((id, delta) => {
     onTransformShape(id, toolActionType, delta)
-  }
+  }, [onTransformShape, toolActionType])
 
   return (
     <View fill>
       <View pointerEvents="none" style={styles.shadow} />
       <Svg
         onStartShouldSetResponder={event => true}
-        onResponderGrant={event => onSelectShape()}
+        onResponderGrant={handleResponderGrant}
         // onResponderMove={event => console.log(event.nativeEvent.locationX)}
-        style={{flex: 1, xboxShadow: 'inset 0 0 5px hsla(0, 0%, 0%, 0.5)'}}
+        style={{ flex: 1 }}
       >
         <Grid />
         <Ruler />
@@ -44,7 +48,7 @@ const AppCanvas = ({ toolActionType, allShapes, selectedShapes, onSelectShape, o
           const { type, opacity, position, size } = allShapes[childId]
 
           return (
-            <AppCanvasShape
+            <CanvasShape
               key={childId}
               id={childId}
               shape={allShapes[childId]}
