@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { Spacer, Divider, Toolbar } from 'core/components'
-import { ActionTypes } from 'app/actions/common'
+import { ActionTypes, arrangeShape } from 'app/actions/common'
 
 const mapStateToProps = state => {
   return {
@@ -16,7 +16,7 @@ const mapDispatchToProps = dispatch => {
     // transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
     // selectShape: id => dispatch(selectShape(id)),
     // setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
-    // arrangeShape: () => dispatch(arrangeShape()),
+    arrangeShape: () => dispatch(arrangeShape()),
   }
 }
 

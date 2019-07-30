@@ -1,10 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { StyleSheet, SectionList } from 'react-native'
+import { connect } from 'react-redux'
 
 import { View, Spacer, Text, Slider } from 'core/components'
 import { NumericInput, NumericField } from 'core/components/NumericInput'
 import PanelHeader from './PanelHeader'
-import { ActionTypes } from 'app/actions/common'
+import { ActionTypes, selectTool, selectShape, transformShape, setOpacity, arrangeShape } from 'app/actions/common'
 import { shapeRegistration } from 'app/components/Shape'
 
 const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape, dispatch }) => {
@@ -90,4 +91,21 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape,
   )
 }
 
-export default AppPropertiesPanel
+const mapStateToProps = state => {
+  return {
+    allShapes: state.allShapes,
+    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatch,
+    transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
+    selectShape: id => dispatch(selectShape(id)),
+    setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
+    arrangeShape: (id, actionType) => dispatch(arrangeShape(id, actionType)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AppPropertiesPanel)

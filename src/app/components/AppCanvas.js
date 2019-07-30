@@ -1,4 +1,6 @@
 import React, { useMemo } from 'react'
+import { connect } from 'react-redux'
+
 import { StyleSheet } from 'react-native'
 import { Svg } from 'react-native-svg'
 
@@ -7,6 +9,7 @@ import Ruler from 'core/components/Ruler'
 import Grid from 'core/components/Grid'
 
 import { AppCanvasShape } from 'app/components'
+import { selectShape, transformShape, setOpacity, arrangeShape } from 'app/actions/common'
 
 const styles = StyleSheet.create({
   shadow: {
@@ -58,4 +61,20 @@ const AppCanvas = ({ allShapes, selectedShapes, onSelectShape, onDragShape }) =>
   )
 }
 
-export default AppCanvas
+const mapStateToProps = state => {
+  return {
+    allShapes: state.allShapes,
+    rootChildIds: state.allShapes[0].childIds,
+    selectedShapeIds: state.selectedShapeIds,
+    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatch,
+    onSelectShape: id => dispatch(selectShape(id)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AppCanvas)

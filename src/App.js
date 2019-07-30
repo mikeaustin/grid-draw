@@ -61,21 +61,11 @@ const App = ({
 
   return (
     <View fill>
-      <AppMainToolbar
-        toolActionType={toolActionType}
-        setToolActionType={setToolActionType}
-        arrangeShape={arrangeShape}
-      />
+      <AppMainToolbar toolActionType={toolActionType} setToolActionType={setToolActionType} />
       <View horizontal fill>
         <AppObjectsPanel theme={theme} />
-        <AppCanvas allShapes={allShapes} selectedShapes={selectedShapes} onSelectShape={handleSelect} onDragShape={handleDrag} />
-        <AppPropertiesPanel
-          theme={theme}
-          selectedShapes={selectedShapes}
-          setOpacity={setOpacity}
-          transformShape={transformShape}
-          dispatch={dispatch}
-        />
+        <AppCanvas onSelectShape={handleSelect} onDragShape={handleDrag} />
+        <AppPropertiesPanel theme={theme} />
       </View>
     </View>
   )
