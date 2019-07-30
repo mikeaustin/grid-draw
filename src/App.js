@@ -11,6 +11,7 @@ import { AppMainToolbar, AppObjectsPanel, AppPropertiesPanel, AppCanvasShape } f
 import Ruler from 'core/components/Ruler'
 import Grid from 'core/components/Grid'
 import { ActionTypes, selectTool, selectShape, transformShape, setOpacity, arrangeShape } from 'app/actions/common'
+import { AppCanvas } from 'app/components'
 import './App.css'
 
 const theme = {
@@ -49,7 +50,6 @@ const App = ({
   // console.log('App.render()')
 
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
-  const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [allShapes, selectedShapes])
 
   const handleSelect = id => {
     selectShape(id)
@@ -67,41 +67,8 @@ const App = ({
         arrangeShape={arrangeShape}
       />
       <View horizontal fill>
-        <AppObjectsPanel
-          theme={theme}
-        />
-        <View fill>
-          <View pointerEvents="none" style={{ position: 'absolute', top: 31, right: 0, bottom: 0, left: 0, boxShadow: 'inset 0 0 5px hsla(0, 0%, 0%, 0.2)'}} />
-          <Svg
-            onStartShouldSetResponder={event => true}
-            onResponderGrant={event => selectShape()}
-            // onResponderMove={event => console.log(event.nativeEvent.locationX)}
-            style={{flex: 1, xboxShadow: 'inset 0 0 5px hsla(0, 0%, 0%, 0.5)'}}
-          >
-            <Grid />
-            <Ruler />
-            {allShapes[0].childIds.asMutable().map((childId) => {
-              const { type, opacity, position, size } = allShapes[childId]
-
-              return (
-                <AppCanvasShape
-                  key={childId}
-                  id={childId}
-                  shape={allShapes[childId]}
-                  // type={type}
-                  opacity={opacity}
-                  selected={selectedShapes.some(shape => shape.id === childId)}
-                  // position={position}
-                  // size={size}
-                  childIds={allShapes[childId].childIds}
-                  shapeListProps={shapeListProps}
-                  onSelect={handleSelect}
-                  onDrag={handleDrag}
-                />
-              )
-            })}
-          </Svg>
-        </View>
+        <AppObjectsPanel theme={theme} />
+        <AppCanvas allShapes={allShapes} selectedShapes={selectedShapes} onSelectShape={handleSelect} onDragShape={handleDrag} />
         <AppPropertiesPanel
           theme={theme}
           selectedShapes={selectedShapes}
