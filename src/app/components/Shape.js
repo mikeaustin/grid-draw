@@ -101,7 +101,7 @@ const ShapeList = ({
   childIds, shapeListProps, onSelect, onDrag
 }) => {
   return (
-    childIds.asMutable().reverse().map(childId => {
+    childIds.asMutable().map(childId => {
       const { type, opacity, position, size } = shapeListProps.allShapes[childId]
       const selected = shapeListProps.selectedShapes.some(shape => shape.id === childId)
 

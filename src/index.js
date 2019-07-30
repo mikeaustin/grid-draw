@@ -84,15 +84,15 @@ const shapeReducer = (allShapes, action) => {
       const shape = allShapes[action.payload.id]
 
       return allShapes.update(shape.parentId, merge(({ childIds }) => ({
-        childIds: [shape.id].concat(childIds.filter(id => id !== shape.id))
+        childIds: childIds.filter(id => id !== shape.id).concat(shape.id)
       })))
     }
     case ActionTypes.SEND_TO_BACK: {
       const shape = allShapes[action.payload.id]
 
       return allShapes.update(shape.parentId, merge(({ childIds }) => ({
-          childIds: childIds.filter(id => id !== shape.id).concat(shape.id)
-        })))
+        childIds: [shape.id].concat(childIds.filter(id => id !== shape.id))
+      })))
     }
     default: return allShapes
   }

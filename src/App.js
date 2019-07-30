@@ -80,7 +80,7 @@ const App = ({
           >
             <Grid />
             <Ruler />
-            {allShapes[0].childIds.asMutable().reverse().map((childId) => {
+            {allShapes[0].childIds.asMutable().map((childId) => {
               const { type, opacity, position, size } = allShapes[childId]
 
               return (
