@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
 import { StyleSheet, TextInput } from 'react-native'
 
-import { View, Text, Spacer, Divider } from 'core/components'
+import { View, Text, Spacer } from 'core/components'
 
 const styles = StyleSheet.create({
   numericInput: {

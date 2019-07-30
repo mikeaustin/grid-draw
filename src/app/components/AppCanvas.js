@@ -9,7 +9,7 @@ import Ruler from 'core/components/Ruler'
 import Grid from 'core/components/Grid'
 
 import { AppCanvasShape } from 'app/components'
-import { selectShape, transformShape, setOpacity, arrangeShape } from 'app/actions/common'
+import { selectShape, transformShape } from 'app/actions/common'
 
 const styles = StyleSheet.create({
   shadow: {
@@ -22,8 +22,12 @@ const styles = StyleSheet.create({
   }
 })
 
-const AppCanvas = ({ allShapes, selectedShapes, onSelectShape, onDragShape }) => {
+const AppCanvas = ({ toolActionType, allShapes, selectedShapes, onSelectShape, onTransformShape, onDragShape }) => {
   const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [allShapes, selectedShapes])
+
+  const handleDragShape = (id, delta) => {
+    onTransformShape(id, toolActionType, delta)
+  }
 
   return (
     <View fill>
@@ -52,7 +56,7 @@ const AppCanvas = ({ allShapes, selectedShapes, onSelectShape, onDragShape }) =>
               childIds={allShapes[childId].childIds}
               shapeListProps={shapeListProps}
               onSelect={onSelectShape}
-              onDrag={onDragShape}
+              onDrag={handleDragShape}
             />
           )
         })}
@@ -74,6 +78,7 @@ const mapDispatchToProps = dispatch => {
   return {
     dispatch,
     onSelectShape: id => dispatch(selectShape(id)),
+    onTransformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
   }
 }
 

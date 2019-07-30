@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { StyleSheet, SectionList } from 'react-native'
 import { connect } from 'react-redux'
 
@@ -9,25 +9,25 @@ import { ActionTypes, selectTool, selectShape, transformShape, setOpacity, arran
 import { shapeRegistration } from 'app/components/Shape'
 
 const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape, dispatch }) => {
-  const handleOpacityValueChange = opacity => {
+  const handleOpacityValueChange = useCallback(opacity => {
     setOpacity(selectedShapes[0].id, opacity)
-  }
+  }, [setOpacity, selectedShapes])
 
-  const handleOpacitySubmit = opacity => {
+  const handleOpacitySubmit = useCallback(opacity => {
     setOpacity(selectedShapes[0].id, opacity / 100)
-  }
+  }, [setOpacity, selectedShapes])
 
-  const handlePositionXSubmit = positionX => {
+  const handlePositionXSubmit = useCallback(positionX => {
     transformShape(selectedShapes[0].id, ActionTypes.MOVE_SHAPE, {
       x: positionX - selectedShapes[0].position.x, y: 0
     })
-  }
+  }, [transformShape, selectedShapes])
 
-  const handlePositionYSubmit = positionY => {
+  const handlePositionYSubmit = useCallback(positionY => {
     transformShape(selectedShapes[0].id, ActionTypes.MOVE_SHAPE, {
       x: 0, y: positionY - selectedShapes[0].position.y
     })
-  }
+  }, [transformShape, selectedShapes])
 
   const selectedShape = selectedShapes[0] || { position: {}, opacity: null }
   const disabled = !selectedShapes[0]
