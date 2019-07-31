@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
 })
 
 const AppCanvas = ({ toolActionType, allShapes, selectedShapes, onSelectShape, onTransformShape }) => {
-  const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [allShapes, selectedShapes])
+  const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [selectedShapes])
 
   const handleResponderGrant = useCallback(event => {
     event.preventDefault()

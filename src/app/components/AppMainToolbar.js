@@ -1,12 +1,38 @@
 import React, { useCallback } from 'react';
 import { connect } from 'react-redux'
+import { createSelector, defaultMemoize, createSelectorCreator } from 'reselect'
 import { Spacer, Divider, Toolbar } from 'core/components'
 import { ActionTypes, arrangeShape } from 'app/actions/common'
 
+const createOptimizedSelector = createSelectorCreator(defaultMemoize, (state, prevState) => (
+  state.selectedShapeIds === prevState.selectedShapeIds
+))
+
+const getAllShapes = state => state.allShapes
+const getSelectedShapeIds = state => state.selectedShapeIds
+
+const getAllShapesCached = createOptimizedSelector(
+  [state => state, getAllShapes],
+  (state, allShapes) => allShapes
+)
+
+const getSelectedShapes = createOptimizedSelector(
+  [state => state, getAllShapesCached, getSelectedShapeIds],
+  (state, allShapes, selectedShapeIds) => selectedShapeIds.map(id => allShapes[id])
+)
+
+// const xuseMemo = defaultMemoize(state => ({
+//     allShapes: state.allShapes,
+//     selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id])
+//   }), (state, prevState) => (
+//     state.selectedShapeIds === prevState.selectedShapeIds
+//   )
+// )
+
 const mapStateToProps = state => {
   return {
-    allShapes: state.allShapes,
-    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
+    allShapes: getAllShapesCached(state),
+    selectedShapes: getSelectedShapes(state),
   }
 }
 
@@ -24,6 +50,8 @@ const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, onA
   const handleArrangeShape = useCallback(actionType => {
     onArrangeShape(selectedShapes[0].id, actionType)
   }, [onArrangeShape, selectedShapes])
+
+  console.log('AppMainToolbar()', selectedShapes.length)
 
   return (
     <Toolbar horizontal>
@@ -54,5 +82,7 @@ const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, onA
     </Toolbar>
   )
 }
+
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppMainToolbar)
