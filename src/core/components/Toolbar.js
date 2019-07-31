@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { View, Text, Image, TouchableWithoutFeedback } from 'react-native'
 
 import { Spacer, List } from '.'
@@ -9,6 +9,12 @@ const toolbarStyle = {
 }
 
 const Toolbar = ({ children, style, value, setValue, ...props }) => {
+  const handlePressIn = value => event => {
+    event.preventDefault()
+
+    setValue(value)
+  }
+
   return (
     <List
       borderStyle={{borderBottomWidth: 1, bottom: -1, borderColor: 'hsla(0, 0%, 0%, 0.1)'}}
@@ -18,7 +24,7 @@ const Toolbar = ({ children, style, value, setValue, ...props }) => {
         React.cloneElement(child, {
           ...props,
           selected: child.props.value === value,
-          onPressIn: () => setValue(child.props.value),
+          onPressIn: handlePressIn(child.props.value),
         })
       ))}
     </List>

@@ -5,8 +5,8 @@ import { StyleSheet } from 'react-native'
 import { Svg } from 'react-native-svg'
 
 import { View } from 'core/components'
-import Ruler from 'core/components/Ruler'
-import Grid from 'core/components/Grid'
+import Ruler from 'core/components/svg/Ruler'
+import Grid from 'core/components/svg/Grid'
 
 import { CanvasShape } from 'app/components'
 import { selectShape, transformShape } from 'app/actions/common'
@@ -26,6 +26,8 @@ const AppCanvas = ({ toolActionType, allShapes, selectedShapes, onSelectShape, o
   const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [allShapes, selectedShapes])
 
   const handleResponderGrant = useCallback(event => {
+    event.preventDefault()
+    
     onSelectShape()
   }, [onSelectShape])
   

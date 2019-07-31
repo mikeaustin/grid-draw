@@ -1,10 +1,32 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { StyleSheet, Text, TouchableWithoutFeedback } from 'react-native'
 
 import { View } from 'core/components'
 import PanelHeader from './PanelHeader'
 import { connect } from 'react-redux'
 import { selectShape } from 'app/actions/common'
+
+const styles = StyleSheet.create({
+  objectsPanel: {
+    // backgroundColor: theme.backgroundColor,
+    marginTop: 1,
+  },
+  panelBorder: {
+    borderRightWidth: 1,
+    right: -1,
+    borderColor: 'hsla(0, 0%, 0%, 0.1)',
+  },
+  item: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    outlineWidth: 1,
+  },
+  itemText: {
+    marginTop: -1,
+    fontWeight: '500',
+    color: 'hsl(0, 0%, 25%)',
+  }
+})
 
 const ShapeItemList = ({
   depth, theme, allShapes, childIds, selectedShapeIds, onSelectShape
@@ -36,21 +58,17 @@ const ShapeItemList = ({
 const ShapeItem = ({
   depth, theme, id, type, selected, onSelectShape, shapeListProps
 }) => {
+  const handlePressIn = useCallback(event => {
+    event.preventDefault()
+
+    onSelectShape(id)
+  }, [onSelectShape, id])
+
   return (
     <View>
-      <TouchableWithoutFeedback key={id} onPressIn={() => onSelectShape(id)}>
-        <View
-          style={[
-            {paddingVertical: 5, paddingHorizontal: 10, outlineWidth: 1},
-            selected && {backgroundColor: theme.highlightColor}
-          ]}
-        >
-          <Text
-            style={[
-              {marginTop: -1, paddingLeft: depth * 15, fontWeight: '500', color: 'hsl(0, 0%, 25%)'},
-              selected && {color: 'white'}
-            ]}
-          >
+      <TouchableWithoutFeedback key={id} onPressIn={handlePressIn}>
+        <View style={[styles.item, selected && {backgroundColor: theme.highlightColor} ]}>
+          <Text style={[styles.itemText, { paddingLeft: depth * 15 }, selected && { color: 'white' }]}>
             {type}
           </Text>
         </View>
@@ -65,18 +83,6 @@ const ShapeItem = ({
   )
 }
 
-const styles = StyleSheet.create({
-  objectsPanel: {
-    // backgroundColor: theme.backgroundColor,
-    marginTop: 1,
-  },
-  border: {
-    borderRightWidth: 1,
-    right: -1,
-    borderColor: 'hsla(0, 0%, 0%, 0.1)',
-  },
-})
-
 const AppObjectsPanel = ({
   theme, allShapes, rootChildIds, selectedShapeIds, onSelectShape
 }) => {
@@ -87,7 +93,7 @@ const AppObjectsPanel = ({
   }
   
   return (
-    <View width={256} style={styles.objectsPanel} borderStyle={styles.border}>
+    <View width={256} style={styles.objectsPanel} borderStyle={styles.panelBorder}>
       <PanelHeader heading="Objects" />
       <View style={{paddingVertical: 5}}>
         <ShapeItemList
