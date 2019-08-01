@@ -16,7 +16,7 @@ const theme = {
 }
 
 const App = () => {
-  console.log('App.render()')
+  console.log('App()')
 
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
   const activeModifiers = useRef(new Set())
