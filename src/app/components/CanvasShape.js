@@ -15,7 +15,7 @@ const setCornerRadius = (id, cornerRadius) => {
 
 const shapeRegistration = {
   'GridDraw.Ellipse': {
-    render: ({ shape: { position, size }, selected, ...props }) => {
+    render: ({ position, size, selected, ...props }) => {
       return (
         <Ellipse
           cx={position.x + size.x / 2}
@@ -31,7 +31,7 @@ const shapeRegistration = {
     }
   },
   'GridDraw.Rectangle': {
-    render: ({ shape: { position, size }, selected, ...props }) => {
+    render: ({ position, size, selected, ...props }) => {
       return (
         <Rect
           x={position.x}
@@ -47,7 +47,7 @@ const shapeRegistration = {
     }
   },
   'GridDraw.RoundRect': {
-    design: ({ shape: { id, cornerRadius }, dispatch }) => {
+    design: ({id, shape: { cornerRadius }, dispatch}) => {
       const handleValueChange = newCornerRadius => dispatch(setCornerRadius(id, newCornerRadius * 50))
       const handleSubmit = newCornerRadius => dispatch(setCornerRadius(id, newCornerRadius))
 
@@ -59,7 +59,7 @@ const shapeRegistration = {
         </View>
       )
     },
-    render: ({ shape: { position, size, cornerRadius }, selected, ...props }) => {
+    render: ({ position, size, selected, shape: { cornerRadius }, ...props }) => {
       return (
         <Path d={`
             M ${position.x + cornerRadius}, ${position.y}
@@ -82,7 +82,7 @@ const shapeRegistration = {
     }
   },
   'GridDraw.Group': {
-    render: ({ shape: { position }, selected, ...props }) => {
+    render: ({ position, selected, ...props }) => {
       return (
         <G
           x={position.x}
@@ -102,19 +102,15 @@ const ShapeList = ({
 }) => {
   return (
     childIds.asMutable().map(childId => {
-      const { type, opacity, position, size } = shapeListProps.allShapes[childId]
-      const selected = shapeListProps.selectedShapes.some(shape => shape.id === childId)
+      const shape = shapeListProps.allShapes[childId]
+      const selected = shapeListProps.selectedShapes.some(selectedShape => selectedShape.id === childId)
 
       return (
         <Shape
           key={childId}
-          // type={type}
-          shape={shapeListProps.allShapes[childId]}
-          opacity={opacity}
-          // position={position}
-          // size={size}
+          shape={shape}
           selected={selected}
-          childIds={shapeListProps.allShapes[childId].childIds}
+          childIds={shape.childIds}
           shapeListProps={shapeListProps}
           onSelectShape={onSelectShape}
           onDrag={onDrag}
@@ -126,7 +122,7 @@ const ShapeList = ({
 
 class Shape extends React.PureComponent {
   handleTouchStart = event => {
-    const { id, onSelectShape } = this.props
+    const { shape: { id }, onSelectShape } = this.props
 
     event.preventDefault()
 
@@ -135,7 +131,7 @@ class Shape extends React.PureComponent {
   }
 
   handleTouchMove = event => {
-    const { id, onDrag } = this.props
+    const { shape: { id }, onDrag } = this.props
 
     event.preventDefault()
 
@@ -150,16 +146,17 @@ class Shape extends React.PureComponent {
 
   render() {
     const {
-      shape, opacity, selected, childIds, shapeListProps, onSelectShape, onDrag
+      shape, selected, childIds, shapeListProps, onSelectShape, onDrag
     } = this.props
 
     return (
       React.createElement(shapeRegistration[shape.type].render, {
         shape,
-        opacity,
         selected,
-        // position,
-        // size,
+        id: shape.id,
+        position: shape.position,
+        size: shape.size,
+        opacity: shape.opacity,
         onStartShouldSetResponder: this.handleShouldSetResponder,
         onStartShouldSetResponderCapture: this.handleShouldSetResponder,
         onMoveShouldSetResponderCapture: this.handleShouldSetResponder,

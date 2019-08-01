@@ -23,7 +23,13 @@ const styles = StyleSheet.create({
 })
 
 const AppCanvas = ({
-  toolActionType, activeModifiers, allShapes, selectedShapes, onAddSelection, onSelectShape, onTransformShape
+  toolActionType,
+  activeModifiers,
+  allShapes,
+  selectedShapes,
+  onAddSelection,
+  onSelectShape,
+  onTransformShape
 }) => {
   const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [selectedShapes])
 
@@ -62,13 +68,8 @@ const AppCanvas = ({
           return (
             <CanvasShape
               key={childId}
-              id={childId}
               shape={allShapes[childId]}
-              // type={type}
-              opacity={opacity}
               selected={selectedShapes.some(shape => shape.id === childId)}
-              // position={position}
-              // size={size}
               childIds={allShapes[childId].childIds}
               shapeListProps={shapeListProps}
               onSelectShape={handleSelectShape}
