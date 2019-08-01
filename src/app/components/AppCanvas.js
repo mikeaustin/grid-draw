@@ -9,7 +9,7 @@ import Ruler from 'core/components/svg/Ruler'
 import Grid from 'core/components/svg/Grid'
 
 import { CanvasShape } from 'app/components'
-import { selectShape, transformShape } from 'app/actions/common'
+import { selectShape, addSelection, transformShape } from 'app/actions/common'
 
 const styles = StyleSheet.create({
   shadow: {
@@ -22,15 +22,25 @@ const styles = StyleSheet.create({
   }
 })
 
-const AppCanvas = ({ toolActionType, allShapes, selectedShapes, onSelectShape, onTransformShape }) => {
+const AppCanvas = ({
+  toolActionType, activeModifiers, allShapes, selectedShapes, onAddSelection, onSelectShape, onTransformShape
+}) => {
   const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [selectedShapes])
 
   const handleResponderGrant = useCallback(event => {
     event.preventDefault()
     
-    onSelectShape()
+    onSelectShape(null)
   }, [onSelectShape])
   
+  const handleSelectShape = id => {
+    if (activeModifiers.has('Shift')) {
+      onAddSelection(id)
+    } else {
+      onSelectShape(id)
+    }
+  }
+
   const handleDragShape = useCallback((id, delta) => {
     onTransformShape(id, toolActionType, delta)
   }, [onTransformShape, toolActionType])
@@ -61,7 +71,7 @@ const AppCanvas = ({ toolActionType, allShapes, selectedShapes, onSelectShape, o
               // size={size}
               childIds={allShapes[childId].childIds}
               shapeListProps={shapeListProps}
-              onSelect={onSelectShape}
+              onSelectShape={handleSelectShape}
               onDrag={handleDragShape}
             />
           )
@@ -83,7 +93,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     dispatch,
-    onSelectShape: id => dispatch(selectShape(id)),
+    onAddSelection: id => dispatch(addSelection(id)),
+    onSelectShape: (id, activeModifiers) => dispatch(selectShape(id, activeModifiers)),
     onTransformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
   }
 }

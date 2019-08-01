@@ -1,6 +1,7 @@
 const ActionTypes = {
   ADD_ACTION: 'app/ADD_ACTION',
   SELECT_TOOL: 'tool/SELECT_TOOL',
+  ADD_SELECTION: 'tool/ADD_SELECTION',
   SELECT_SHAPE: 'tool/SELECT_SHAPE',
   SHAPE_ELLIPSE: '/tool/SHAPE_ELLIPSE',
   SHAPE_RECTANGLE: 'tool/SHAPE_RECTANGLE',
@@ -18,18 +19,25 @@ const selectTool = actionType => ({
   }
 })
 
+const selectShape = id => ({
+  type: ActionTypes.SELECT_SHAPE,
+  payload: {
+    id,
+  }
+})
+
+const addSelection = id => ({
+  type: ActionTypes.ADD_SELECTION,
+  payload: {
+    id,
+  }
+})
+
 const transformShape = (id, actionType, delta) => ({
   type: actionType,
   payload: {
     id,
     delta,
-  }
-})
-
-const selectShape = id => ({
-  type: ActionTypes.SELECT_SHAPE,
-  payload: {
-    id,
   }
 })
 
@@ -52,6 +60,7 @@ export {
   ActionTypes,
   selectTool,
   selectShape,
+  addSelection,
   transformShape,
   setOpacity,
   arrangeShape,

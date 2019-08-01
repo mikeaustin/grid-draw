@@ -98,7 +98,7 @@ const shapeRegistration = {
 }
 
 const ShapeList = ({ 
-  childIds, shapeListProps, onSelect, onDrag
+  childIds, shapeListProps, onSelectShape, onDrag
 }) => {
   return (
     childIds.asMutable().map(childId => {
@@ -116,7 +116,7 @@ const ShapeList = ({
           selected={selected}
           childIds={shapeListProps.allShapes[childId].childIds}
           shapeListProps={shapeListProps}
-          onSelect={onSelect}
+          onSelectShape={onSelectShape}
           onDrag={onDrag}
         />
       )
@@ -126,11 +126,11 @@ const ShapeList = ({
 
 class Shape extends React.PureComponent {
   handleTouchStart = event => {
-    const { id, onSelect } = this.props
+    const { id, onSelectShape } = this.props
 
     event.preventDefault()
 
-    onSelect(id)
+    onSelectShape(id)
     this.touchStart = [event.nativeEvent.pageX, event.nativeEvent.pageY]
   }
 
@@ -150,7 +150,7 @@ class Shape extends React.PureComponent {
 
   render() {
     const {
-      shape, opacity, selected, childIds, shapeListProps, onSelect, onDrag
+      shape, opacity, selected, childIds, shapeListProps, onSelectShape, onDrag
     } = this.props
 
     return (
@@ -169,7 +169,7 @@ class Shape extends React.PureComponent {
         <ShapeList 
           childIds={childIds}
           shapeListProps={shapeListProps}
-          onSelect={onSelect}
+          onSelectShape={onSelectShape}
           onDrag={onDrag}
         />
       ))

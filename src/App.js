@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 // import { Slider } from 'react-native-elements'
 // import * as Slider from '@react-native-community/slider'
 // import Slider from "react-native-slider"
@@ -16,16 +16,27 @@ const theme = {
 }
 
 const App = () => {
-  // console.log('App.render()')
+  console.log('App.render()')
 
   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
+  const activeModifiers = useRef(new Set())
+
+  useEffect(() => {
+    document.addEventListener('keydown', event => {
+      activeModifiers.current.add(event.key)
+    })
+
+    document.addEventListener('keyup', event => {
+      activeModifiers.current.delete(event.key)
+    })
+  })
 
   return (
     <View fill>
       <AppMainToolbar toolActionType={toolActionType} setToolActionType={setToolActionType} />
       <View horizontal fill>
         <AppObjectsPanel theme={theme} />
-        <AppCanvas toolActionType={toolActionType} />
+        <AppCanvas activeModifiers={activeModifiers.current} toolActionType={toolActionType} />
         <AppPropertiesPanel theme={theme} />
       </View>
     </View>
