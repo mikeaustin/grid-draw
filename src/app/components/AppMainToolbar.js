@@ -51,6 +51,16 @@ const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, onA
     onArrangeShape(selectedShapes[0].id, actionType)
   }, [onArrangeShape, selectedShapes])
 
+  const handleGroupShapes = useCallback(actionType => {
+    // onGroupShape(selectedShapes, actionType)
+    dispatch({
+      type: actionType,
+      payload: {
+        selectedShapes
+      }
+    })
+  }, [dispatch, selectedShapes])
+
   console.log('AppMainToolbar()', selectedShapes.length)
 
   return (
@@ -69,8 +79,13 @@ const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, onA
       </Toolbar.Group>
       <Divider xsize="xsmall" />
       <Toolbar.Group title="Arrange" value={toolActionType} setValue={handleArrangeShape}>
-        <Toolbar.Button title="Bring to Front" value={ActionTypes.BRING_TO_FRONT} icon="018-alignment-1" />
-        <Toolbar.Button title="Send to Back" value={ActionTypes.SEND_TO_BACK} icon="002-object-alignment" />
+        <Toolbar.Button title="Bring to Front" value={ActionTypes.BRING_TO_FRONT} icon="foreground" />
+        <Toolbar.Button title="Send to Back" value={ActionTypes.SEND_TO_BACK} icon="background" />
+      </Toolbar.Group>
+      <Divider xsize="xsmall" />
+      <Toolbar.Group title="Group" value={toolActionType} setValue={handleGroupShapes}>
+        <Toolbar.Button title="Group" value={'shape/GROUP_SHAPES'} icon="group" />
+        <Toolbar.Button title="Ungroup" value={ActionTypes.SEND_TO_BACK} icon="ungroup" />
       </Toolbar.Group>
       <Divider xsize="xsmall" />
       <Toolbar.Group title="Combine" value={toolActionType} setValue={setToolActionType}>
@@ -82,7 +97,5 @@ const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, onA
     </Toolbar>
   )
 }
-
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppMainToolbar)

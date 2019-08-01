@@ -25,6 +25,7 @@ const initialState = Immutable({
     }
   },
   allShapes: {
+    nextShapeId: 7,
     0: {
       id: 0,
       type: 'GridDraw.Group',
@@ -32,7 +33,8 @@ const initialState = Immutable({
       size: Point(0, 0),
       opacity: 1.0,
       parent: 0,
-      childIds: [1, 2, 3, 6]
+      // childIds: [1, 2, 3, 6]
+      childIds: [1, 2, 6]
     },
     1: {
       id: 1,

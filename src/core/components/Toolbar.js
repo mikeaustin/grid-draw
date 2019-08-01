@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react'
-import { View, Text, Image, TouchableWithoutFeedback } from 'react-native'
+import React, { useCallback, useState } from 'react'
+import { StyleSheet, View, Text, Image, TouchableWithoutFeedback } from 'react-native'
 
 import { Spacer, List } from '.'
 
@@ -38,7 +38,7 @@ const Group = ({ children, title, value, setValue, ...props }) => {
         {React.Children.map(children, (child, index) => (
           React.cloneElement(child, {
             selected: child.props.value === value,
-            onPressIn: () => setValue(child.props.value),
+            onPress: () => setValue(child.props.value),
           })
         ))}
       </List>
@@ -48,22 +48,55 @@ const Group = ({ children, title, value, setValue, ...props }) => {
   )
 }
 
-const Button = ({ value, title, icon, imageSource, selected, onPressIn }) => {
-  const buttonStyle = [
-    { padding: 5, borderRadius: 2, outlineWidth: 1 },
-    selected && {backgroundColor: 'hsla(0, 0%, 0%, 0.11)' },
-  ]
+const styles = StyleSheet.create({
+  button: {
+    padding: 5,
+    borderRadius: 2,
+    outlineWidth: 1,
+  },
+  selectedButton: {
+    backgroundColor: 'hsla(0, 0%, 0%, 0.1)'
+  },
+  activeButton: {
+    backgroundColor: 'hsla(0, 0%, 0%, 0.2)'
+  },
+})
+
+const Button = ({ title, icon, imageSource, selected, onPress }) => {
+  const [active, setActive] = useState(false)
   
   const setNativeProps = ref => {
     ref && title && ref.setNativeProps({ title: title })
   }
 
+  const handlePressIn = event => {
+    setActive(true)
+  }
+
+  const handlePressOut = event => {
+    setActive(false)
+  }
+
+  const handlePress = event => {
+    onPress()
+  }
+
+  const buttonStyle = [
+    styles.button,
+    selected && styles.selectedButton,
+    active && styles.activeButton,
+  ]
+
   return (
-    <TouchableWithoutFeedback onPressIn={onPressIn}>
+    <TouchableWithoutFeedback
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
+      onPress={handlePress}
+    >
       <View ref={setNativeProps} style={buttonStyle}>
         <Image
           source={imageSource || {uri: `images/icons/${icon}.svg`}}
-          style={{width: 25, height: 25, opacity: 0.65}}
+          style={{width: 25, height: 25, opacity: 1.0}}
         />
       </View>
     </TouchableWithoutFeedback>

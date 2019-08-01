@@ -61,6 +61,35 @@ const shapeReducer = (allShapes, action) => {
         childIds: [shape.id].concat(childIds.filter(id => id !== shape.id))
       })))
     }
+    case 'shape/GROUP_SHAPES': {
+      const selectedShapeIds = action.payload.selectedShapes.map(shape => shape.id)
+      const firstShape = allShapes[action.payload.selectedShapes[0].id]
+      const parentChildIds = allShapes[firstShape.parentId].childIds
+      const shapeIndex = parentChildIds.indexOf(firstShape.id)
+      const groupId = allShapes.nextShapeId
+
+      const group = {
+        id: groupId,
+        type: 'GridDraw.Group',
+        position: Point(0, 0),
+        size: Point(0, 0),
+        opacity: 1.0,
+        parent: 0,
+        childIds: selectedShapeIds
+      }
+
+      const removedIds = parentChildIds.filter(id => !selectedShapeIds.includes(id))
+      const addedGroupIds = removedIds.slice(0, shapeIndex).concat([groupId]).concat(removedIds.slice(shapeIndex))
+
+      // Need to change each selected shape's parent
+      return allShapes.set(groupId, group).update(firstShape.parentId, merge(({ childIds }) => {
+        const removedIds = childIds.filter(id => !selectedShapeIds.includes(id))
+
+        return {
+          childIds: removedIds.slice(0, shapeIndex).concat([groupId]).concat(removedIds.slice(shapeIndex))
+        }
+      })).update('nextShapeId', nextShapeId => nextShapeId + 1)
+    }
     default: return allShapes
   }
 }
