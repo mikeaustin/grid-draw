@@ -32,8 +32,7 @@ const initialState = Immutable({
       position: Point(0, 0),
       size: Point(0, 0),
       opacity: 1.0,
-      // childIds: [1, 2, 3, 6]
-      childIds: [1, 2, 6]
+      childIds: [1, 2, 3, 6],
     },
     1: {
       id: 1,
@@ -42,7 +41,7 @@ const initialState = Immutable({
       size: Point(100, 100),
       opacity: 1.0,
       childIds: [],
-      parentId: 0
+      parentId: 0,
     },
     2: {
       id: 2,
@@ -51,7 +50,7 @@ const initialState = Immutable({
       size: Point(100, 100),
       opacity: 1.0,
       childIds: [],
-      parentId: 0
+      parentId: 0,
     },
     3: {
       id: 3,
@@ -60,7 +59,7 @@ const initialState = Immutable({
       size: Point(100, 100),
       opacity: 1.0,
       childIds: [4, 5],
-      parentId: 0
+      parentId: 0,
     },
     4: {
       id: 4,
@@ -69,7 +68,7 @@ const initialState = Immutable({
       size: Point(100, 100),
       opacity: 1.0,
       childIds: [],
-      parentId: 3
+      parentId: 3,
     },
     5: {
       id: 5,
@@ -78,7 +77,7 @@ const initialState = Immutable({
       size: Point(100, 100),
       opacity: 1.0,
       childIds: [],
-      parentId: 3
+      parentId: 3,
     },
     6: {
       id: 6,
@@ -88,7 +87,7 @@ const initialState = Immutable({
       opacity: 1.0,
       childIds: [],
       parentId: 0,
-      cornerRadius: 10
+      cornerRadius: 10,
     },
   },
   selectedShapeIds: [],

@@ -71,7 +71,7 @@ const shapeReducer = (allShapes, action) => {
       const selectedShapeIds = selectedShapes.map(shape => shape.id)
       const firstShape = allShapes[selectedShapes[0].id]
       const parentChildIds = allShapes[firstShape.parentId].childIds
-      const shapeIndex = parentChildIds.indexOf(firstShape.id)
+      const firstShapeIndex = parentChildIds.indexOf(firstShape.id)
       const groupId = allShapes.nextShapeId
 
       const group = {
@@ -86,7 +86,7 @@ const shapeReducer = (allShapes, action) => {
 
       const removedSelectedIds = parentChildIds.filter(id => !selectedShapeIds.includes(id))
 
-      const [init, tail] = splitAt(shapeIndex, removedSelectedIds)
+      const [init, tail] = splitAt(firstShapeIndex, removedSelectedIds)
       const addedGroupIds3 = pipe([concat(tail), concat([groupId]), concat(init)])([])
 
       const result = allShapes
