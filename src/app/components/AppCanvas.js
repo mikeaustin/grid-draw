@@ -7,6 +7,7 @@ import { Svg } from 'react-native-svg'
 import { View } from 'core/components'
 import Ruler from 'core/components/svg/Ruler'
 import Grid from 'core/components/svg/Grid'
+import BoundingBox from 'core/components/svg/BoundingBox'
 
 import { CanvasShape } from 'app/components'
 import { selectShape, addSelection, transformShape } from 'app/actions/common'
@@ -77,6 +78,7 @@ const AppCanvas = ({
             />
           )
         })}
+        <BoundingBox position={selectedShapes[0] && selectedShapes[0].position} />
       </Svg>
     </View>
   )

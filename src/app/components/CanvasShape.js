@@ -23,7 +23,7 @@ const shapeRegistration = {
           rx={size.x / 2}
           ry={size.y / 2}
           strokeWidth={3}
-          stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
+          stroke={'black'}
           fill="#f0f0f0"
           {...props}
         />
@@ -34,12 +34,12 @@ const shapeRegistration = {
     render: ({ position, size, selected, ...props }) => {
       return (
         <Rect
-          x={position.x}
-          y={position.y}
+          x={position.x + 0.5}
+          y={position.y + 0.5}
           width={size.x}
           height={size.y}
           strokeWidth={3}
-          stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
+          stroke={'black'}
           fill="#f0f0f0"
           {...props}
         />
@@ -61,7 +61,8 @@ const shapeRegistration = {
     },
     render: ({ position, size, selected, shape: { cornerRadius }, ...props }) => {
       return (
-        <Path d={`
+        <Path
+          d={`
             M ${position.x + cornerRadius}, ${position.y}
             l ${size.x - cornerRadius * 2}, 0
             a ${cornerRadius}, ${cornerRadius} 0 0 1 ${cornerRadius}, ${cornerRadius}
@@ -74,7 +75,7 @@ const shapeRegistration = {
             z
           `}
           strokeWidth={3}
-          stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
+          stroke={'black'}
           fill="#f0f0f0"
           {...props}
         />
@@ -88,7 +89,7 @@ const shapeRegistration = {
           x={position.x}
           y={position.y}
           strokeWidth={3}
-          stroke={selected ? 'rgb(33, 150, 243)' : 'black'}
+          stroke={'black'}
           fill="#f0f0f0"
           {...props}
         />
