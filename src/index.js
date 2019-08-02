@@ -2,6 +2,7 @@ import React from 'react'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { AppRegistry } from 'react-native'
+import { pipe, take, drop, concat, mapValues, partition } from 'lodash/fp'
 import Immutable from 'seamless-immutable'
 import JsxParser from 'react-jsx-parser'
 
@@ -11,7 +12,10 @@ import { Point, add } from 'core/utils/geometry'
 import { ActionTypes } from 'app/actions/common'
 import initialState from './initialState'
 
+// import test from './test.macro'
+
 const merge = updater => value => value.merge(updater(value))
+const splitAt = (index, it) => [it.slice(0, index), it.slice(index)]
 
 // const reducer = (state, actions, action) => {
 //   state = Object.entries(actions).reduce((actions, [actionType, callback]) => {
@@ -62,8 +66,10 @@ const shapeReducer = (allShapes, action) => {
       })))
     }
     case 'shape/GROUP_SHAPES': {
-      const selectedShapeIds = action.payload.selectedShapes.map(shape => shape.id)
-      const firstShape = allShapes[action.payload.selectedShapes[0].id]
+      const { selectedShapes } = action.payload
+
+      const selectedShapeIds = selectedShapes.map(shape => shape.id)
+      const firstShape = allShapes[selectedShapes[0].id]
       const parentChildIds = allShapes[firstShape.parentId].childIds
       const shapeIndex = parentChildIds.indexOf(firstShape.id)
       const groupId = allShapes.nextShapeId
@@ -74,21 +80,23 @@ const shapeReducer = (allShapes, action) => {
         position: Point(0, 0),
         size: Point(0, 0),
         opacity: 1.0,
-        parent: 0,
+        parentId: firstShape.parentId,
         childIds: selectedShapeIds
       }
 
-      const removedIds = parentChildIds.filter(id => !selectedShapeIds.includes(id))
-      const addedGroupIds = removedIds.slice(0, shapeIndex).concat([groupId]).concat(removedIds.slice(shapeIndex))
+      const removedSelectedIds = parentChildIds.filter(id => !selectedShapeIds.includes(id))
 
-      // Need to change each selected shape's parent
-      return allShapes.set(groupId, group).update(firstShape.parentId, merge(({ childIds }) => {
-        const removedIds = childIds.filter(id => !selectedShapeIds.includes(id))
+      const [init, tail] = splitAt(shapeIndex, removedSelectedIds)
+      const addedGroupIds3 = pipe([concat(tail), concat([groupId]), concat(init)])([])
 
-        return {
-          childIds: removedIds.slice(0, shapeIndex).concat([groupId]).concat(removedIds.slice(shapeIndex))
-        }
-      })).update('nextShapeId', nextShapeId => nextShapeId + 1)
+      const result = allShapes
+        .set(groupId, group)
+        .update(firstShape.parentId, merge(() => ({ childIds: addedGroupIds3 })))
+        .update('nextShapeId', nextShapeId => nextShapeId + 1)
+
+      return mapValues(shape => (
+        selectedShapeIds.includes(shape.id) ? Immutable.merge(shape, { parentId: groupId }) : shape
+      ), result)
     }
     default: return allShapes
   }
