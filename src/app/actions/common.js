@@ -24,6 +24,7 @@ const selectTool = actionType => ({
 
 const selectShape = id => ({
   type: ActionTypes.SELECT_SHAPE,
+  category: 'selection',
   payload: {
     id,
   }
@@ -31,6 +32,7 @@ const selectShape = id => ({
 
 const addSelection = id => ({
   type: ActionTypes.ADD_SELECTION,
+  category: 'selection',
   payload: {
     id,
   }

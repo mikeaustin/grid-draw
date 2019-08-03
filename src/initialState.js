@@ -24,6 +24,8 @@ const initialState = Immutable({
       )
     }
   },
+  allShapesSelection$: null,
+  allShapesHierarchy$: null,
   allShapes: {
     nextShapeId: 7,
     0: {

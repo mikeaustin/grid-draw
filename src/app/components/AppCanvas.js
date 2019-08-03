@@ -30,8 +30,12 @@ const AppCanvas = ({
   selectedShapes,
   onAddSelection,
   onSelectShape,
-  onTransformShape
+  onTransformShape,
+  onDragShape,
+  onCommitDragShape,
 }) => {
+  console.log('AppCanvas()')
+
   const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [selectedShapes])
 
   const handleResponderGrant = useCallback(event => {
@@ -49,8 +53,9 @@ const AppCanvas = ({
   }
 
   const handleDragShape = useCallback((id, delta) => {
-    onTransformShape(id, toolActionType, delta)
-  }, [onTransformShape, toolActionType])
+    // onTransformShape(id, toolActionType, delta)
+    onDragShape(id, delta)
+  }, [onDragShape, onTransformShape, toolActionType])
 
   return (
     <View fill>
@@ -74,7 +79,8 @@ const AppCanvas = ({
               childIds={allShapes[childId].childIds}
               shapeListProps={shapeListProps}
               onSelectShape={handleSelectShape}
-              onDrag={handleDragShape}
+              onDragShape={handleDragShape}
+              onCommitDragShape={onCommitDragShape}
             />
           )
         })}
@@ -89,7 +95,7 @@ const mapStateToProps = state => {
     allShapes: state.allShapes,
     rootChildIds: state.allShapes[0].childIds,
     selectedShapeIds: state.selectedShapeIds,
-    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
+    // selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
   }
 }
 

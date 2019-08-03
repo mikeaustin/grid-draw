@@ -31,7 +31,7 @@ const getSelectedShapes = createOptimizedSelector(
 
 const mapStateToProps = state => {
   return {
-    allShapes: getAllShapesCached(state),
+    allShapes: state.allShapesSelected,
     selectedShapes: getSelectedShapes(state),
   }
 }
@@ -61,7 +61,7 @@ const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, onA
     })
   }, [dispatch, selectedShapes])
 
-  console.log('AppMainToolbar()', selectedShapes.length)
+  console.log('AppMainToolbar()')
 
   return (
     <Toolbar horizontal>

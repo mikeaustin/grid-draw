@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Text, G, Line, Rect } from 'react-native-svg'
 
 const Ruler = ({ vertical }) => {
+  console.log('Ruler()')
+
   return (
     <G>
       <Rect x={30} y={0} width={1000} height={30} fill="white" />
@@ -30,4 +32,4 @@ const Ruler = ({ vertical }) => {
   )
 }
 
-export default Ruler
+export default memo(Ruler)

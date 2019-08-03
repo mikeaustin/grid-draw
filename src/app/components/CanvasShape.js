@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { memo, useRef } from 'react'
 import { G, Ellipse, Rect, Path } from 'react-native-svg'
 
-import { Point } from 'core/utils/geometry'
 import { View, Spacer, Slider, NumericInput } from 'core/components'
+import { Point, add, sub } from 'core/utils/geometry'
 
 const setCornerRadius = (id, cornerRadius) => {
   return {
@@ -15,9 +15,10 @@ const setCornerRadius = (id, cornerRadius) => {
 
 const shapeRegistration = {
   'GridDraw.Ellipse': {
-    render: ({ position, size, selected, ...props }) => {
+    render: ({ nativeRef, position, size, selected, ...props }) => {
       return (
         <Ellipse
+          // ref={nativeRef}
           cx={position.x + size.x / 2}
           cy={position.y + size.y / 2}
           rx={size.x / 2}
@@ -122,40 +123,74 @@ const ShapeList = ({
 }
 
 class Shape extends React.PureComponent {
+  state = {
+    translate: Point(0, 0)
+  }
+
   handleTouchStart = event => {
     const { shape: { id }, onSelectShape } = this.props
 
     event.preventDefault()
 
     onSelectShape(id)
-    this.touchStart = [event.nativeEvent.pageX, event.nativeEvent.pageY]
+
+    this.touchStart = Point(event.nativeEvent.pageX, event.nativeEvent.pageY)
+    this.touchStart2 = Point(event.nativeEvent.pageX, event.nativeEvent.pageY)
   }
 
   handleTouchMove = event => {
-    const { shape: { id }, onDrag } = this.props
+    const { shape: { id }, onDragShape } = this.props
 
     event.preventDefault()
 
-    onDrag(id, Point(
-      event.nativeEvent.pageX - this.touchStart[0],
-      event.nativeEvent.pageY - this.touchStart[1])
-    )
-    this.touchStart = [event.nativeEvent.pageX, event.nativeEvent.pageY]
+    const touch = Point(event.nativeEvent.pageX, event.nativeEvent.pageY)
+
+    this.setState({
+      translate: sub(touch, this.touchStart)
+    })
+
+    onDragShape(id, Point(
+      event.nativeEvent.pageX - this.touchStart2.x,
+      event.nativeEvent.pageY - this.touchStart2.y
+    ))
+
+    this.touchStart2 = Point(event.nativeEvent.pageX, event.nativeEvent.pageY)
+  }
+
+  handleTouchEnd = event => {
+    const { shape: { id }, onCommitDragShape } = this.props
+
+    onCommitDragShape(id, Point(
+      event.nativeEvent.pageX - this.touchStart.x,
+      event.nativeEvent.pageY - this.touchStart.y
+    ))
+
+    this.setState({
+      translate: Point(0, 0)
+    })
   }
 
   handleShouldSetResponder = event => true
 
+  nativeRef = ref => this.ref = ref
+
   render() {
+    console.log('CanvasShape()')
+
     const {
       shape, selected, childIds, shapeListProps, onSelectShape, onDrag
     } = this.props
 
+    //console.log(this.ref)
+    // this.ref && this.ref.setNativeProps({})
+
     return (
       React.createElement(shapeRegistration[shape.type].render, {
+        // nativeRef: this.nativeRef,
         shape,
         selected,
         id: shape.id,
-        position: shape.position,
+        position: add(this.state.translate, shape.position),
         size: shape.size,
         opacity: shape.opacity,
         onStartShouldSetResponder: this.handleShouldSetResponder,
@@ -163,6 +198,7 @@ class Shape extends React.PureComponent {
         onMoveShouldSetResponderCapture: this.handleShouldSetResponder,
         onResponderGrant: this.handleTouchStart,
         onResponderMove: this.handleTouchMove,
+        onResponderRelease: this.handleTouchEnd,
       }, (
         <ShapeList 
           childIds={childIds}
@@ -175,7 +211,7 @@ class Shape extends React.PureComponent {
   }
 }
 
-export default Shape
+export default memo(Shape)
 export {
   shapeRegistration
 }
