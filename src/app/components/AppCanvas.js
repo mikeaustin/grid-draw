@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import { connect } from 'react-redux'
 
 import { StyleSheet } from 'react-native'
@@ -9,8 +9,10 @@ import Ruler from 'core/components/svg/Ruler'
 import Grid from 'core/components/svg/Grid'
 import BoundingBox from 'core/components/svg/BoundingBox'
 
-import { CanvasShape } from 'app/components'
+import { CanvasShape, ShapeList, SelectedShapesContext } from 'app/components'
 import { selectShape, addSelection, transformShape } from 'app/actions/common'
+
+const SvgMemo = React.memo(Svg)
 
 const styles = StyleSheet.create({
   shadow: {
@@ -36,7 +38,8 @@ const AppCanvas = ({
 }) => {
   console.log('AppCanvas()')
 
-  const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [selectedShapes])
+  const shapeListProps = useMemo(() => ({ allShapes, selectedShapes }), [allShapes, selectedShapes])
+  const [selectedShapes2, setSelectedShapes2] = useState([])
 
   const handleResponderGrant = useCallback(event => {
     event.preventDefault()
@@ -44,49 +47,62 @@ const AppCanvas = ({
     onSelectShape(null)
   }, [onSelectShape])
   
-  const handleSelectShape = id => {
+  const handleSelectShape = useCallback(id => {
     if (activeModifiers.has('Shift')) {
       onAddSelection(id)
     } else {
       onSelectShape(id)
     }
-  }
+  }, [activeModifiers, onAddSelection, onSelectShape])
 
   const handleDragShape = useCallback((id, delta) => {
     // onTransformShape(id, toolActionType, delta)
-    onDragShape(id, delta)
+    // onDragShape(id, delta)
+    setSelectedShapes2([])
   }, [onDragShape, onTransformShape, toolActionType])
 
-  return (
-    <View fill>
-      <View pointerEvents="none" style={styles.shadow} />
-      <Svg
-        onStartShouldSetResponder={event => true}
-        onResponderGrant={handleResponderGrant}
-        // onResponderMove={event => console.log(event.nativeEvent.locationX)}
-        style={{ flex: 1 }}
-      >
-        <Grid />
-        <Ruler />
-        {allShapes[0].childIds.asMutable().map((childId) => {
-          const { type, opacity, position, size } = allShapes[childId]
+  const handleShouldSetResponder = useCallback(event => true, [])
+  const memoStyle = useMemo(() => ({ flex: 1 }))
 
-          return (
-            <CanvasShape
-              key={childId}
-              shape={allShapes[childId]}
-              selected={selectedShapes.some(shape => shape.id === childId)}
-              childIds={allShapes[childId].childIds}
-              shapeListProps={shapeListProps}
-              onSelectShape={handleSelectShape}
-              onDragShape={handleDragShape}
-              onCommitDragShape={onCommitDragShape}
-            />
-          )
-        })}
-        <BoundingBox position={selectedShapes[0] && selectedShapes[0].position} />
-      </Svg>
-    </View>
+  return (
+    <SelectedShapesContext.Provider value={selectedShapes2}>
+      <View fill>
+        <View pointerEvents="none" style={styles.shadow} />
+        <SvgMemo
+          onStartShouldSetResponder={handleShouldSetResponder}
+          onResponderGrant={handleResponderGrant}
+          // onResponderMove={event => console.log(event.nativeEvent.locationX)}
+          style={memoStyle}
+        >
+          <Grid />
+          <Ruler />
+          <ShapeList
+            childIds={allShapes[0].childIds}
+            shapeListProps={shapeListProps}
+            onSelectShape={onSelectShape}
+            onDragShape={onDragShape}
+            onCommitDragShape={onCommitDragShape}
+          />
+          {/* {allShapes[0].childIds.asMutable().map(childId => {
+            console.log('AppCanvas : map')
+
+            return (
+              <CanvasShape
+                key={childId}
+                shape={allShapes[childId]}
+                selected={selectedShapes.some(shape => shape.id === childId)}
+                childIds={allShapes[childId].childIds}
+                shapeListProps={shapeListProps}
+                onSelectShape={handleSelectShape}
+                onDragShape={handleDragShape}
+                onCommitDragShape={onCommitDragShape}
+              />
+            )
+          })} */}
+          <BoundingBox position={selectedShapes[0] && selectedShapes[0].position} />
+        </SvgMemo>
+      </View>
+    </SelectedShapesContext.Provider>
   )
 }
 

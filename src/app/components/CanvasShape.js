@@ -100,29 +100,48 @@ const shapeRegistration = {
 }
 
 const ShapeList = ({ 
-  childIds, shapeListProps, onSelectShape, onDrag
+  childIds, shapeListProps, onSelectShape, onDragShape, onCommitDragShape
 }) => {
   return (
     childIds.asMutable().map(childId => {
       const shape = shapeListProps.allShapes[childId]
       const selected = shapeListProps.selectedShapes.some(selectedShape => selectedShape.id === childId)
+      // const Shape = selected ? CanvasShapeWithSelectedShapes : CanvasShape
+      console.log('ShapeList map()')
 
       return (
-        <Shape
+        <CanvasShape
           key={childId}
           shape={shape}
           selected={selected}
           childIds={shape.childIds}
           shapeListProps={shapeListProps}
           onSelectShape={onSelectShape}
-          onDrag={onDrag}
+          onDragShape={onDragShape}
+          onCommitDragShape={onCommitDragShape}
         />
       )
     })
   )
 }
 
-class Shape extends React.PureComponent {
+const SelectedShapesContext = React.createContext([])
+
+const withSelectedShapes = Component => memo(({ ...props }) => {
+  return (
+    <SelectedShapesContext.Consumer>
+      {selectedShapes => <Component selectedShapes={selectedShapes} {...props} />}
+    </SelectedShapesContext.Consumer>
+  )
+})
+
+const SvgShape = ({}) => {
+  return (
+    0
+  )
+}
+
+class CanvasShape extends React.PureComponent {
   state = {
     translate: Point(0, 0)
   }
@@ -172,8 +191,6 @@ class Shape extends React.PureComponent {
 
   handleShouldSetResponder = event => true
 
-  nativeRef = ref => this.ref = ref
-
   render() {
     console.log('CanvasShape()')
 
@@ -181,12 +198,8 @@ class Shape extends React.PureComponent {
       shape, selected, childIds, shapeListProps, onSelectShape, onDrag
     } = this.props
 
-    //console.log(this.ref)
-    // this.ref && this.ref.setNativeProps({})
-
     return (
       React.createElement(shapeRegistration[shape.type].render, {
-        // nativeRef: this.nativeRef,
         shape,
         selected,
         id: shape.id,
@@ -211,7 +224,9 @@ class Shape extends React.PureComponent {
   }
 }
 
-export default memo(Shape)
+export default memo(CanvasShape)
 export {
-  shapeRegistration
+  ShapeList,
+  shapeRegistration,
+  SelectedShapesContext,
 }
