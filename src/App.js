@@ -35,9 +35,9 @@ const App = ({ allShapes, selectedShapeIds, onTransformShape }) => {
     // })))
   }, [setSelectedShapes, selectedShapeIds, selectedShapes])
 
-  const handleCommitDragShape = (id, delta) => {
+  const handleCommitDragShape = useCallback((id, delta) => {
     onTransformShape(id, ActionTypes.MOVE_SHAPE, delta)
-  }
+  }, [onTransformShape])
 
   useEffect(() => {
     document.addEventListener('keydown', event => {
@@ -57,8 +57,8 @@ const App = ({ allShapes, selectedShapeIds, onTransformShape }) => {
         <AppCanvas
           activeModifiers={activeModifiers.current}
           toolActionType={toolActionType}
-          selectedShapes={selectedShapes}
-          onDragShape={handleDragShape}
+          // selectedShapes={selectedShapes}
+          // onDragShape={handleDragShape}
           onCommitDragShape={handleCommitDragShape}
         />
         <AppPropertiesPanel theme={theme} selectedShapes={selectedShapes} />
@@ -78,7 +78,7 @@ const mapDispatchToProps = dispatch => {
   return {
     dispatch,
     onTransformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
-    // selectShape: id => dispatch(selectShape(id)),
+    // onSelectShape: id => dispatch(selectShape(id)),
     // setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
     // onArrangeShape: (id, actionType) => dispatch(arrangeShape(id, actionType)),
   }

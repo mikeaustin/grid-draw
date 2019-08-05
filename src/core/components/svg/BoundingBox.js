@@ -30,4 +30,4 @@ const BoundingBox = ({ position }) => {
   )
 }
 
-export default BoundingBox
+export default React.memo(BoundingBox)

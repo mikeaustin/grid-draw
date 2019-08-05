@@ -2,7 +2,7 @@ import React from 'react'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { AppRegistry } from 'react-native'
-import { pipe, take, drop, concat, mapValues, partition } from 'lodash/fp'
+import { pipe, take, drop, concat, mapValues } from 'lodash/fp'
 import Immutable from 'seamless-immutable'
 import JsxParser from 'react-jsx-parser'
 
@@ -13,6 +13,12 @@ import { ActionTypes } from 'app/actions/common'
 import initialState from './initialState'
 
 // import test from './test.macro'
+
+if (process.env.NODE_ENV !== 'production') {
+  const whyDidYouRender = require('@welldone-software/why-did-you-render')
+
+  // whyDidYouRender(React, { include: [/AppCanvas/] })
+}
 
 const merge = updater => value => value.merge(updater(value))
 const splitAt = (index, it) => [it.slice(0, index), it.slice(index)]

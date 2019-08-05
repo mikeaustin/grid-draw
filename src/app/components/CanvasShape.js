@@ -1,4 +1,4 @@
-import React, { memo, useRef } from 'react'
+import React from 'react'
 import { G, Ellipse, Rect, Path } from 'react-native-svg'
 
 import { View, Spacer, Slider, NumericInput } from 'core/components'
@@ -99,23 +99,24 @@ const shapeRegistration = {
   },
 }
 
-const ShapeList = ({ 
-  childIds, shapeListProps, onSelectShape, onDragShape, onCommitDragShape
+const ShapeList = React.memo(({ 
+  childIds, allShapes, selectedShapeIds, onSelectShape, onDragShape, onCommitDragShape
 }) => {
+  console.log('ShapeList()')
+
   return (
-    childIds.asMutable().map(childId => {
-      const shape = shapeListProps.allShapes[childId]
-      const selected = shapeListProps.selectedShapes.some(selectedShape => selectedShape.id === childId)
-      // const Shape = selected ? CanvasShapeWithSelectedShapes : CanvasShape
-      console.log('ShapeList map()')
+    childIds.map(childId => {
+      const shape = allShapes[childId]
+      const selected = selectedShapeIds.some(shapeId => shapeId === childId)
 
       return (
-        <CanvasShape
+        <CanvasShapeMemo
           key={childId}
           shape={shape}
           selected={selected}
           childIds={shape.childIds}
-          shapeListProps={shapeListProps}
+          allShapes={allShapes}
+          selectedShapeIds={selectedShapeIds}
           onSelectShape={onSelectShape}
           onDragShape={onDragShape}
           onCommitDragShape={onCommitDragShape}
@@ -123,29 +124,12 @@ const ShapeList = ({
       )
     })
   )
-}
-
-const SelectedShapesContext = React.createContext([])
-
-const withSelectedShapes = Component => memo(({ ...props }) => {
-  return (
-    <SelectedShapesContext.Consumer>
-      {selectedShapes => <Component selectedShapes={selectedShapes} {...props} />}
-    </SelectedShapesContext.Consumer>
-  )
 })
 
-const SvgShape = ({}) => {
-  return (
-    0
-  )
-}
+const SelectedShapesContext = React.createContext({ x: 0, y: 0 })
+const NullContext = React.createContext({ x: 0, y: 0 })
 
 class CanvasShape extends React.PureComponent {
-  state = {
-    translate: Point(0, 0)
-  }
-
   handleTouchStart = event => {
     const { shape: { id }, onSelectShape } = this.props
 
@@ -154,7 +138,6 @@ class CanvasShape extends React.PureComponent {
     onSelectShape(id)
 
     this.touchStart = Point(event.nativeEvent.pageX, event.nativeEvent.pageY)
-    this.touchStart2 = Point(event.nativeEvent.pageX, event.nativeEvent.pageY)
   }
 
   handleTouchMove = event => {
@@ -164,16 +147,10 @@ class CanvasShape extends React.PureComponent {
 
     const touch = Point(event.nativeEvent.pageX, event.nativeEvent.pageY)
 
-    this.setState({
-      translate: sub(touch, this.touchStart)
-    })
-
     onDragShape(id, Point(
-      event.nativeEvent.pageX - this.touchStart2.x,
-      event.nativeEvent.pageY - this.touchStart2.y
+      event.nativeEvent.pageX - this.touchStart.x,
+      event.nativeEvent.pageY - this.touchStart.y
     ))
-
-    this.touchStart2 = Point(event.nativeEvent.pageX, event.nativeEvent.pageY)
   }
 
   handleTouchEnd = event => {
@@ -183,10 +160,6 @@ class CanvasShape extends React.PureComponent {
       event.nativeEvent.pageX - this.touchStart.x,
       event.nativeEvent.pageY - this.touchStart.y
     ))
-
-    this.setState({
-      translate: Point(0, 0)
-    })
   }
 
   handleShouldSetResponder = event => true
@@ -195,36 +168,46 @@ class CanvasShape extends React.PureComponent {
     console.log('CanvasShape()')
 
     const {
-      shape, selected, childIds, shapeListProps, onSelectShape, onDrag
+      shape, selected, childIds, allShapes, selectedShapeIds, onSelectShape, onDragShape,
     } = this.props
 
+    const Context = selected ? SelectedShapesContext : NullContext
+
     return (
-      React.createElement(shapeRegistration[shape.type].render, {
-        shape,
-        selected,
-        id: shape.id,
-        position: add(this.state.translate, shape.position),
-        size: shape.size,
-        opacity: shape.opacity,
-        onStartShouldSetResponder: this.handleShouldSetResponder,
-        onStartShouldSetResponderCapture: this.handleShouldSetResponder,
-        onMoveShouldSetResponderCapture: this.handleShouldSetResponder,
-        onResponderGrant: this.handleTouchStart,
-        onResponderMove: this.handleTouchMove,
-        onResponderRelease: this.handleTouchEnd,
-      }, (
-        <ShapeList 
-          childIds={childIds}
-          shapeListProps={shapeListProps}
-          onSelectShape={onSelectShape}
-          onDrag={onDrag}
-        />
-      ))
+      <Context.Consumer>
+        {selectedShapes => (
+          console.log('translate'),
+          React.createElement(shapeRegistration[shape.type].render, {
+            shape,
+            selected,
+            id: shape.id,
+            position: add(selectedShapes, shape.position),
+            size: shape.size,
+            opacity: shape.opacity,
+            onStartShouldSetResponder: this.handleShouldSetResponder,
+            onStartShouldSetResponderCapture: this.handleShouldSetResponder,
+            onMoveShouldSetResponderCapture: this.handleShouldSetResponder,
+            onResponderGrant: this.handleTouchStart,
+            onResponderMove: this.handleTouchMove,
+            onResponderRelease: this.handleTouchEnd,
+          }, (
+            <ShapeList 
+              childIds={childIds}
+              allShapes={allShapes}
+              selectedShapeIds={selectedShapeIds}
+              onSelectShape={onSelectShape}
+              onDragShape={onDragShape}
+            />
+          ))
+        )}
+      </Context.Consumer>
     )
   }
 }
 
-export default memo(CanvasShape)
+const CanvasShapeMemo = React.memo(CanvasShape)
+
+export default CanvasShape
 export {
   ShapeList,
   shapeRegistration,
