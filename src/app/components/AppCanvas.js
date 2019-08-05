@@ -27,7 +27,10 @@ const styles = StyleSheet.create({
 })
 
 class AppCanvas extends React.PureComponent {
-  state = { x: 0, y: 0 }
+  state = {
+    transform: { x: 0, y: 0 },
+    opacity: 1,
+  }
 
   handleResponderGrant = event => {
     event.preventDefault()
@@ -44,20 +47,26 @@ class AppCanvas extends React.PureComponent {
   }
 
   handleDragShape = (id, delta) => {
-    this.setState(delta)
+    this.props.onDragShape(id, delta)
+    
+    this.setState({
+      transform: delta
+    })
   }
 
   handleCommitDragShape = (id, delta) => {
     this.props.onCommitDragShape(id, delta)
 
-    this.setState({ x: 0, y: 0 })
+    this.setState({
+      transform: { x: 0, y: 0 }
+    })
   }
 
   handleShouldSetResponder = event => true
 
   render() {
     const { allShapes, selectedShapeIds } = this.props
-    const position = selectedShapeIds[0] && add(allShapes[selectedShapeIds[0]].position, this.state)
+    const position = selectedShapeIds[0] && add(allShapes[selectedShapeIds[0]].position, this.state.transform)
 
     return (
       <SelectedShapesContext.Provider value={this.state}>
@@ -69,16 +78,16 @@ class AppCanvas extends React.PureComponent {
             style={styles.svg}
           >
             <Grid />
-            <Ruler />
             <ShapeList
-              childIds={this.props.allShapes[0].childIds}
               allShapes={this.props.allShapes}
               selectedShapeIds={this.props.selectedShapeIds}
+              childIds={this.props.allShapes[0].childIds}
               onSelectShape={this.handleSelectShape}
               onDragShape={this.handleDragShape}
               onCommitDragShape={this.handleCommitDragShape}
             />
             <BoundingBox position={position} />
+            <Ruler />
           </Svg>
         </View>
       </SelectedShapesContext.Provider>

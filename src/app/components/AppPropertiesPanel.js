@@ -96,7 +96,7 @@ const AppPropertiesPanel = ({ theme, selectedShapes, setOpacity, transformShape,
 const mapStateToProps = state => {
   return {
     allShapes: state.allShapes,
-    selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
+    // selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
   }
 }
 

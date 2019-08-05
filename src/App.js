@@ -29,10 +29,10 @@ const App = ({ allShapes, selectedShapeIds, onTransformShape }) => {
   }, [setSelectedShapes, allShapes, selectedShapeIds])
 
   const handleDragShape = useCallback((id, delta) => {
-    // setSelectedShapes(selectedShapes.map(shape => ({
-    //   ...shape,
-    //   position: add(shape.position, delta)
-    // })))
+    setSelectedShapes(selectedShapes.map(shape => ({
+      ...shape,
+      position: add(allShapes[selectedShapeIds[0]].position, delta)
+    })))
   }, [setSelectedShapes, selectedShapeIds, selectedShapes])
 
   const handleCommitDragShape = useCallback((id, delta) => {
@@ -58,7 +58,7 @@ const App = ({ allShapes, selectedShapeIds, onTransformShape }) => {
           activeModifiers={activeModifiers.current}
           toolActionType={toolActionType}
           // selectedShapes={selectedShapes}
-          // onDragShape={handleDragShape}
+          onDragShape={handleDragShape}
           onCommitDragShape={handleCommitDragShape}
         />
         <AppPropertiesPanel theme={theme} selectedShapes={selectedShapes} />

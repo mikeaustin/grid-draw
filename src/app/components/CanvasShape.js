@@ -15,10 +15,9 @@ const setCornerRadius = (id, cornerRadius) => {
 
 const shapeRegistration = {
   'GridDraw.Ellipse': {
-    render: ({ nativeRef, position, size, selected, ...props }) => {
+    render: ({ position, size, selected, ...props }) => {
       return (
         <Ellipse
-          // ref={nativeRef}
           cx={position.x + size.x / 2}
           cy={position.y + size.y / 2}
           rx={size.x / 2}
@@ -126,8 +125,11 @@ const ShapeList = React.memo(({
   )
 })
 
-const SelectedShapesContext = React.createContext({ x: 0, y: 0 })
-const NullContext = React.createContext({ x: 0, y: 0 })
+const SelectedShapesContext = React.createContext()
+const NullContext = React.createContext({
+  transform: { x: 0, y: 0 },
+  opacity: 1.0,
+})
 
 class CanvasShape extends React.PureComponent {
   handleTouchStart = event => {
@@ -181,7 +183,7 @@ class CanvasShape extends React.PureComponent {
             shape,
             selected,
             id: shape.id,
-            position: add(selectedShapes, shape.position),
+            position: add(selectedShapes.transform, shape.position),
             size: shape.size,
             opacity: shape.opacity,
             onStartShouldSetResponder: this.handleShouldSetResponder,
