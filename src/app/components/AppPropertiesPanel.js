@@ -11,92 +11,93 @@ import { ShapeList, SelectedShapesContext } from 'app/components'
 
 class AppPropertiesPanel extends React.PureComponent {
   handleOpacityValueChange = opacity => {
-    const { selectedShapes, onSetOpacity } = this.props
+    const { selectedShapeIds, onSetOpacity } = this.props
 
-    onSetOpacity(selectedShapes[0].id, opacity)
+    onSetOpacity(selectedShapeIds[0], opacity)
   }
 
   handleOpacitySubmit = opacity => {
-    const { selectedShapes, onSetOpacity } = this.props
+    const { selectedShapeIds, onSetOpacity } = this.props
 
-    onSetOpacity(selectedShapes[0].id, opacity / 100)
+    onSetOpacity(selectedShapeIds[0], opacity / 100)
   }
 
   handlePositionXSubmit = positionX => {
-    const { selectedShapes } = this.props
-
-    transformShape(selectedShapes[0].id, ActionTypes.MOVE_SHAPE, {
-      x: positionX - selectedShapes[0].position.x,
+    const { allShapes, selectedShapeIds } = this.props
+console.log(positionX)
+    transformShape(selectedShapeIds[0], ActionTypes.MOVE_SHAPE, {
+      x: positionX - allShapes[selectedShapeIds[0]].position.x,
       y: 0
     })
   }
 
   handlePositionYSubmit = positionY => {
-    const { selectedShapes } = this.props
+    const { allShapes, selectedShapeIds } = this.props
 
-    transformShape(selectedShapes[0].id, ActionTypes.MOVE_SHAPE, {
+    transformShape(selectedShapeIds[0], ActionTypes.MOVE_SHAPE, {
       x: 0,
-      y: positionY - selectedShapes[0].position.y
+      y: positionY - allShapes[selectedShapeIds[0]].position.y
     })
   }
 
   render() {
-    const { theme, selectedShapes } = this.props
+    console.log('AppPropertiesPanel.render()')
+
+    const { theme } = this.props
 
     const opacityProps = { width: 50, maxLength: 3, units: '%' }
     const positionProps = { width: 65, maxLength: 4, units: 'px' }
 
     return (
-            <View
-              width={256}
-              style={{marginTop: 1, backgroundColor: theme.backgroundColor}}
-              borderStyle={{borderLeftWidth: 1, left: -1, borderColor: 'hsla(0, 0%, 0%, 0.1)'}}
-            >
-              <PanelHeader heading="Properties" />
-              <SelectedShapesContext.Consumer>
-                {xselectedShapes => {
-                  const selectedShape = selectedShapes[0] || { position: {}, opacity: null }
-                  const disabled = !selectedShapes[0]
-                  const { position, opacity } = selectedShape
+      <View
+        width={256}
+        style={{marginTop: 1, backgroundColor: theme.backgroundColor}}
+        borderStyle={{borderLeftWidth: 1, left: -1, borderColor: 'hsla(0, 0%, 0%, 0.1)'}}
+      >
+        <PanelHeader heading="Properties" />
+        <SelectedShapesContext.Consumer>
+          {selectedShapes => {
+            const selectedShape = selectedShapes[0] || { position: {}, opacity: null }
+            const disabled = !selectedShapes[0]
+            const { position, opacity } = selectedShape
 
-                  return (
-                    <React.Fragment>
-                      <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
-                        <Slider value={opacity} disabled={disabled} onValueChange={this.handleOpacityValueChange} />
-                        <Spacer />
-                        <NumericInput {...opacityProps} value={opacity * 100} disabled={!selectedShapes[0]} onSubmit={this.handleOpacitySubmit} />
-                      </View>
-                      <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
-                        <NumericField {...positionProps} label="X" value={position.x} disabled={!selectedShapes[0]} onSubmit={this.handlePositionXSubmit} />
-                        <Spacer />
-                        <NumericField {...positionProps} label="Y" value={position.y} disabled={!selectedShapes[0]} onSubmit={this.handlePositionYSubmit}
-                        />
-                      </View>
-                    </React.Fragment>
-                  )
-                }}
-              </SelectedShapesContext.Consumer>
+            return (
+              <React.Fragment>
+                <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
+                  <Slider value={opacity} disabled={disabled} onValueChange={this.handleOpacityValueChange} />
+                  <Spacer />
+                  <NumericInput {...opacityProps} value={opacity * 100} disabled={!selectedShapes[0]} onSubmit={this.handleOpacitySubmit} />
+                </View>
+                <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
+                  <NumericField {...positionProps} label="X" value={position.x} disabled={!selectedShapes[0]} onSubmit={this.handlePositionXSubmit} />
+                  <Spacer />
+                  <NumericField {...positionProps} label="Y" value={position.y} disabled={!selectedShapes[0]} onSubmit={this.handlePositionYSubmit}
+                  />
+                </View>
+              </React.Fragment>
+            )
+          }}
+        </SelectedShapesContext.Consumer>
 
-              <SectionList
-                renderSectionHeader={({section: {title}}) => (
-                  <View style={{paddingVertical: 5, paddingHorizontal: 10, marginTop: 10}}>
-                    <Text style={{fontWeight: '700'}}>{title}</Text>
-                  </View>
-                )}
-                renderItem={({item, index, section}) => (
-                  <View style={{paddingVertical: 5, paddingHorizontal: 10, backgroundColor: 'white'}}>
-                    <Text key={index}>{item}</Text>
-                  </View>
-                )}
-                keyExtractor={(item, index) => item}
-                sections={[
-                  {title: 'Title1', data: ['item1', 'item2']},
-                  {title: 'Title2', data: ['item3', 'item4']},
-                  {title: 'Title3', data: ['item5', 'item6']},
-                ]}
-              />
+        <SectionList
+          renderSectionHeader={({section: {title}}) => (
+            <View style={{paddingVertical: 5, paddingHorizontal: 10, marginTop: 10}}>
+              <Text style={{fontWeight: '700'}}>{title}</Text>
             </View>
-          
+          )}
+          renderItem={({item, index, section}) => (
+            <View style={{paddingVertical: 5, paddingHorizontal: 10, backgroundColor: 'white'}}>
+              <Text key={index}>{item}</Text>
+            </View>
+          )}
+          keyExtractor={(item, index) => item}
+          sections={[
+            {title: 'Title1', data: ['item1', 'item2']},
+            {title: 'Title2', data: ['item3', 'item4']},
+            {title: 'Title3', data: ['item5', 'item6']},
+          ]}
+        />
+      </View>          
     )
   }
 }
@@ -189,6 +190,7 @@ const AppPropertiesPanel2 = ({ theme, selectedShapes, setOpacity, transformShape
 const mapStateToProps = state => {
   return {
     allShapes: state.allShapes,
+    selectedShapeIds: state.selectedShapeIds,
     // selectedShapes: state.selectedShapeIds.map(id => state.allShapes[id]),
   }
 }

@@ -5,10 +5,11 @@ import { connect } from 'react-redux'
 // import Slider from "react-native-slider"
 import JsxParser from 'react-jsx-parser'
 
-import { View } from 'core/components'
-import { AppMainToolbar, AppCanvas, AppObjectsPanel, AppPropertiesPanel } from 'app/components'
-import { ActionTypes, transformShape } from 'app/actions/common'
 import { Point, add } from 'core/utils/geometry'
+import { View } from 'core/components'
+import { ActionTypes, transformShape } from 'app/actions/common'
+import { AppMainToolbar, AppCanvas, AppObjectsPanel, AppPropertiesPanel } from 'app/components'
+import { ShapeList, SelectedShapesContext } from 'app/components'
 
 const theme = {
   backgroundColor: 'transparent',
@@ -32,7 +33,7 @@ class App extends React.PureComponent {
     if (props.selectedShapeIds !== state.selectedShapeIds) {
       return {
         selectedShapeIds: props.selectedShapeIds,
-        selectedShapes: props.selectedShapeIds.map(id => allShapes[id])
+        selectedShapes: props.selectedShapeIds.map(id => ({ ...allShapes[id], transform: Point(0, 0) }))
       }
     }
 
@@ -58,7 +59,7 @@ class App extends React.PureComponent {
   handleDragShape = (id, delta) => {
     const { allShapes, selectedShapeIds } = this.props
     const { selectedShapes } = this.state
-    
+
     this.setState({
       selectedShapes: selectedShapes.map(shape => ({
         ...shape,
@@ -68,29 +69,38 @@ class App extends React.PureComponent {
   }
 
   handleCommitDragShape = (id, delta) => {
-    const { onTransformShape } = this.props
+    const { allShapes, selectedShapeIds, onTransformShape } = this.props
 
     onTransformShape(id, ActionTypes.MOVE_SHAPE, delta)
+
+    this.setState({
+      selectedShapes: this.state.selectedShapeIds.map(id => ({
+        ...allShapes[id],
+        position: add(allShapes[selectedShapeIds[0]].position, delta)
+      }))
+    })
   }
 
   render() {
     const { toolActionType, selectedShapes } = this.state
 
     return (
-      <View fill>
-        <AppMainToolbar toolActionType={toolActionType} setToolActionType={this.setToolActionType} />
-        <View horizontal fill>
-          <AppObjectsPanel theme={theme} />
-          <AppCanvas
-            activeModifiers={this.activeModifiers}
-            toolActionType={toolActionType}
-            // selectedShapes={selectedShapes}
-            onDragShape={this.handleDragShape}
-            onCommitDragShape={this.handleCommitDragShape}
-          />
-          <AppPropertiesPanel theme={theme} selectedShapes={selectedShapes} />
+      <SelectedShapesContext.Provider value={selectedShapes}>
+        <View fill>
+          <AppMainToolbar toolActionType={toolActionType} setToolActionType={this.setToolActionType} />
+          <View horizontal fill>
+            <AppObjectsPanel theme={theme} />
+            <AppCanvas
+              activeModifiers={this.activeModifiers}
+              toolActionType={toolActionType}
+              // selectedShapes={selectedShapes}
+              onDragShape={this.handleDragShape}
+              onCommitDragShape={this.handleCommitDragShape}
+            />
+            <AppPropertiesPanel theme={theme} />
+          </View>
         </View>
-      </View>
+      </SelectedShapesContext.Provider>
     )
   }
 }

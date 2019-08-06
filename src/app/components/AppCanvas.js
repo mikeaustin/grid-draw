@@ -7,10 +7,9 @@ import { View } from 'core/components'
 import Ruler from 'core/components/svg/Ruler'
 import Grid from 'core/components/svg/Grid'
 import BoundingBox from 'core/components/svg/BoundingBox'
-import { Point, add } from 'core/utils/geometry'
 
-import { ShapeList, SelectedShapesContext } from 'app/components'
 import { selectShape, addSelection, transformShape } from 'app/actions/common'
+import { ShapeList, SelectedShapesContext } from 'app/components'
 
 const styles = StyleSheet.create({
   shadow: {
@@ -27,11 +26,6 @@ const styles = StyleSheet.create({
 })
 
 class AppCanvas extends React.PureComponent {
-  state = {
-    transform: { x: 0, y: 0 },
-    opacity: 1,
-  }
-
   handleResponderGrant = event => {
     event.preventDefault()
     
@@ -48,49 +42,42 @@ class AppCanvas extends React.PureComponent {
 
   handleDragShape = (id, delta) => {
     this.props.onDragShape(id, delta)
-    
-    this.setState({
-      transform: delta
-    })
   }
 
   handleCommitDragShape = (id, delta) => {
     this.props.onCommitDragShape(id, delta)
-
-    this.setState({
-      transform: { x: 0, y: 0 }
-    })
   }
 
   handleShouldSetResponder = event => true
 
   render() {
-    const { allShapes, selectedShapeIds } = this.props
-    const position = selectedShapeIds[0] && add(allShapes[selectedShapeIds[0]].position, this.state.transform)
-
     return (
-      <SelectedShapesContext.Provider value={this.state}>
-        <View fill>
-          <View pointerEvents="none" style={styles.shadow} />
-          <Svg
-            onStartShouldSetResponder={this.handleShouldSetResponder}
-            onResponderGrant={this.handleResponderGrant}
-            style={styles.svg}
-          >
-            <Grid />
-            <ShapeList
-              allShapes={this.props.allShapes}
-              selectedShapeIds={this.props.selectedShapeIds}
-              childIds={this.props.allShapes[0].childIds}
-              onSelectShape={this.handleSelectShape}
-              onDragShape={this.handleDragShape}
-              onCommitDragShape={this.handleCommitDragShape}
-            />
-            <BoundingBox position={position} />
-            <Ruler />
-          </Svg>
-        </View>
-      </SelectedShapesContext.Provider>
+      <View fill>
+        <View pointerEvents="none" style={styles.shadow} />
+        <Svg
+          onStartShouldSetResponder={this.handleShouldSetResponder}
+          onResponderGrant={this.handleResponderGrant}
+          style={styles.svg}
+        >
+          <Grid />
+          <ShapeList
+            allShapes={this.props.allShapes}
+            selectedShapeIds={this.props.selectedShapeIds}
+            childIds={this.props.allShapes[0].childIds}
+            onSelectShape={this.handleSelectShape}
+            onDragShape={this.handleDragShape}
+            onCommitDragShape={this.handleCommitDragShape}
+          />
+          <SelectedShapesContext.Consumer>
+            {selectedShapes => {
+              const position = selectedShapes[0] && selectedShapes[0].position
+
+              return <BoundingBox position={position} />
+            }}
+          </SelectedShapesContext.Consumer>
+          <Ruler />
+        </Svg>
+      </View>
     )
   }
 }

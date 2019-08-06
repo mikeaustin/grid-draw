@@ -126,10 +126,10 @@ const ShapeList = React.memo(({
 })
 
 const SelectedShapesContext = React.createContext()
-const NullContext = React.createContext({
-  transform: { x: 0, y: 0 },
+const NullContext = React.createContext([{
+  position: { x: 0, y: 0 },
   opacity: 1.0,
-})
+}])
 
 class CanvasShape extends React.PureComponent {
   handleTouchStart = event => {
@@ -147,7 +147,7 @@ class CanvasShape extends React.PureComponent {
 
     event.preventDefault()
 
-    const touch = Point(event.nativeEvent.pageX, event.nativeEvent.pageY)
+    // const touch = Point(event.nativeEvent.pageX, event.nativeEvent.pageY)
 
     onDragShape(id, Point(
       event.nativeEvent.pageX - this.touchStart.x,
@@ -177,31 +177,35 @@ class CanvasShape extends React.PureComponent {
 
     return (
       <Context.Consumer>
-        {selectedShapes => (
-          console.log('translate'),
-          React.createElement(shapeRegistration[shape.type].render, {
-            shape,
-            selected,
-            id: shape.id,
-            position: add(selectedShapes.transform, shape.position),
-            size: shape.size,
-            opacity: shape.opacity,
-            onStartShouldSetResponder: this.handleShouldSetResponder,
-            onStartShouldSetResponderCapture: this.handleShouldSetResponder,
-            onMoveShouldSetResponderCapture: this.handleShouldSetResponder,
-            onResponderGrant: this.handleTouchStart,
-            onResponderMove: this.handleTouchMove,
-            onResponderRelease: this.handleTouchEnd,
-          }, (
-            <ShapeList 
-              childIds={childIds}
-              allShapes={allShapes}
-              selectedShapeIds={selectedShapeIds}
-              onSelectShape={onSelectShape}
-              onDragShape={onDragShape}
-            />
+        {selectedShapes => {
+          console.log('translate')
+          const { position } = selectedShapes[0]
+
+          return (
+            React.createElement(shapeRegistration[shape.type].render, {
+              shape,
+              selected,
+              id: shape.id,
+              position: selected ? position : allShapes[shape.id].position,
+              size: shape.size,
+              opacity: shape.opacity,
+              onStartShouldSetResponder: this.handleShouldSetResponder,
+              onStartShouldSetResponderCapture: this.handleShouldSetResponder,
+              onMoveShouldSetResponderCapture: this.handleShouldSetResponder,
+              onResponderGrant: this.handleTouchStart,
+              onResponderMove: this.handleTouchMove,
+              onResponderRelease: this.handleTouchEnd,
+            }, (
+              <ShapeList 
+                childIds={childIds}
+                allShapes={allShapes}
+                selectedShapeIds={selectedShapeIds}
+                onSelectShape={onSelectShape}
+                onDragShape={onDragShape}
+              />
+            )
           ))
-        )}
+        }}
       </Context.Consumer>
     )
   }
