@@ -17,55 +17,133 @@ const theme = {
   titleColor: 'hsla(0, 0%, 0%, 0.11)',
 }
 
-const App = ({ allShapes, selectedShapeIds, onTransformShape }) => {
-  console.log('App()')
+class App extends React.PureComponent {
+  state = {
+    toolActionType: ActionTypes.MOVE_SHAPE,
+    selectedShapeIds: [],
+    selectedShapes: [],
+  }
 
-  const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
-  const [selectedShapes, setSelectedShapes] = useState([])
-  const activeModifiers = useRef(new Set())
+  activeModifiers = new Set()
 
-  useEffect(() => {
-    setSelectedShapes(selectedShapeIds.map(id => allShapes[id]))
-  }, [setSelectedShapes, allShapes, selectedShapeIds])
+  static getDerivedStateFromProps(props, state) {
+    const { allShapes } = props
 
-  const handleDragShape = useCallback((id, delta) => {
-    setSelectedShapes(selectedShapes.map(shape => ({
-      ...shape,
-      position: add(allShapes[selectedShapeIds[0]].position, delta)
-    })))
-  }, [setSelectedShapes, selectedShapeIds, selectedShapes])
+    if (props.selectedShapeIds !== state.selectedShapeIds) {
+      return {
+        selectedShapeIds: props.selectedShapeIds,
+        selectedShapes: props.selectedShapeIds.map(id => allShapes[id])
+      }
+    }
 
-  const handleCommitDragShape = useCallback((id, delta) => {
-    onTransformShape(id, ActionTypes.MOVE_SHAPE, delta)
-  }, [onTransformShape])
+    return null
+  }
 
-  useEffect(() => {
+  componentDidMount() {
     document.addEventListener('keydown', event => {
-      activeModifiers.current.add(event.key)
+      this.activeModifiers.add(event.key)
     })
 
     document.addEventListener('keyup', event => {
-      activeModifiers.current.delete(event.key)
+      this.activeModifiers.delete(event.key)
     })
-  })
+  }
 
-  return (
-    <View fill>
-      <AppMainToolbar toolActionType={toolActionType} setToolActionType={setToolActionType} />
-      <View horizontal fill>
-        <AppObjectsPanel theme={theme} />
-        <AppCanvas
-          activeModifiers={activeModifiers.current}
-          toolActionType={toolActionType}
-          // selectedShapes={selectedShapes}
-          onDragShape={handleDragShape}
-          onCommitDragShape={handleCommitDragShape}
-        />
-        <AppPropertiesPanel theme={theme} selectedShapes={selectedShapes} />
+  setToolActionType = toolActionType => {
+    this.setState({
+      toolActionType
+    })
+  }
+
+  handleDragShape = (id, delta) => {
+    const { allShapes, selectedShapeIds } = this.props
+    const { selectedShapes } = this.state
+    
+    this.setState({
+      selectedShapes: selectedShapes.map(shape => ({
+        ...shape,
+        position: add(allShapes[selectedShapeIds[0]].position, delta)
+      }))
+    })
+  }
+
+  handleCommitDragShape = (id, delta) => {
+    const { onTransformShape } = this.props
+
+    onTransformShape(id, ActionTypes.MOVE_SHAPE, delta)
+  }
+
+  render() {
+    const { toolActionType, selectedShapes } = this.state
+
+    return (
+      <View fill>
+        <AppMainToolbar toolActionType={toolActionType} setToolActionType={this.setToolActionType} />
+        <View horizontal fill>
+          <AppObjectsPanel theme={theme} />
+          <AppCanvas
+            activeModifiers={this.activeModifiers}
+            toolActionType={toolActionType}
+            // selectedShapes={selectedShapes}
+            onDragShape={this.handleDragShape}
+            onCommitDragShape={this.handleCommitDragShape}
+          />
+          <AppPropertiesPanel theme={theme} selectedShapes={selectedShapes} />
+        </View>
       </View>
-    </View>
-  )
+    )
+  }
 }
+
+// const App = ({ allShapes, selectedShapeIds, onTransformShape }) => {
+//   console.log('App()')
+
+//   const [toolActionType, setToolActionType] = useState(ActionTypes.MOVE_SHAPE)
+//   const [selectedShapes, setSelectedShapes] = useState([])
+//   const activeModifiers = useRef(new Set())
+
+//   useEffect(() => {
+//     setSelectedShapes(selectedShapeIds.map(id => allShapes[id]))
+//   }, [setSelectedShapes, allShapes, selectedShapeIds])
+
+//   const handleDragShape = useCallback((id, delta) => {
+//     setSelectedShapes(selectedShapes.map(shape => ({
+//       ...shape,
+//       position: add(allShapes[selectedShapeIds[0]].position, delta)
+//     })))
+//   }, [setSelectedShapes, selectedShapeIds, selectedShapes])
+
+//   const handleCommitDragShape = useCallback((id, delta) => {
+//     onTransformShape(id, ActionTypes.MOVE_SHAPE, delta)
+//   }, [onTransformShape])
+
+//   useEffect(() => {
+//     document.addEventListener('keydown', event => {
+//       activeModifiers.current.add(event.key)
+//     })
+
+//     document.addEventListener('keyup', event => {
+//       activeModifiers.current.delete(event.key)
+//     })
+//   })
+
+//   return (
+//     <View fill>
+//       <AppMainToolbar toolActionType={toolActionType} setToolActionType={setToolActionType} />
+//       <View horizontal fill>
+//         <AppObjectsPanel theme={theme} />
+//         <AppCanvas
+//           activeModifiers={activeModifiers.current}
+//           toolActionType={toolActionType}
+//           // selectedShapes={selectedShapes}
+//           onDragShape={handleDragShape}
+//           onCommitDragShape={handleCommitDragShape}
+//         />
+//         <AppPropertiesPanel theme={theme} selectedShapes={selectedShapes} />
+//       </View>
+//     </View>
+//   )
+// }
 
 const mapStateToProps = state => {
   return {

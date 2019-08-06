@@ -11,57 +11,72 @@ import { ShapeList, SelectedShapesContext } from 'app/components'
 
 class AppPropertiesPanel extends React.PureComponent {
   handleOpacityValueChange = opacity => {
-    setOpacity(this.props.selectedShapes[0].id, this.props.opacity)
+    const { selectedShapes, onSetOpacity } = this.props
+
+    onSetOpacity(selectedShapes[0].id, opacity)
   }
 
   handleOpacitySubmit = opacity => {
-    setOpacity(this.props.selectedShapes[0].id, this.props.opacity / 100)
+    const { selectedShapes, onSetOpacity } = this.props
+
+    onSetOpacity(selectedShapes[0].id, opacity / 100)
   }
 
   handlePositionXSubmit = positionX => {
-    transformShape(this.props.selectedShapes[0].id, ActionTypes.MOVE_SHAPE, {
-      x: positionX - this.props.selectedShapes[0].position.x,
+    const { selectedShapes } = this.props
+
+    transformShape(selectedShapes[0].id, ActionTypes.MOVE_SHAPE, {
+      x: positionX - selectedShapes[0].position.x,
       y: 0
     })
   }
 
   handlePositionYSubmit = positionY => {
-    transformShape(this.props.selectedShapes[0].id, ActionTypes.MOVE_SHAPE, {
+    const { selectedShapes } = this.props
+
+    transformShape(selectedShapes[0].id, ActionTypes.MOVE_SHAPE, {
       x: 0,
-      y: positionY - this.props.selectedShapes[0].position.y
+      y: positionY - selectedShapes[0].position.y
     })
   }
 
   render() {
     const { theme, selectedShapes } = this.props
-  
-    return (
-      <SelectedShapesContext.Consumer>
-        {xselectedShapes => {
-          const selectedShape = selectedShapes[0] || { position: {}, opacity: null }
-          const disabled = !selectedShapes[0]
-          const opacityProps = { width: 50, maxLength: 3, units: '%', disabled: !selectedShapes[0] }
-          const positionProps = { width: 65, maxLength: 4, units: 'px', disabled: !selectedShapes[0] }
-          const { position, opacity } = selectedShape
 
-          return (
+    const opacityProps = { width: 50, maxLength: 3, units: '%' }
+    const positionProps = { width: 65, maxLength: 4, units: 'px' }
+
+    return (
             <View
               width={256}
               style={{marginTop: 1, backgroundColor: theme.backgroundColor}}
               borderStyle={{borderLeftWidth: 1, left: -1, borderColor: 'hsla(0, 0%, 0%, 0.1)'}}
             >
               <PanelHeader heading="Properties" />
-              <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
-                <Slider value={opacity} disabled={disabled} onValueChange={this.handleOpacityValueChange} />
-                <Spacer />
-                <NumericInput {...opacityProps} value={opacity * 100} onSubmit={this.handleOpacitySubmit} />
-              </View>
-              <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
-                <NumericField {...positionProps} label="X" value={position.x} onSubmit={this.handlePositionXSubmit} />
-                <Spacer />
-                <NumericField {...positionProps} label="Y" value={position.y} onSubmit={this.handlePositionYSubmit}
-                />
-              </View>
+              <SelectedShapesContext.Consumer>
+                {xselectedShapes => {
+                  const selectedShape = selectedShapes[0] || { position: {}, opacity: null }
+                  const disabled = !selectedShapes[0]
+                  const { position, opacity } = selectedShape
+
+                  return (
+                    <React.Fragment>
+                      <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
+                        <Slider value={opacity} disabled={disabled} onValueChange={this.handleOpacityValueChange} />
+                        <Spacer />
+                        <NumericInput {...opacityProps} value={opacity * 100} disabled={!selectedShapes[0]} onSubmit={this.handleOpacitySubmit} />
+                      </View>
+                      <View horizontal align="center" style={{ paddingVertical: 5, paddingHorizontal: 10}}>
+                        <NumericField {...positionProps} label="X" value={position.x} disabled={!selectedShapes[0]} onSubmit={this.handlePositionXSubmit} />
+                        <Spacer />
+                        <NumericField {...positionProps} label="Y" value={position.y} disabled={!selectedShapes[0]} onSubmit={this.handlePositionYSubmit}
+                        />
+                      </View>
+                    </React.Fragment>
+                  )
+                }}
+              </SelectedShapesContext.Consumer>
+
               <SectionList
                 renderSectionHeader={({section: {title}}) => (
                   <View style={{paddingVertical: 5, paddingHorizontal: 10, marginTop: 10}}>
@@ -81,9 +96,7 @@ class AppPropertiesPanel extends React.PureComponent {
                 ]}
               />
             </View>
-          )
-        }}
-      </SelectedShapesContext.Consumer>
+          
     )
   }
 }
@@ -184,7 +197,7 @@ const mapDispatchToProps = dispatch => {
   return {
     dispatch,
     transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
-    setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
+    onSetOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
   }
 }
 
