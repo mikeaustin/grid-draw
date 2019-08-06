@@ -23,18 +23,18 @@ class AppPropertiesPanel extends React.PureComponent {
   }
 
   handlePositionXSubmit = positionX => {
-    const { allShapes, selectedShapeIds } = this.props
-console.log(positionX)
-    transformShape(selectedShapeIds[0], ActionTypes.MOVE_SHAPE, {
+    const { allShapes, selectedShapeIds, onTransformShape } = this.props
+
+    onTransformShape(selectedShapeIds[0], ActionTypes.MOVE_SHAPE, {
       x: positionX - allShapes[selectedShapeIds[0]].position.x,
       y: 0
     })
   }
 
   handlePositionYSubmit = positionY => {
-    const { allShapes, selectedShapeIds } = this.props
+    const { allShapes, selectedShapeIds, onTransformShape } = this.props
 
-    transformShape(selectedShapeIds[0], ActionTypes.MOVE_SHAPE, {
+    onTransformShape(selectedShapeIds[0], ActionTypes.MOVE_SHAPE, {
       x: 0,
       y: positionY - allShapes[selectedShapeIds[0]].position.y
     })
@@ -198,7 +198,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     dispatch,
-    transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
+    onTransformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
     onSetOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
   }
 }

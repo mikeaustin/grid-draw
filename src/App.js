@@ -30,8 +30,9 @@ class App extends React.PureComponent {
   static getDerivedStateFromProps(props, state) {
     const { allShapes } = props
 
-    if (props.selectedShapeIds !== state.selectedShapeIds) {
+    if (props.selectedShapeIds !== state.selectedShapeIds || props.allShapes !== state.allShapes) {
       return {
+        allShapes: props.allShapes,
         selectedShapeIds: props.selectedShapeIds,
         selectedShapes: props.selectedShapeIds.map(id => ({ ...allShapes[id], transform: Point(0, 0) }))
       }
@@ -157,7 +158,7 @@ class App extends React.PureComponent {
 
 const mapStateToProps = state => {
   return {
-    allShapes: state.allShapesSelection$,
+    allShapes: state.allShapes,
     selectedShapeIds: state.selectedShapeIds,
   }
 }
