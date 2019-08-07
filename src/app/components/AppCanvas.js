@@ -70,9 +70,19 @@ class AppCanvas extends React.PureComponent {
           />
           <SelectedShapesContext.Consumer>
             {selectedShapes => {
-              const position = selectedShapes[0] && selectedShapes[0].position
+              // const position = selectedShapes[0] && selectedShapes[0].position
 
-              return <BoundingBox position={position} />
+              const position = selectedShapes.reduce(({ x, y }, shape) => ({
+                x: Math.min(x, shape.position.x),
+                y: Math.min(y, shape.position.y),
+              }), { x: Number.MAX_SAFE_INTEGER, y: Number.MAX_SAFE_INTEGER })
+
+              const size = selectedShapes.reduce(({ x, y }, shape) => ({
+                x: Math.max(x, shape.position.x + shape.size.x),
+                y: Math.max(y, shape.position.y + shape.size.y),
+              }), { x: 0, y: 0 })
+
+              return <BoundingBox position={position} size={{ x: size.x - position.x, y: size.y - position.y }} />
             }}
           </SelectedShapesContext.Consumer>
           <Ruler />

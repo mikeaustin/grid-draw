@@ -18,8 +18,8 @@ const shapeRegistration = {
     render: ({ position, size, selected, ...props }) => {
       return (
         <Ellipse
-          cx={position.x + size.x / 2}
-          cy={position.y + size.y / 2}
+          cx={position.x + size.x / 2 + 0.5}
+          cy={position.y + size.y / 2 + 0.5}
           rx={size.x / 2}
           ry={size.y / 2}
           strokeWidth={3}
@@ -63,7 +63,7 @@ const shapeRegistration = {
       return (
         <Path
           d={`
-            M ${position.x + cornerRadius}, ${position.y}
+            M ${position.x + cornerRadius + 0.5}, ${position.y + 0.5}
             l ${size.x - cornerRadius * 2}, 0
             a ${cornerRadius}, ${cornerRadius} 0 0 1 ${cornerRadius}, ${cornerRadius}
             l 0, ${100 - cornerRadius * 2}
@@ -174,18 +174,20 @@ class CanvasShape extends React.PureComponent {
     } = this.props
 
     const Context = selected ? SelectedShapesContext : NullContext
+    const selectedShapeIndex = selectedShapeIds.findIndex(id => id === shape.id)
 
     return (
       <Context.Consumer>
         {selectedShapes => {
           console.log('translate')
+          const { position } = selected ? selectedShapes[selectedShapeIndex] : shape
 
           return (
             React.createElement(shapeRegistration[shape.type].render, {
               shape,
               selected,
               id: shape.id,
-              position: selected ? selectedShapes[0].position : allShapes[shape.id].position,
+              position: position,
               size: shape.size,
               opacity: shape.opacity,
               onStartShouldSetResponder: this.handleShouldSetResponder,

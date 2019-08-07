@@ -37,7 +37,7 @@ const initialState = Immutable({
     1: {
       id: 1,
       type: 'GridDraw.Ellipse',
-      position: Point(100, 100),
+      position: Point(150, 100),
       size: Point(100, 100),
       opacity: 1.0,
       childIds: [],
