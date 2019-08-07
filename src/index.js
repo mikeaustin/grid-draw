@@ -119,19 +119,16 @@ const appReducer = (state = initialState, action) => {
       if (state.selectedShapeIds.includes(action.payload.id)) {
         return state.merge({
           selectedShapeIds: state.selectedShapeIds.filter(id => id !== action.payload.id),
-          allShapesSelection$: state.allShapes,
         })
       } else {
         return state.merge({
           selectedShapeIds: state.selectedShapeIds.concat([action.payload.id]),
-          allShapesSelection$: state.allShapes,
         })
       }
     }
     case ActionTypes.SELECT_SHAPE: {
       return state.merge({
         selectedShapeIds: action.payload.id !== null ? [action.payload.id] : [],
-        allShapesSelection$: state.allShapes,
       })
     }
     default: return state

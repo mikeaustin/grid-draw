@@ -179,14 +179,13 @@ class CanvasShape extends React.PureComponent {
       <Context.Consumer>
         {selectedShapes => {
           console.log('translate')
-          const { position } = selectedShapes[0]
 
           return (
             React.createElement(shapeRegistration[shape.type].render, {
               shape,
               selected,
               id: shape.id,
-              position: selected ? position : allShapes[shape.id].position,
+              position: selected ? selectedShapes[0].position : allShapes[shape.id].position,
               size: shape.size,
               opacity: shape.opacity,
               onStartShouldSetResponder: this.handleShouldSetResponder,
