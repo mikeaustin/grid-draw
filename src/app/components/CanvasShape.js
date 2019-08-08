@@ -133,11 +133,13 @@ const NullContext = React.createContext([{
 
 class CanvasShape extends React.PureComponent {
   handleTouchStart = event => {
-    const { shape: { id }, onSelectShape } = this.props
+    const { shape: { id }, selectedShapeIds, onSelectShape } = this.props
 
     event.preventDefault()
 
-    onSelectShape(id)
+    if (!selectedShapeIds.includes(id)) {
+      onSelectShape(id)
+    }
 
     this.touchStart = Point(event.nativeEvent.pageX, event.nativeEvent.pageY)
   }
@@ -174,13 +176,13 @@ class CanvasShape extends React.PureComponent {
     } = this.props
 
     const Context = selected ? SelectedShapesContext : NullContext
-    const selectedShapeIndex = selectedShapeIds.findIndex(id => id === shape.id)
 
     return (
       <Context.Consumer>
         {selectedShapes => {
-          console.log('translate')
-          const { position } = selected ? selectedShapes[selectedShapeIndex] : shape
+          const selectedShapeIndex = selectedShapes.findIndex(selectedShape => selectedShape.id === shape.id)
+          console.log('translate', selected, selectedShapeIndex)
+          const { position } = selectedShapeIndex >= 0 ? selectedShapes[selectedShapeIndex] : shape
 
           return (
             React.createElement(shapeRegistration[shape.type].render, {

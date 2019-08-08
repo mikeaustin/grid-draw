@@ -34,7 +34,7 @@ class App extends React.PureComponent {
       return {
         allShapes: props.allShapes,
         selectedShapeIds: props.selectedShapeIds,
-        selectedShapes: props.selectedShapeIds.map(id => ({ ...allShapes[id], transform: Point(0, 0) }))
+        selectedShapes: props.selectedShapeIds.map(id => allShapes[id])
       }
     }
 
@@ -64,7 +64,7 @@ class App extends React.PureComponent {
     this.setState({
       selectedShapes: selectedShapes.map(shape => ({
         ...shape,
-        position: add(allShapes[selectedShapeIds[0]].position, delta)
+        position: add(allShapes[shape.id].position, delta)
       }))
     })
   }
@@ -72,12 +72,14 @@ class App extends React.PureComponent {
   handleCommitDragShape = (id, delta) => {
     const { allShapes, selectedShapeIds, onTransformShape } = this.props
 
-    onTransformShape(id, ActionTypes.MOVE_SHAPE, delta)
+    selectedShapeIds.forEach(shapeId => {
+      onTransformShape(shapeId, ActionTypes.MOVE_SHAPE, delta)
+    })
 
     this.setState({
       selectedShapes: this.state.selectedShapeIds.map(id => ({
         ...allShapes[id],
-        position: add(allShapes[selectedShapeIds[0]].position, delta)
+        position: add(allShapes[id].position, delta)
       }))
     })
   }
