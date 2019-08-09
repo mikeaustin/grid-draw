@@ -1,5 +1,5 @@
 import React from 'react'
-import { Path } from 'react-native-svg'
+import { G, Path } from 'react-native-svg'
 
 import { boundingBox } from 'core/utils/geometry'
 
@@ -11,7 +11,7 @@ const BoundingBox = ({ shapes, shapeRegistration }) => {
   const [position, size] = boundingBox(shapes, shapeRegistration)
 
   return (
-    <React.Fragment>
+    <G x={30} y={30}>
       <Path
         transform={`translate(${position.x}, ${position.y})`}
         strokeWidth={3}
@@ -45,7 +45,7 @@ const BoundingBox = ({ shapes, shapeRegistration }) => {
           Z
         `}
       />
-    </React.Fragment>
+    </G>
   )
 }
 

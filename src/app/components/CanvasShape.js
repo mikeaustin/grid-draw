@@ -188,7 +188,7 @@ class CanvasShape extends React.PureComponent {
       <Context.Consumer>
         {selectedShapes => {
           const selectedShapeIndex = selectedShapes.findIndex(selectedShape => selectedShape.id === shape.id)
-          console.log('translate', selected, selectedShapeIndex)
+          if (process.env.NODE_ENV === 'development') console.log('translate', selected, selectedShapeIndex)
           const { position } = selectedShapeIndex >= 0 ? selectedShapes[selectedShapeIndex] : shape
 
           return (

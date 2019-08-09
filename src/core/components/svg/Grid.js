@@ -3,7 +3,7 @@ import { G, Line } from 'react-native-svg'
 
 const Grid = () => {
   return (
-    <G>
+    <G x={30} y={30}>
       {Array.from({length: 50}, (_, index) => (
         <React.Fragment key={index}>
           <Line
