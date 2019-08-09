@@ -2,7 +2,7 @@ import React from 'react'
 import { G, Ellipse, Rect, Path } from 'react-native-svg'
 
 import { View, Spacer, Slider, NumericInput } from 'core/components'
-import { Point, add, sub } from 'core/utils/geometry'
+import { Point } from 'core/utils/geometry'
 
 const setCornerRadius = (id, cornerRadius) => {
   return {
@@ -15,6 +15,7 @@ const setCornerRadius = (id, cornerRadius) => {
 
 const shapeRegistration = {
   'GridDraw.Ellipse': {
+    size: ({ size }) => size,
     render: ({ position, size, selected, ...props }) => {
       return (
         <Ellipse
@@ -31,6 +32,7 @@ const shapeRegistration = {
     }
   },
   'GridDraw.Rectangle': {
+    size: ({ size }) => size,
     render: ({ position, size, selected, ...props }) => {
       return (
         <Rect
@@ -47,6 +49,7 @@ const shapeRegistration = {
     }
   },
   'GridDraw.RoundRect': {
+    size: ({ size }) => size,
     design: ({id, shape: { cornerRadius }, dispatch}) => {
       const handleValueChange = newCornerRadius => dispatch(setCornerRadius(id, newCornerRadius * 50))
       const handleSubmit = newCornerRadius => dispatch(setCornerRadius(id, newCornerRadius))
@@ -83,6 +86,7 @@ const shapeRegistration = {
     }
   },
   'GridDraw.Group': {
+    size: ({ size }) => size,
     render: ({ position, selected, ...props }) => {
       return (
         <G
@@ -113,6 +117,7 @@ const ShapeList = React.memo(({
           key={childId}
           shape={shape}
           selected={selected}
+          capture={true}
           childIds={shape.childIds}
           allShapes={allShapes}
           selectedShapeIds={selectedShapeIds}
@@ -166,13 +171,15 @@ class CanvasShape extends React.PureComponent {
     ))
   }
 
-  handleShouldSetResponder = event => true
+  handleStartShouldSetResponder = event => true
+
+  handleStartShouldSetResponderCapture = event => this.props.capture
 
   render() {
     console.log('CanvasShape()')
 
     const {
-      shape, selected, childIds, allShapes, selectedShapeIds, onSelectShape, onDragShape,
+      shape, selected, capture, childIds, allShapes, selectedShapeIds, onSelectShape, onDragShape, onCommitDragShape,
     } = this.props
 
     const Context = selected ? SelectedShapesContext : NullContext
@@ -188,23 +195,25 @@ class CanvasShape extends React.PureComponent {
             React.createElement(shapeRegistration[shape.type].render, {
               shape,
               selected,
+              capture,
               id: shape.id,
               position: position,
               size: shape.size,
               opacity: shape.opacity,
-              onStartShouldSetResponder: this.handleShouldSetResponder,
-              onStartShouldSetResponderCapture: this.handleShouldSetResponder,
-              onMoveShouldSetResponderCapture: this.handleShouldSetResponder,
+              onStartShouldSetResponder: this.handleStartShouldSetResponder,
+              onStartShouldSetResponderCapture: this.handleStartShouldSetResponderCapture,
+              onMoveShouldSetResponderCapture: this.handleStartShouldSetResponderCapture,
               onResponderGrant: this.handleTouchStart,
               onResponderMove: this.handleTouchMove,
               onResponderRelease: this.handleTouchEnd,
             }, (
-              <ShapeList 
+              <ShapeList
                 childIds={childIds}
                 allShapes={allShapes}
                 selectedShapeIds={selectedShapeIds}
                 onSelectShape={onSelectShape}
                 onDragShape={onDragShape}
+                onCommitDragShape={onCommitDragShape}
               />
             )
           ))

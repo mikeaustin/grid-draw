@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 // import Slider from "react-native-slider"
 import JsxParser from 'react-jsx-parser'
 
-import { Point, add } from 'core/utils/geometry'
+import { Point } from 'core/utils/geometry'
 import { View } from 'core/components'
 import { ActionTypes, transformShape } from 'app/actions/common'
 import { AppMainToolbar, AppCanvas, AppObjectsPanel, AppPropertiesPanel } from 'app/components'
@@ -64,7 +64,7 @@ class App extends React.PureComponent {
     this.setState({
       selectedShapes: selectedShapes.map(shape => ({
         ...shape,
-        position: add(allShapes[shape.id].position, delta)
+        position: Point.add(allShapes[shape.id].position, delta)
       }))
     })
   }
@@ -79,7 +79,7 @@ class App extends React.PureComponent {
     this.setState({
       selectedShapes: this.state.selectedShapeIds.map(id => ({
         ...allShapes[id],
-        position: add(allShapes[id].position, delta)
+        position: Point.add(allShapes[id].position, delta)
       }))
     })
   }

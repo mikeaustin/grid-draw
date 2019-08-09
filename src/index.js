@@ -8,7 +8,7 @@ import JsxParser from 'react-jsx-parser'
 
 import './index.css';
 import App from './App';
-import { Point, add } from 'core/utils/geometry'
+import { Point } from 'core/utils/geometry'
 import { ActionTypes } from 'app/actions/common'
 import initialState from './initialState'
 
@@ -40,12 +40,12 @@ const shapeReducer = (allShapes, action) => {
     case ActionTypes.MOVE_SHAPE: {
       const { id, delta } = action.payload
 
-      return allShapes.update(id, merge(({ position }) => ({ position: add(position, delta) })))
+      return allShapes.update(id, merge(({ position }) => ({ position: Point.add(position, delta) })))
     }
     case ActionTypes.SCALE_SHAPE: {
       const { id, delta } = action.payload
 
-      return allShapes.update(id, merge(({ size }) => ({ size: add(size, delta) })))
+      return allShapes.update(id, merge(({ size }) => ({ size: Point.add(size, delta) })))
     }
     case ActionTypes.SET_OPACITY: {
       const { id, opacity } = action.payload

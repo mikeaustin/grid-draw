@@ -1,5 +1,5 @@
 import Immutable from 'seamless-immutable'
-import { Point, add } from 'core/utils/geometry'
+import { Point } from 'core/utils/geometry'
 import { ActionTypes } from 'app/actions/common'
 
 const merge = updater => value => value.merge(updater(value))
@@ -18,7 +18,7 @@ const initialState = Immutable({
       [ActionTypes.MOVE_SHAPE]: (state, { id, delta }) => (
         state.merge({
           allShapes: state.allShapes.update(id, merge(({ position }) => ({
-            position: add(position, delta)
+            position: Point.add(position, delta)
           }))),
         })      
       )
@@ -55,7 +55,7 @@ const initialState = Immutable({
     3: {
       id: 3,
       type: 'GridDraw.Group',
-      position: Point(200, 200),
+      position: Point(300, 300),
       size: Point(100, 100),
       opacity: 1.0,
       childIds: [4, 5],
@@ -64,7 +64,7 @@ const initialState = Immutable({
     4: {
       id: 4,
       type: 'GridDraw.Ellipse',
-      position: Point(100, 100),
+      position: Point(0, 0),
       size: Point(100, 100),
       opacity: 1.0,
       childIds: [],
@@ -73,7 +73,7 @@ const initialState = Immutable({
     5: {
       id: 5,
       type: 'GridDraw.Rectangle',
-      position: Point(300, 100),
+      position: Point(200, 0),
       size: Point(100, 100),
       opacity: 1.0,
       childIds: [],

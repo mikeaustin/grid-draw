@@ -7,9 +7,10 @@ import { View } from 'core/components'
 import Ruler from 'core/components/svg/Ruler'
 import Grid from 'core/components/svg/Grid'
 import BoundingBox from 'core/components/svg/BoundingBox'
+import { boundingBox } from 'core/utils/geometry'
 
 import { selectShape, addSelection, transformShape } from 'app/actions/common'
-import { ShapeList, SelectedShapesContext } from 'app/components'
+import { shapeRegistration, CanvasShape, SelectedShapesContext } from 'app/components'
 
 const styles = StyleSheet.create({
   shadow: {
@@ -22,10 +23,13 @@ const styles = StyleSheet.create({
   },
   svg: {
     flex: 1,
+    touchAction: 'none',
   }
 })
 
 class AppCanvas extends React.PureComponent {
+  handleStartShouldSetResponder = event => true
+
   handleResponderGrant = event => {
     event.preventDefault()
     
@@ -48,41 +52,30 @@ class AppCanvas extends React.PureComponent {
     this.props.onCommitDragShape(id, delta)
   }
 
-  handleShouldSetResponder = event => true
-
   render() {
     return (
       <View fill>
         <View pointerEvents="none" style={styles.shadow} />
         <Svg
-          onStartShouldSetResponder={this.handleShouldSetResponder}
+          onStartShouldSetResponder={this.handleStartShouldSetResponder}
           onResponderGrant={this.handleResponderGrant}
           style={styles.svg}
         >
           <Grid />
-          <ShapeList
+          <CanvasShape
+            shape={this.props.allShapes[0]}
+            selected={false}
+            capture={false}
             allShapes={this.props.allShapes}
-            selectedShapeIds={this.props.selectedShapeIds}
             childIds={this.props.allShapes[0].childIds}
+            selectedShapeIds={this.props.selectedShapeIds}
             onSelectShape={this.handleSelectShape}
             onDragShape={this.handleDragShape}
             onCommitDragShape={this.handleCommitDragShape}
           />
           <SelectedShapesContext.Consumer>
             {selectedShapes => {
-              // const position = selectedShapes[0] && selectedShapes[0].position
-
-              const position = selectedShapes.reduce(({ x, y }, shape) => ({
-                x: Math.min(x, shape.position.x),
-                y: Math.min(y, shape.position.y),
-              }), { x: Number.MAX_SAFE_INTEGER, y: Number.MAX_SAFE_INTEGER })
-
-              const size = selectedShapes.reduce(({ x, y }, shape) => ({
-                x: Math.max(x, shape.position.x + shape.size.x),
-                y: Math.max(y, shape.position.y + shape.size.y),
-              }), { x: 0, y: 0 })
-
-              return <BoundingBox position={position} size={{ x: size.x - position.x, y: size.y - position.y }} />
+              return <BoundingBox shapes={selectedShapes} shapeRegistration={shapeRegistration} />
             }}
           </SelectedShapesContext.Consumer>
           <Ruler />

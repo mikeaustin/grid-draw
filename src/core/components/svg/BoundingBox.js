@@ -1,10 +1,14 @@
 import React from 'react'
 import { Path } from 'react-native-svg'
 
-const BoundingBox = ({ position, size }) => {
-  if (!position) {
+import { boundingBox } from 'core/utils/geometry'
+
+const BoundingBox = ({ shapes, shapeRegistration }) => {
+  if (shapes.size === 0) {
     return null
   }
+
+  const [position, size] = boundingBox(shapes, shapeRegistration)
 
   return (
     <React.Fragment>
