@@ -131,6 +131,11 @@ const appReducer = (state = initialState, action) => {
         selectedShapeIds: action.payload.id !== null ? [action.payload.id] : [],
       })
     }
+    case 'options/SHOW_GRID': {
+      return state.merge({
+        options: state.options.merge({ showGrid: !state.options.showGrid })
+      })
+    }
     default: return state
   }
 }

@@ -29,24 +29,7 @@ const getSelectedShapes = createOptimizedSelector(
 //   )
 // )
 
-const mapStateToProps = state => {
-  return {
-    allShapes: state.allShapesSelected,
-    selectedShapes: getSelectedShapes(state),
-  }
-}
-
-const mapDispatchToProps = dispatch => {
-  return {
-    dispatch,
-    // transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
-    // selectShape: id => dispatch(selectShape(id)),
-    // setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
-    onArrangeShape: (id, actionType) => dispatch(arrangeShape(id, actionType)),
-  }
-}
-
-const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, onArrangeShape, dispatch }) => {
+const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, options, onArrangeShape, dispatch }) => {
   const handleArrangeShape = useCallback(actionType => {
     onArrangeShape(selectedShapes[0].id, actionType)
   }, [onArrangeShape, selectedShapes])
@@ -60,6 +43,12 @@ const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, onA
       }
     })
   }, [dispatch, selectedShapes])
+
+  const handleToggleOptions = useCallback(actionType => {
+    dispatch({
+      type: actionType
+    })
+  }, [dispatch])
 
   console.log('AppMainToolbar()')
 
@@ -94,8 +83,31 @@ const AppMainToolbar = ({ toolActionType, setToolActionType, selectedShapes, onA
         <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="022-intersection" />
         <Toolbar.Button value={ActionTypes.SET_OPACITY} icon="038-exclude" />
       </Toolbar.Group>
+      <Divider xsize="xsmall" />
+      <Toolbar.Group title="Guides" setValue={handleToggleOptions}>
+        <Toolbar.Button title="Show Grid" value={'options/SHOW_GRID'} selected={options.showGrid} icon="square-20" />
+        <Toolbar.Button title="Show Ruler" value={ActionTypes.SEND_TO_BACK} icon="ruler" />
+      </Toolbar.Group>
     </Toolbar>
   )
+}
+
+const mapStateToProps = state => {
+  return {
+    allShapes: state.allShapesSelected,
+    selectedShapes: getSelectedShapes(state),
+    options: state.options,
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatch,
+    // transformShape: (id, actionType, delta) => dispatch(transformShape(id, actionType, delta)),
+    // selectShape: id => dispatch(selectShape(id)),
+    // setOpacity: (id, opacity) => dispatch(setOpacity(id, opacity)),
+    onArrangeShape: (id, actionType) => dispatch(arrangeShape(id, actionType)),
+  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppMainToolbar)

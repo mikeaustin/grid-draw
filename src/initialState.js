@@ -92,6 +92,9 @@ const initialState = Immutable({
   },
   selectedShapeIds: [],
   selectedTool: ActionTypes.MOVE_SHAPE,
+  options: {
+    showGrid: true,
+  }
 })
 
 export default initialState

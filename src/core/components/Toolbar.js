@@ -35,12 +35,12 @@ const Group = ({ children, title, value, setValue, ...props }) => {
   return (
     <View>
       <List spacerSize="xsmall" {...props}>
-        {React.Children.map(children, (child, index) => (
-          React.cloneElement(child, {
-            selected: child.props.value === value,
+        {React.Children.map(children, (child, index) => {
+          return React.cloneElement(child, {
+            selected: child.props.selected || child.props.value === value,
             onPress: () => setValue(child.props.value),
           })
-        ))}
+        })}
       </List>
       <Spacer size="xsmall" />
       <Text style={{ fontSize: 12, color: 'hsl(0, 0%, 25%)', textAlign: 'center' }}>{title}</Text>
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'hsla(0, 0%, 0%, 0.1)'
   },
   activeButton: {
-    backgroundColor: 'hsla(0, 0%, 0%, 0.2)'
+    backgroundColor: 'hsla(0, 0%, 0%, 0.15)'
   },
 })
 

@@ -53,6 +53,10 @@ class AppCanvas extends React.PureComponent {
   }
 
   render() {
+    console.log('AppCanvas()')
+    
+    const { options } = this.props
+
     return (
       <View fill>
         <View pointerEvents="none" style={styles.shadow} />
@@ -61,7 +65,7 @@ class AppCanvas extends React.PureComponent {
           onResponderGrant={this.handleResponderGrant}
           style={styles.svg}
         >
-          <Grid />
+          {options.showGrid && <Grid />}
           <CanvasShape
             shape={this.props.allShapes[0]}
             selected={false}
@@ -88,6 +92,7 @@ class AppCanvas extends React.PureComponent {
 const mapStateToProps = state => {
   return {
     allShapes: state.allShapes,
+    options: state.options,
     rootChildIds: state.allShapes[0].childIds,
     selectedShapeIds: state.selectedShapeIds,
   }
