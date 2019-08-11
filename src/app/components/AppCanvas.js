@@ -10,7 +10,8 @@ import BoundingBox from 'core/components/svg/BoundingBox'
 import { Point } from 'core/utils/geometry'
 
 import { selectShape, addSelection, transformShape } from 'app/actions/common'
-import { shapeRegistration, CanvasShape, SelectedShapesContext } from 'app/components'
+import { CanvasShape, SelectedShapesContext } from 'app/components'
+import shapeRegistration from 'app/components/shapeRegistration'
 
 const styles = StyleSheet.create({
   shadow: {

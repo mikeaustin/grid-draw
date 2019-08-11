@@ -1,9 +1,8 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 // import { Slider } from 'react-native-elements'
 // import * as Slider from '@react-native-community/slider'
 // import Slider from "react-native-slider"
-import JsxParser from 'react-jsx-parser'
 
 import { Point } from 'core/utils/geometry'
 import { View } from 'core/components'
