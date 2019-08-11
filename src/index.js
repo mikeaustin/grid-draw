@@ -115,6 +115,11 @@ const appReducer = (state = initialState, action) => {
     case ActionTypes.SELECT_TOOL: {
       return state.merge({ selectedTool: action.payload.actionType })
     }
+    case ActionTypes.CLEAR_SELECTION: {
+      return state.merge({
+        selectedShapeIds: []
+      })
+    }
     case ActionTypes.ADD_SELECTION: {
       if (state.selectedShapeIds.includes(action.payload.id)) {
         return state.merge({
@@ -127,6 +132,10 @@ const appReducer = (state = initialState, action) => {
       }
     }
     case ActionTypes.SELECT_SHAPE: {
+      if (action.payload.id != null && !state.allShapes[action.payload.id]) {
+        return state
+      }
+
       return state.merge({
         selectedShapeIds: action.payload.id !== null ? [action.payload.id] : [],
       })
@@ -141,6 +150,28 @@ const appReducer = (state = initialState, action) => {
 }
 
 const store = createStore(appReducer)
+
+window.app = {
+  get allObjects() {
+    return store.getState().allShapes
+  },
+
+  selection: {
+    clear() {
+      store.dispatch({ type: 'tool/CLEAR_SELECTION' })
+    },
+
+    addObjectId(shapeId) {
+      store.dispatch({ type: 'tool/ADD_SELECTION', payload: { id: shapeId }})
+    }
+  },
+
+  options: {
+    toggleGrid() {
+      store.dispatch({ type: 'options/SHOW_GRID' })
+    }
+  },
+}
 
 AppRegistry.registerComponent('App', () => props => (
   <Provider store={store}>
