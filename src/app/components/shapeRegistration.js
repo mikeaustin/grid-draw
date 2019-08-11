@@ -17,6 +17,33 @@ const shapeRegistration = {
   'GridDraw.Ellipse': {
     size: ({ size }) => size,
     render: ({ position, size, selected, ...props }) => {
+      console.log('JsxParser props', props)
+
+      return (
+        <JsxParser
+          bindings={{ position, size, ...props }}
+          components={{ Ellipse }}
+          renderInWrapper={false}
+          showWarnings={true}
+          jsx={`
+            <Ellipse
+              cx={position.x + size.x / 2 + 0.5}
+              cy={position.y + size.y / 2 + 0.5}
+              rx={size.x / 2}
+              ry={size.y / 2}
+              strokeWidth={3}
+              stroke={'black'}
+              fill="#f0f0f0"
+              onStartShouldSetResponder={onStartShouldSetResponder}
+              onStartShouldSetResponderCapture={onStartShouldSetResponderCapture}
+              onMoveShouldSetResponderCapture={onMoveShouldSetResponderCapture}
+              onResponderGrant={onResponderGrant}
+              onResponderMove={onResponderMove}
+              onResponderRelease={onResponderRelease}
+            />
+          `}
+        />
+      )
       return (
         <Ellipse
           cx={position.x + size.x / 2 + 0.5}
