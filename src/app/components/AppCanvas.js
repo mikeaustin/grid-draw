@@ -7,7 +7,7 @@ import { View } from 'core/components'
 import Ruler from 'core/components/svg/Ruler'
 import Grid from 'core/components/svg/Grid'
 import BoundingBox from 'core/components/svg/BoundingBox'
-import { boundingBox } from 'core/utils/geometry'
+import { Point } from 'core/utils/geometry'
 
 import { selectShape, addSelection, transformShape } from 'app/actions/common'
 import { shapeRegistration, CanvasShape, SelectedShapesContext } from 'app/components'
@@ -54,7 +54,7 @@ class AppCanvas extends React.PureComponent {
 
   render() {
     console.log('AppCanvas()')
-    
+
     const { options } = this.props
 
     return (
@@ -65,7 +65,7 @@ class AppCanvas extends React.PureComponent {
           onResponderGrant={this.handleResponderGrant}
           style={styles.svg}
         >
-          {options.showGrid && <Grid />}
+          {options.showGrid && <Grid offset={Point(30, 30)} />}
           <CanvasShape
             shape={this.props.allShapes[0]}
             selected={false}
@@ -79,7 +79,7 @@ class AppCanvas extends React.PureComponent {
           />
           <SelectedShapesContext.Consumer>
             {selectedShapes => {
-              return <BoundingBox shapes={selectedShapes} shapeRegistration={shapeRegistration} />
+              return <BoundingBox offset={Point(30, 30)} shapes={selectedShapes} shapeRegistration={shapeRegistration} />
             }}
           </SelectedShapesContext.Consumer>
           <Ruler />

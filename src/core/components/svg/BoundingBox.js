@@ -3,7 +3,7 @@ import { G, Path } from 'react-native-svg'
 
 import { boundingBox } from 'core/utils/geometry'
 
-const BoundingBox = ({ shapes, shapeRegistration }) => {
+const BoundingBox = ({ offset, shapes, shapeRegistration }) => {
   if (shapes.size === 0) {
     return null
   }
@@ -11,7 +11,7 @@ const BoundingBox = ({ shapes, shapeRegistration }) => {
   const [position, size] = boundingBox(shapes, shapeRegistration)
 
   return (
-    <G x={30} y={30}>
+    <G x={offset.x} y={offset.y}>
       <Path
         transform={`translate(${position.x}, ${position.y})`}
         strokeWidth={3}

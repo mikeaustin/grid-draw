@@ -1,9 +1,9 @@
 import React from 'react'
 import { G, Line } from 'react-native-svg'
 
-const Grid = () => {
+const Grid = ({ offset }) => {
   return (
-    <G x={30} y={30}>
+    <G x={offset.x} y={offset.y}>
       {Array.from({length: 50}, (_, index) => (
         <React.Fragment key={index}>
           <Line
