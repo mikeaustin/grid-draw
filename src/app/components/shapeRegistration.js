@@ -125,7 +125,7 @@ const shapeRegistration = {
       ))
 
       // const tail = shape.bezierNodes2.subarray(2)
-console.log(shape.bezierNodes2.asMutable())
+
       return (
         <React.Fragment>
           <Path

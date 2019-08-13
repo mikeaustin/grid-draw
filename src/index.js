@@ -2,7 +2,7 @@ import React from 'react'
 import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import { AppRegistry } from 'react-native'
-import { pipe, take, drop, concat, mapValues } from 'lodash/fp'
+import { extend, pipe, take, drop, concat, mapValues } from 'lodash/fp'
 import Immutable from 'seamless-immutable'
 
 import './index.css';
@@ -19,7 +19,7 @@ if (process.env.NODE_ENV !== 'production') {
   // whyDidYouRender(React, { include: [/AppCanvas/] })
 }
 
-const merge = updater => value => value.merge(updater(value))
+const mergeUpdater = updater => value => value.merge(updater(value))
 const splitAt = (index, it) => [it.slice(0, index), it.slice(index)]
 
 // const reducer = (state, actions, action) => {
@@ -39,34 +39,34 @@ const shapeReducer = (allShapes, action) => {
     case ActionTypes.MOVE_SHAPE: {
       const { id, delta } = action.payload
 
-      return allShapes.update(id, merge(({ position }) => ({ position: Point.add(position, delta) })))
+      return allShapes.update(id, mergeUpdater(({ position }) => ({ position: Point.add(position, delta) })))
     }
     case ActionTypes.SCALE_SHAPE: {
       const { id, delta } = action.payload
 
-      return allShapes.update(id, merge(({ size }) => ({ size: Point.add(size, delta) })))
+      return allShapes.update(id, mergeUpdater(({ size }) => ({ size: Point.add(size, delta) })))
     }
     case ActionTypes.SET_OPACITY: {
       const { id, opacity } = action.payload
 
-      return allShapes.update(id, merge(() => ({ opacity: Math.round(opacity * 100) / 100 })))
+      return allShapes.update(id, mergeUpdater(() => ({ opacity: Math.round(opacity * 100) / 100 })))
     }
     case 'shape/SET_CORNER_RADIUS': {
       const { id, cornerRadius } = action.payload
 
-      return allShapes.update(id, merge(() => ({ cornerRadius: cornerRadius })))
+      return allShapes.update(id, mergeUpdater(() => ({ cornerRadius: cornerRadius })))
     }
     case ActionTypes.BRING_TO_FRONT: {
       const shape = allShapes[action.payload.id]
 
-      return allShapes.update(shape.parentId, merge(({ childIds }) => ({
+      return allShapes.update(shape.parentId, mergeUpdater(({ childIds }) => ({
         childIds: childIds.filter(id => id !== shape.id).concat(shape.id)
       })))
     }
     case ActionTypes.SEND_TO_BACK: {
       const shape = allShapes[action.payload.id]
 
-      return allShapes.update(shape.parentId, merge(({ childIds }) => ({
+      return allShapes.update(shape.parentId, mergeUpdater(({ childIds }) => ({
         childIds: [shape.id].concat(childIds.filter(id => id !== shape.id))
       })))
     }
@@ -96,7 +96,7 @@ const shapeReducer = (allShapes, action) => {
 
       const result = allShapes
         .set(groupId, group)
-        .update(firstShape.parentId, merge(() => ({ childIds: addedGroupIds3 })))
+        .update(firstShape.parentId, mergeUpdater(() => ({ childIds: addedGroupIds3 })))
         .update('nextShapeId', nextShapeId => nextShapeId + 1)
 
       return mapValues(shape => (
