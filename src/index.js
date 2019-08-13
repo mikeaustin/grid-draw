@@ -4,7 +4,6 @@ import { Provider } from 'react-redux'
 import { AppRegistry } from 'react-native'
 import { pipe, take, drop, concat, mapValues } from 'lodash/fp'
 import Immutable from 'seamless-immutable'
-import JsxParser from 'react-jsx-parser'
 
 import './index.css';
 import App from './App';

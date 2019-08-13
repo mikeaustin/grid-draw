@@ -1,5 +1,5 @@
 import React from 'react'
-import { G, Ellipse, Rect, Path } from 'react-native-svg'
+import { G, Line, Circle, Ellipse, Rect, Path } from 'react-native-svg'
 import JsxParser from 'react-jsx-parser'
 
 import { View, Spacer, Slider, NumericInput } from 'core/components'
@@ -109,6 +109,47 @@ const shapeRegistration = {
           fill="#f0f0f0"
           {...props}
         />
+      )
+    }
+  },
+  'GridDraw.Path': {
+    size: ({ size }) => size,
+    render: ({ position, selected, shape, ...props }) => {
+      const d = shape.bezierNodes.map((node, index) => (
+        `${index === 0 ? 'M ' : index === 1 ? 'C ' : ''}${node.x},${node.y}`
+      ))
+      console.log(d.join(' '))
+
+      const handles = shape.bezierNodes.map((node, index) => (
+        `${index === 0 ? 'M ' : index === 1 ? 'C ' : ''}${node.x},${node.y}`
+      ))
+
+      // const tail = shape.bezierNodes2.subarray(2)
+console.log(shape.bezierNodes2.asMutable())
+      return (
+        <React.Fragment>
+          <Path
+            transform={`translate(${position.x}, ${position.y})`}
+            d={d}
+            // xd={`
+            //   M ${position.x}, ${position.y}
+            //   C ${position.x - 100}, ${position.y + 200}
+            //     ${position.x + 400}, ${position.y + 200}
+            //     ${position.x + 300}, ${position.y}
+            // `}
+            strokeWidth={3}
+            stroke={'black'}
+            fill="none"
+            {...props}
+          />
+          <Line x1={position.x} y1={position.y} x2={position.x - 100} y2={position.y + 200} strokeWidth={2} stroke="rgb(33, 150, 243)" />
+          <Circle cx={position.x} cy={position.y} r={5} strokeWidth={2} fill="white" />
+          <Circle cx={position.x - 100} cy={position.y + 200} r={5} strokeWidth={2} fill="white" />
+
+          <Line x1={position.x + 300} y1={position.y} x2={position.x + 400} y2={position.y + 200} strokeWidth={2} stroke="rgb(33, 150, 243)" />
+          <Circle cx={position.x + 300} cy={position.y} r={5} strokeWidth={2} fill="white" />
+          <Circle cx={position.x + 400} cy={position.y + 200} r={5} strokeWidth={2} fill="white" />
+        </React.Fragment>
       )
     }
   },

@@ -25,14 +25,14 @@ const initialState = Immutable({
     }
   },
   allShapes: {
-    nextShapeId: 7,
+    nextShapeId: 8,
     0: {
       id: 0,
       type: 'GridDraw.Group',
       position: Point(30, 30),
       size: Point(0, 0),
       opacity: 1.0,
-      childIds: [1, 2, 3, 6],
+      childIds: [1, 2, 3, 6, 7],
     },
     1: {
       id: 1,
@@ -88,6 +88,19 @@ const initialState = Immutable({
       childIds: [],
       parentId: 0,
       cornerRadius: 10,
+    },
+    7: {
+      id: 7,
+      type: 'GridDraw.Path',
+      position: Point(200, 500),
+      size: Point(100, 100),
+      opacity: 1.0,
+      childIds: [],
+      parentId: 0,
+      bezierNodes: [
+        Point(0, 0), Point(-100, 200), Point(400, 200), Point(300, 0)
+      ],
+      bezierNodes2: new Uint16Array([0,0, -100,200, 400,200, 300,0]),
     },
   },
   selectedShapeIds: [],

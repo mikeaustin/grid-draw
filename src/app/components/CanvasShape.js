@@ -1,4 +1,5 @@
 import React from 'react'
+import { UIManager } from 'react-native'
 
 import { Point } from 'core/utils/geometry'
 import shapeRegistration from './shapeRegistration'
@@ -38,6 +39,11 @@ const NullContext = React.createContext([{
 }])
 
 class CanvasShape extends React.PureComponent {
+  componentDidMount() {
+    // console.log('>>>', UIManager.measure)
+    // UIManager.measure(this.element, a => console.log('>>>', a))
+  }
+
   handleTouchStart = event => {
     const { shape: { id }, selectedShapeIds, onSelectShape } = this.props
 
@@ -94,6 +100,7 @@ class CanvasShape extends React.PureComponent {
 
           return (
             React.createElement(shapeRegistration[shape.type].render, {
+              // elementRef: ref => this.element = ref,
               shape,
               selected,
               capture,
