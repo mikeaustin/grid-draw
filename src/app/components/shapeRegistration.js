@@ -1,6 +1,7 @@
 import React from 'react'
 import { G, Line, Circle, Ellipse, Rect, Path } from 'react-native-svg'
 import JsxParser from 'react-jsx-parser'
+import { chunk, concat } from 'lodash/fp'
 
 import { View, Spacer, Slider, NumericInput } from 'core/components'
 
@@ -118,10 +119,36 @@ const shapeRegistration = {
       const d = shape.bezierNodes.map((node, index) => (
         `${index === 0 ? 'M ' : index === 1 ? 'C ' : ''}${node.x},${node.y}`
       ))
-      console.log(d.join(' '))
 
       const handles = shape.bezierNodes.map((node, index) => (
-        `${index === 0 ? 'M ' : index === 1 ? 'C ' : ''}${node.x},${node.y}`
+        <Circle key={index} transform={`translate(${position.x}, ${position.y})`} cx={node.x} cy={node.y} r={5} strokeWidth={2} fill="white" />
+      ))
+
+      const phantomLines = chunk(3, concat(null, shape.bezierNodes))
+      const lines = phantomLines.map((nodes, index) => (
+        <React.Fragment key={index}>
+          {nodes[0] && (
+            <Line
+              transform={`translate(${position.x}, ${position.y})`}
+              x1={nodes[0].x}
+              y1={nodes[0].y}
+              x2={nodes[1].x}
+              y2={nodes[1].y}
+              strokeWidth={2}
+              stroke="rgb(33, 150, 243)"
+            />
+          )}
+          {nodes[2] && (
+            <Line
+              transform={`translate(${position.x}, ${position.y})`}
+              x1={nodes[1].x}
+              y1={nodes[1].y}
+              x2={nodes[2].x}
+              y2={nodes[2].y}
+              strokeWidth={2}
+              stroke="rgb(33, 150, 243)" />
+          )}
+        </React.Fragment>
       ))
 
       // const tail = shape.bezierNodes2.subarray(2)
@@ -131,24 +158,13 @@ const shapeRegistration = {
           <Path
             transform={`translate(${position.x}, ${position.y})`}
             d={d}
-            // xd={`
-            //   M ${position.x}, ${position.y}
-            //   C ${position.x - 100}, ${position.y + 200}
-            //     ${position.x + 400}, ${position.y + 200}
-            //     ${position.x + 300}, ${position.y}
-            // `}
             strokeWidth={3}
             stroke={'black'}
             fill="none"
             {...props}
           />
-          <Line x1={position.x} y1={position.y} x2={position.x - 100} y2={position.y + 200} strokeWidth={2} stroke="rgb(33, 150, 243)" />
-          <Circle cx={position.x} cy={position.y} r={5} strokeWidth={2} fill="white" />
-          <Circle cx={position.x - 100} cy={position.y + 200} r={5} strokeWidth={2} fill="white" />
-
-          <Line x1={position.x + 300} y1={position.y} x2={position.x + 400} y2={position.y + 200} strokeWidth={2} stroke="rgb(33, 150, 243)" />
-          <Circle cx={position.x + 300} cy={position.y} r={5} strokeWidth={2} fill="white" />
-          <Circle cx={position.x + 400} cy={position.y + 200} r={5} strokeWidth={2} fill="white" />
+          {lines}
+          {handles}
         </React.Fragment>
       )
     }

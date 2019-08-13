@@ -98,7 +98,11 @@ const initialState = Immutable({
       childIds: [],
       parentId: 0,
       bezierNodes: [
-        Point(0, 0), Point(-100, 200), Point(400, 200), Point(300, 0)
+        Point(0, 0),
+        Point(-100, 200), Point(400, 200),
+        Point(300, 0),
+        Point(350, -50), Point(-50, -50),
+        Point(0, 0),
       ],
       bezierNodes2: new Uint16Array([0,0, -100,200, 400,200, 300,0]),
     },
