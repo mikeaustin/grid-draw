@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useState, useCallback } from 'react'
 import { G, Line, Circle, Ellipse, Rect, Path } from 'react-native-svg'
+import { Point } from 'core/utils/geometry'
 import JsxParser from 'react-jsx-parser'
 import { chunk, concat } from 'lodash/fp'
+import _ from 'lodash'
 
 import { View, Spacer, Slider, NumericInput } from 'core/components'
 
@@ -11,6 +13,115 @@ const setCornerRadius = (id, cornerRadius) => {
     payload: {
       id, cornerRadius
     }
+  }
+}
+
+const CurveNode = ({ index, position, node, onDrag }) => {
+  const [touchStart, setTouchStart] = useState()
+  const [translate, setTranslate] = useState(Point(0, 0))
+
+  const handleStartShouldSetResponder = useCallback(event => true, [])
+
+  const handleResponderGrant = useCallback(event => {
+    event.preventDefault()
+
+    setTouchStart(Point(event.nativeEvent.pageX, event.nativeEvent.pageY))
+  }, [setTouchStart])
+
+  const handleResponderMove = useCallback(event => {
+    setTranslate(Point(event.nativeEvent.pageX - touchStart.x, event.nativeEvent.pageY - touchStart.y))
+
+    onDrag(
+      index,
+      Point(event.nativeEvent.pageX - touchStart.x, event.nativeEvent.pageY - touchStart.y),
+    )
+  }, [touchStart, setTranslate, onDrag])
+
+  return (
+    <Circle
+      transform={`translate(${position.x}, ${position.y})`}
+      cx={node.x + translate.x}
+      cy={node.y + translate.y}
+      r={5}
+      strokeWidth={2}
+      fill="white"
+      onStartShouldSetResponder={handleStartShouldSetResponder}
+      onResponderGrant={handleResponderGrant}
+      onResponderMove={handleResponderMove}
+    />
+  )
+}
+
+const ControlLine = ({ position, nodes, offset }) => {
+  return (
+    <Line
+      transform={`translate(${position.x}, ${position.y})`}
+      x1={nodes[offset + 0].x}
+      y1={nodes[offset + 0].y}
+      x2={nodes[offset + 1].x}
+      y2={nodes[offset + 1].y}
+      strokeWidth={2}
+      stroke="rgb(33, 150, 243)"
+    />
+  )
+}
+
+class PathObject extends React.PureComponent {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      bezierNodeOffsets: Array.from({length: props.shape.bezierNodes.length}, () => Point(0, 0)),
+    }
+  }
+
+  handleDrag = (nodeIndex, newOffset) => {
+    console.log(nodeIndex, newOffset)
+    this.setState(state => ({
+      bezierNodeOffsets: state.bezierNodeOffsets.map((offset, index) => (
+        index === nodeIndex ? Point(this.props.shape.bezierNodes[index].x + newOffset.x, this.props.shape.bezierNodes[index].y + newOffset.y) : offset
+      ))
+    }))
+  }
+
+  render() {
+    const { position, selected, shape, ...props } = this.props
+
+    const d = shape.bezierNodes.map((node, index) => {
+      const offset = this.state.bezierNodeOffsets[index]
+
+      return (
+        `${index === 0 ? 'M ' : index === 1 ? 'C ' : ''}${node.x + offset.x},${node.y + offset.y}`
+      )
+    }).join(' ')
+
+    const bezierNodes = _(null).concat(shape.bezierNodes).concat(null).chunk(3)
+
+    const lines = bezierNodes.map((nodes, index) => (
+      <React.Fragment key={index}>
+        {nodes[0] && <ControlLine position={position} nodes={nodes} offset={0} />}
+        {nodes[2] && <ControlLine position={position} nodes={nodes} offset={1} />}
+      </React.Fragment>
+    )).value()
+
+    const handles = bezierNodes.map((nodes, index) => (
+      <CurveNode key={index} index={index} position={position} node={nodes[1]} onDrag={this.handleDrag} />
+    )).value()
+
+    return (
+      <React.Fragment>
+        <Path
+          transform={`translate(${position.x}, ${position.y})`}
+          d={d}
+          strokeWidth={3}
+          stroke={'black'}
+          fill="none"
+          {...props}
+        />
+        {lines}
+        {handles}
+      </React.Fragment>
+    )
   }
 }
 
@@ -115,59 +226,7 @@ const shapeRegistration = {
   },
   'GridDraw.Path': {
     size: ({ size }) => size,
-    render: ({ position, selected, shape, ...props }) => {
-      const d = shape.bezierNodes.map((node, index) => (
-        `${index === 0 ? 'M ' : index === 1 ? 'C ' : ''}${node.x},${node.y}`
-      ))
-
-      const handles = shape.bezierNodes.map((node, index) => (
-        <Circle key={index} transform={`translate(${position.x}, ${position.y})`} cx={node.x} cy={node.y} r={5} strokeWidth={2} fill="white" />
-      ))
-
-      const phantomLines = chunk(3, concat(null, shape.bezierNodes))
-      const lines = phantomLines.map((nodes, index) => (
-        <React.Fragment key={index}>
-          {nodes[0] && (
-            <Line
-              transform={`translate(${position.x}, ${position.y})`}
-              x1={nodes[0].x}
-              y1={nodes[0].y}
-              x2={nodes[1].x}
-              y2={nodes[1].y}
-              strokeWidth={2}
-              stroke="rgb(33, 150, 243)"
-            />
-          )}
-          {nodes[2] && (
-            <Line
-              transform={`translate(${position.x}, ${position.y})`}
-              x1={nodes[1].x}
-              y1={nodes[1].y}
-              x2={nodes[2].x}
-              y2={nodes[2].y}
-              strokeWidth={2}
-              stroke="rgb(33, 150, 243)" />
-          )}
-        </React.Fragment>
-      ))
-
-      // const tail = shape.bezierNodes2.subarray(2)
-
-      return (
-        <React.Fragment>
-          <Path
-            transform={`translate(${position.x}, ${position.y})`}
-            d={d}
-            strokeWidth={3}
-            stroke={'black'}
-            fill="none"
-            {...props}
-          />
-          {lines}
-          {handles}
-        </React.Fragment>
-      )
-    }
+    render: PathObject,
   },
   'GridDraw.Group': {
     size: ({ size }) => size,
