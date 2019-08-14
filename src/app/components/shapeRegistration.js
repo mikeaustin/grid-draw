@@ -71,7 +71,7 @@ class PathObject extends React.PureComponent {
     super(props)
 
     this.state = {
-      bezierNodeOffsets: Array.from({length: props.shape.bezierNodes.length}, () => Point(0, 0)),
+      bezierNodeOffsets: Array.from({ length: props.shape.bezierNodes.length }, () => Point(0, 0)),
     }
   }
 
@@ -79,13 +79,19 @@ class PathObject extends React.PureComponent {
     console.log(nodeIndex, newOffset)
     this.setState(state => ({
       bezierNodeOffsets: state.bezierNodeOffsets.map((offset, index) => (
-        index === nodeIndex ? Point(this.props.shape.bezierNodes[index].x + newOffset.x, this.props.shape.bezierNodes[index].y + newOffset.y) : offset
+        index === nodeIndex
+          ? Point(
+            this.props.shape.bezierNodes[index].x + newOffset.x,
+            this.props.shape.bezierNodes[index].y + newOffset.y
+          )
+          : offset
       ))
     }))
   }
 
   render() {
     const { position, selected, shape, ...props } = this.props
+    console.log(shape.bezierNodes2)
 
     const d = shape.bezierNodes.map((node, index) => {
       const offset = this.state.bezierNodeOffsets[index]
@@ -189,7 +195,7 @@ const shapeRegistration = {
   },
   'GridDraw.RoundRect': {
     size: ({ size }) => size,
-    design: ({id, shape: { cornerRadius }, dispatch}) => {
+    design: ({ id, shape: { cornerRadius }, dispatch }) => {
       const handleValueChange = newCornerRadius => dispatch(setCornerRadius(id, newCornerRadius * 50))
       const handleSubmit = newCornerRadius => dispatch(setCornerRadius(id, newCornerRadius))
 

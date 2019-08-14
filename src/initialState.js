@@ -104,7 +104,7 @@ const initialState = Immutable({
         Point(250, 100), Point(350, 100),
         Point(400, 0),
       ],
-      bezierNodes2: new Uint16Array([0,0, -100,200, 400,200, 300,0]),
+      bezierNodes2: new Uint16Array([0,0, 50,-100, 150,-100, 200,0, 250,100, 350,100, 400,0]),
     },
   },
   selectedShapeIds: [],
